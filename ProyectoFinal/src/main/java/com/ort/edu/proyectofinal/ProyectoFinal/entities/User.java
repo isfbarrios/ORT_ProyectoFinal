@@ -1,17 +1,17 @@
-package com.ort.edu.proyectofinal.entities;
+package com.ort.edu.proyectofinal.ProyectoFinal.entities;
 
 import jakarta.persistence.*;
 
 import java.util.Date;
 
 @Entity
-@Table(name = "users")
+@Table(name = "Users")
 public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "UserId")
     private int userId;
-
     @Column(name = "Name")
     private String name;
     @Column(name = "Surname")
