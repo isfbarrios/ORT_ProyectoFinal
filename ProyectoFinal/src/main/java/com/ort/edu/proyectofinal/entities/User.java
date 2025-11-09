@@ -1,11 +1,11 @@
-package com.ort.edu.proyectofinal.ProyectoFinal.entities;
+package com.ort.edu.proyectofinal.entities;
 
 import jakarta.persistence.*;
 
 import java.util.Date;
 
 @Entity
-@Table(name = "Users")
+@Table(name = "users")
 public class User {
 
     @Id

@@ -1,7 +1,7 @@
-package com.ort.edu.proyectofinal.ProyectoFinal.controllers;
+package com.ort.edu.proyectofinal.controllers;
 
-import com.ort.edu.proyectofinal.ProyectoFinal.entities.User;
-import com.ort.edu.proyectofinal.ProyectoFinal.repositories.UserRepository;
+import com.ort.edu.proyectofinal.entities.User;
+import com.ort.edu.proyectofinal.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
