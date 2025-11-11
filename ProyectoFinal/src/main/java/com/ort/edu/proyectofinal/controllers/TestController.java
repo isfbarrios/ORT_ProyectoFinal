@@ -15,7 +15,7 @@ public class TestController {
     private UserRepository repo;
 
     @GetMapping("/usuarios")
-    public List<User> getUsers() {
-        return repo.findAll();
+    public User getUsers() {
+        return repo.findByUsername("admin");
     }
 }

@@ -1,5 +1,5 @@
 const KEY = "auth"; // --> luego lo voy a sustituir con lo que me pase springboot
-
+const BASE_URL = "http://localhost:8080";
 export function saveAuth(auth) {
   localStorage.setItem(KEY, JSON.stringify(auth));
 }
@@ -15,34 +15,20 @@ export function clearAuth() {
   localStorage.removeItem(KEY);
 }
 
+
 // MOCK login (luego lo vamos a remplazar por fetch al backend)
 export async function loginApi({ email, password }) {
-  await new Promise(r => setTimeout(r, 600)); // simula latencia
-  if (!email || !password) {
-    const error = new Error("Credenciales incompletas");
-    error.status = 400;
-    throw error;
-  }
+  console.log('email', email);
+  console.log('password', password);
+  const res = await fetch(BASE_URL + "/api/users/login", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      mail: email,
+      password: password
+    })
+  });
 
-  // Demo: va acepta cualquier email/pass
-  return { token: "fake-jwt-token", user: { id: 1, email } };
-
-
-  /*
-
-    cuando conectemos con springboot loginApi =>
-
-    const res = await fetch("http://localhost:8080/api/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
-    });
-
-    const data = await res.json();
-    return data;
-
-  */
-
-
- 
+  const data = await res.json();
+  return data;
 }

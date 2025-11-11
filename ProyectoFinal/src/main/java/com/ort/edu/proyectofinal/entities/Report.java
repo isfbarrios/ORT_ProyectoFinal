@@ -1,34 +1,32 @@
 package com.ort.edu.proyectofinal.entities;
 
 import jakarta.persistence.*;
-import jakarta.persistence.Table;
 import org.hibernate.annotations.ColumnDefault;
 import jakarta.persistence.Table;
-
 import java.time.Instant;
 
 @Entity
-@Table(name = "users", schema = "proyectofinal")
-public class User {
+@Table(name = "reports", schema = "proyectofinal")
+public class Report {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "UserId", nullable = false)
+    @Column(name = "ReportId", nullable = false)
     private Integer id;
 
-    @Column(name = "Name", nullable = false, length = 100)
+    @Column(name = "Name", nullable = false, length = 120)
     private String name;
 
-    @Column(name = "Surname", nullable = false, length = 100)
-    private String surname;
+    @Lob
+    @Column(name = "Description")
+    private String description;
 
-    @Column(name = "Mail", nullable = false, length = 150)
-    private String mail;
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "StateId", nullable = false)
+    private Reportstate state;
 
-    @Column(name = "Username", nullable = false, length = 100)
-    private String username;
-
-    @Column(name = "Password", nullable = false)
-    private String password;
+    @Lob
+    @Column(name = "Query", nullable = false)
+    private String query;
 
     @ColumnDefault("current_timestamp()")
     @Column(name = "CreatedDate", nullable = false)
@@ -54,36 +52,28 @@ public class User {
         this.name = name;
     }
 
-    public String getSurname() {
-        return surname;
+    public String getDescription() {
+        return description;
     }
 
-    public void setSurname(String surname) {
-        this.surname = surname;
+    public void setDescription(String description) {
+        this.description = description;
     }
 
-    public String getMail() {
-        return mail;
+    public Reportstate getState() {
+        return state;
     }
 
-    public void setMail(String mail) {
-        this.mail = mail;
+    public void setState(Reportstate state) {
+        this.state = state;
     }
 
-    public String getUsername() {
-        return username;
+    public String getQuery() {
+        return query;
     }
 
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
+    public void setQuery(String query) {
+        this.query = query;
     }
 
     public Instant getCreatedDate() {

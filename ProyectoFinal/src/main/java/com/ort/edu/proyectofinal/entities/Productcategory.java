@@ -4,19 +4,15 @@ import jakarta.persistence.*;
 import jakarta.persistence.Table;
 
 @Entity
-@Table(name = "groups", schema = "proyectofinal")
-public class Group {
+@Table(name = "productcategory", schema = "proyectofinal")
+public class Productcategory {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "GroupId", nullable = false)
+    @Column(name = "CategoryId", nullable = false)
     private Integer id;
 
     @Column(name = "Name", nullable = false, length = 100)
     private String name;
-
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "GroupStateId", nullable = false)
-    private Groupstate groupState;
 
     public Integer getId() {
         return id;
@@ -32,14 +28,6 @@ public class Group {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public Groupstate getGroupState() {
-        return groupState;
-    }
-
-    public void setGroupState(Groupstate groupState) {
-        this.groupState = groupState;
     }
 
 }

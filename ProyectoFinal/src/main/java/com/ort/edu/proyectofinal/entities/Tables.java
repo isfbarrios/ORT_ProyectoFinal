@@ -1,34 +1,27 @@
 package com.ort.edu.proyectofinal.entities;
 
 import jakarta.persistence.*;
-import jakarta.persistence.Table;
 import org.hibernate.annotations.ColumnDefault;
-import jakarta.persistence.Table;
 
 import java.time.Instant;
 
 @Entity
-@Table(name = "users", schema = "proyectofinal")
-public class User {
+@jakarta.persistence.Table(name = "`table`", schema = "proyectofinal")
+public class Tables {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "UserId", nullable = false)
+    @Column(name = "TableId", nullable = false)
     private Integer id;
 
-    @Column(name = "Name", nullable = false, length = 100)
+    @Column(name = "Name", nullable = false, length = 50)
     private String name;
 
-    @Column(name = "Surname", nullable = false, length = 100)
-    private String surname;
+    @Lob
+    @Column(name = "Description")
+    private String description;
 
-    @Column(name = "Mail", nullable = false, length = 150)
-    private String mail;
-
-    @Column(name = "Username", nullable = false, length = 100)
-    private String username;
-
-    @Column(name = "Password", nullable = false)
-    private String password;
+    @Column(name = "ChairsAmount", nullable = false)
+    private Integer chairsAmount;
 
     @ColumnDefault("current_timestamp()")
     @Column(name = "CreatedDate", nullable = false)
@@ -54,36 +47,20 @@ public class User {
         this.name = name;
     }
 
-    public String getSurname() {
-        return surname;
+    public String getDescription() {
+        return description;
     }
 
-    public void setSurname(String surname) {
-        this.surname = surname;
+    public void setDescription(String description) {
+        this.description = description;
     }
 
-    public String getMail() {
-        return mail;
+    public Integer getChairsAmount() {
+        return chairsAmount;
     }
 
-    public void setMail(String mail) {
-        this.mail = mail;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
+    public void setChairsAmount(Integer chairsAmount) {
+        this.chairsAmount = chairsAmount;
     }
 
     public Instant getCreatedDate() {
