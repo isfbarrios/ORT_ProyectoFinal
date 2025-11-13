@@ -1,3 +1,10 @@
-export default function Home(){
-    return <h2>Home </h2>;
+
+
+export default function Home() {
+  return (
+    <div className="container mt-5">
+      <h3>Home</h3>
+      
+    </div>
+  );
 }

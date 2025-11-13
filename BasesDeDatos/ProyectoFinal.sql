@@ -423,3 +423,13 @@ CREATE TABLE Reports (
 ) ENGINE=InnoDB;
 
 SET FOREIGN_KEY_CHECKS = 1;
+
+
+select * from userstate u;
+
+insert into userstate (name) values('Activo');
+
+INSERT INTO proyectofinal.users
+(name, surname, mail, username, Password, UserStateId, CreatedDate, LastUpdate)
+values
+('Usuario', 'Administrador', 'fabribarrios@hotmail.com', 'admin', 'pass1234', 1, current_timestamp(), current_timestamp());

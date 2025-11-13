@@ -1,146 +1,76 @@
+import { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { clearAuth, getAuth } from "../services/auth";
 import { useNavigate } from "react-router-dom";
-import React, { useState } from "react";
+
+import Board from "../components/Board";
+
+import {
+  setBoard,
+  setLoading,
+  setError,
+} from "../redux/features/dashboardSlice";
+
+import { fetchBoardFromApi } from "../services/dashboardService";
 
 export default function Dashboard() {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+
   const auth = getAuth();
+  const { isLoading, error } = useSelector((state) => state.dashboard);
 
-  //Si no tiene permisos, lo llevo al login o home
-  if (!auth && !auth.user) {
-    clearAuth();
-    navigate("/login", { replace: true });  
-  }
+  // Validación de autenticación
+  useEffect(() => {
 
-  const [columns, setColumns] = useState({
-    pendiente: [
-        { id: 1, title: "Pedido #1" },
-        { id: 2, title: "Pedido #2" }
-    ],
-    proceso: [],
-    entregado: []
-  });
+    //if (!auth || !auth.user) {
+      clearAuth();
+      navigate("/login", { replace: true });
+    //}
 
-  const onDragStart = (e, item, fromColumn) => {
-    e.dataTransfer.setData("itemId", item.id);
-    e.dataTransfer.setData("fromColumn", fromColumn);
-  };
+  }, [auth, navigate]);
 
-  const onDrop = (e, toColumn) => {
-    const itemId = parseInt(e.dataTransfer.getData("itemId"));
-    const fromColumn = e.dataTransfer.getData("fromColumn");
+  // Cargar tablero desde backend
+  useEffect(() => {
+    async function cargarTablero() {
+      try {
+        dispatch(setLoading(true));
 
-    // Si el drop es dentro de la misma columna → no hacemos nada
-    if (fromColumn === toColumn) return;
+        const data = await fetchBoardFromApi(); // cuando habilitemos el token va en los parametros
+        dispatch(setBoard(data));
 
-    const item = columns[fromColumn].find(i => i.id === itemId);
+      } catch (err) {
+        dispatch(setError(err.message));
 
-    // Si no existe
-    if (!item) return;
+      } finally {
+        dispatch(setLoading(false));
+      }
+    }
 
-    // Quitarlo de la columna original
-    const updatedFrom = columns[fromColumn].filter(i => i.id !== itemId);
+    cargarTablero();
 
-    // Agregarlo a la columna destino
-    const updatedTo = [...columns[toColumn], item];
+  }, [dispatch]);
 
-    setColumns({
-      ...columns,
-      [fromColumn]: updatedFrom,
-      [toColumn]: updatedTo
-    });
-  };
-
-  const allowDrop = (e) => {
-    e.preventDefault();
-  };
-
-  const columnStyle = {
-    minHeight: "300px",
-    background: "#f8f9fa",
-    padding: "10px",
-    borderRadius: "8px",
-    border: "1px solid #dee2e6"
-  };
-
-  /*
   return (
-    <div className="container">
-      <h2>Dashboard</h2>
-      <p className="text-muted">Bienvenido {auth?.user?.email}</p>
-      <button className="btn btn-outline-danger" onClick={handleLogout}>
-        Cerrar sesión
-      </button>
-    </div>
-  );
-  */
-  return (
-    <div className="container py-4">
-        <h2 className="mb-4">Panel de Pedidos (Cocina)</h2>
-        <div className="row">
-            {/* Pendiente */}
-            <div className="col-md-4">
-                <h4>Pendiente</h4>
-                <div
-                    style={columnStyle}
-                    onDrop={e => onDrop(e, "pendiente")}
-                    onDragOver={allowDrop}
-                >
-                    {columns.pendiente.map(item => (
-                        <div
-                            key={item.id}
-                            className="card mb-3 p-2"
-                            draggable
-                            onDragStart={e => onDragStart(e, item, "pendiente")}
-                        >
-                            {item.title}
-                        </div>
-                    ))}
-                </div>
-            </div>
+  <div className="container-fluid py-4" style={{ minHeight: "100vh" }}>
+    <h2 className="mb-4">Panel de Pedidos</h2>
 
-            {/* En proceso */}
-            <div className="col-md-4">
-                <h4>En proceso</h4>
-                <div
-                    style={columnStyle}
-                    onDrop={e => onDrop(e, "proceso")}
-                    onDragOver={allowDrop}
-                >
-                    {columns.proceso.map(item => (
-                        <div
-                            key={item.id}
-                            className="card mb-3 p-2"
-                            draggable
-                            onDragStart={e => onDragStart(e, item, "proceso")}
-                        >
-                            {item.title}
-                        </div>
-                    ))}
-                </div>
-            </div>
+    {isLoading && <p>Cargando tablero...</p>}
+    {error && <p className="text-danger">{error}</p>}
 
-            {/* Entregado */}
-            <div className="col-md-4">
-                <h4>Entregado</h4>
-                <div
-                    style={columnStyle}
-                    onDrop={e => onDrop(e, "entregado")}
-                    onDragOver={allowDrop}
-                >
-                    {columns.entregado.map(item => (
-                        <div
-                            key={item.id}
-                            className="card mb-3 p-2"
-                            draggable
-                            onDragStart={e => onDragStart(e, item, "entregado")}
-                        >
-                            {item.title}
-                        </div>
-                    ))}
-                </div>
-            </div>
-        </div>
+ 
+    <div
+      className="p-3"
+      style={{
+        background: "#ffffff",
+        borderRadius: "10px",
+        border: "1px solid #ddd",
+        minHeight: "75vh",
+        overflowX: "auto",
+      }}
+    >
+      <Board />
     </div>
-  );
+  </div>
+);
 }
