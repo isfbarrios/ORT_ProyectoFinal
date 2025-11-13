@@ -1,5 +1,6 @@
 package com.ort.edu.proyectofinal.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import org.hibernate.annotations.ColumnDefault;
 import jakarta.persistence.Table;
@@ -8,6 +9,7 @@ import java.time.Instant;
 
 @Entity
 @Table(name = "customer", schema = "proyectofinal")
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Customer {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -16,6 +18,7 @@ public class Customer {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "SessionId")
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private Session session;
 
     @ColumnDefault("current_timestamp()")
@@ -24,6 +27,7 @@ public class Customer {
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "StateId", nullable = false)
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private Customerstate state;
 
     @ColumnDefault("current_timestamp()")

@@ -1,5 +1,6 @@
 package com.ort.edu.proyectofinal.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import jakarta.persistence.Table;
 import org.hibernate.annotations.OnDelete;
@@ -7,6 +8,7 @@ import org.hibernate.annotations.OnDeleteAction;
 
 @Entity
 @Table(name = "tableavailability", schema = "proyectofinal")
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Tableavailability {
     @EmbeddedId
     private TableavailabilityId id;
@@ -15,10 +17,12 @@ public class Tableavailability {
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "TableId", nullable = false)
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private Tables table;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "StateId", nullable = false)
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private Tablestate state;
 
     public TableavailabilityId getId() {

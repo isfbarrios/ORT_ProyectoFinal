@@ -1,5 +1,6 @@
 package com.ort.edu.proyectofinal.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.OnDelete;
@@ -10,6 +11,7 @@ import java.time.Instant;
 
 @Entity
 @Table(name = "orderinprogress", schema = "proyectofinal")
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Orderinprogress {
     @EmbeddedId
     private OrderinprogressId id;
@@ -18,11 +20,13 @@ public class Orderinprogress {
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "OrderId", nullable = false)
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private Order order;
 
     @MapsId("stepId")
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "StepId", nullable = false)
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private Progressstep step;
 
     @ColumnDefault("current_timestamp()")

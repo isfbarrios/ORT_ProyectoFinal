@@ -1,10 +1,12 @@
 package com.ort.edu.proyectofinal.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "groups", schema = "proyectofinal")
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Group {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -16,6 +18,7 @@ public class Group {
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "GroupStateId", nullable = false)
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private Groupstate groupState;
 
     public Integer getId() {

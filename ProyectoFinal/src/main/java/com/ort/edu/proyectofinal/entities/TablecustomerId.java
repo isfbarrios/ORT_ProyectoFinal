@@ -1,5 +1,6 @@
 package com.ort.edu.proyectofinal.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import org.hibernate.Hibernate;
@@ -8,6 +9,7 @@ import java.io.Serializable;
 import java.util.Objects;
 
 @Embeddable
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class TablecustomerId implements Serializable {
     private static final long serialVersionUID = 7468013144321986675L;
     @Column(name = "TableId", nullable = false)

@@ -1,10 +1,12 @@
 package com.ort.edu.proyectofinal.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "cartstate", schema = "proyectofinal")
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Cartstate {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

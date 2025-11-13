@@ -1,5 +1,6 @@
 package com.ort.edu.proyectofinal.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.OnDelete;
@@ -10,6 +11,7 @@ import java.math.BigDecimal;
 
 @Entity
 @Table(name = "menuitemhasvariant", schema = "proyectofinal")
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Menuitemhasvariant {
     @EmbeddedId
     private MenuitemhasvariantId id;
@@ -18,11 +20,13 @@ public class Menuitemhasvariant {
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "MenuItemId", nullable = false)
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private Menuitem menuItem;
 
     @MapsId("variantId")
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "VariantId", nullable = false)
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private Menuitemvariant variant;
 
     @ColumnDefault("0.00")

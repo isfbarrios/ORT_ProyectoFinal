@@ -1,5 +1,6 @@
 package com.ort.edu.proyectofinal.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import org.hibernate.annotations.ColumnDefault;
 
@@ -7,6 +8,7 @@ import java.time.Instant;
 
 @Entity
 @jakarta.persistence.Table(name = "`table`", schema = "proyectofinal")
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Tables {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

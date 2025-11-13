@@ -1,5 +1,6 @@
 package com.ort.edu.proyectofinal.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import org.hibernate.annotations.ColumnDefault;
 import jakarta.persistence.Table;
@@ -8,6 +9,7 @@ import java.time.Instant;
 
 @Entity
 @Table(name = "`order`", schema = "proyectofinal")
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Order {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -26,14 +28,17 @@ public class Order {
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "StateId", nullable = false)
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private Orderstate state;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "CanalId", nullable = false)
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private Ordercanal canal;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "PaymentTypeId")
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private Paymenttype paymentType;
 
     @Lob

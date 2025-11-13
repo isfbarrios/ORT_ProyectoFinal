@@ -1,5 +1,6 @@
 package com.ort.edu.proyectofinal.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import org.hibernate.annotations.ColumnDefault;
 
@@ -8,6 +9,7 @@ import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "menuitemvariant", schema = "proyectofinal")
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Menuitemvariant {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
