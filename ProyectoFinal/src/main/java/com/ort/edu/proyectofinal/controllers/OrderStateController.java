@@ -24,7 +24,7 @@ public class OrderStateController {
     private OrderStateRepository repo;
 
     @GetMapping("/{id}")
-    public ResponseEntity<OrderStateDTO> getUser(@PathVariable int id) {
+    public ResponseEntity<OrderStateDTO> get(@PathVariable int id) {
         Optional<Orderstate> optionalOrderState = repo.findById(id);
 
         if (optionalOrderState.isEmpty()) {
@@ -35,7 +35,7 @@ public class OrderStateController {
     }
 
     @GetMapping
-    public ResponseEntity<List<OrderStateDTO>> getAllUsers() {
+    public ResponseEntity<List<OrderStateDTO>> getAll() {
         List<OrderStateDTO> states = repo.findAll()
                 .stream()
                 .map(OrderStateDTO::new)

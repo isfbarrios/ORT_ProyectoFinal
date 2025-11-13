@@ -1,13 +1,18 @@
 package com.ort.edu.proyectofinal.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.ort.edu.proyectofinal.entities.Orderstate;
 
 import java.util.Objects;
 
 public class OrderStateDTO {
 
+    @JsonProperty("id")
     private Integer id;
+    @JsonProperty("title")
     private String name;
+    @JsonIgnore
     private String description;
 
     public OrderStateDTO() {}
