@@ -22,7 +22,7 @@ public class CartController {
     private CartRepository repo;
 
     @GetMapping("/{id}")
-    public ResponseEntity<CartDTO> getUser(@PathVariable int id) {
+    public ResponseEntity<CartDTO> get(@PathVariable int id) {
         Optional<Cart> optionalCart = repo.findById(id);
 
         if (optionalCart.isEmpty()) {
@@ -33,7 +33,7 @@ public class CartController {
     }
 
     @GetMapping
-    public ResponseEntity<List<CartDTO>> getAllUsers() {
+    public ResponseEntity<List<CartDTO>> getAll() {
         List<CartDTO> carts = repo.findAll()
                 .stream()
                 .map(CartDTO::new)
