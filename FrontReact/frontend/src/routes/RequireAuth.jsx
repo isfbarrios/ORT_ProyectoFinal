@@ -5,11 +5,10 @@ export default function RequireAuth() {
   const auth = getAuth();
   const location = useLocation();
 
-  if (!auth) {
-    // Si no hay sesión guardada, redirige al login
+  // Si no hay auth, o isLogged !== true → fuera
+  if (!auth?.isLogged) {
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
-  // Si está logueado, deja continuar
   return <Outlet />;
 }

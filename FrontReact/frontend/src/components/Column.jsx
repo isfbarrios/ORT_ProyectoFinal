@@ -1,36 +1,61 @@
-// src/components/dashboard/Column.jsx
 import { useDispatch, useSelector } from "react-redux";
 import { moveOrder } from "../redux/features/dashboardSlice";
-
 import OrderCard from "./OrderCard";
+import Swal from "sweetalert2";
+import { updateOrderState } from "../services/orderService"; // POST del backend
 
 export default function Column({ column }) {
   const dispatch = useDispatch();
-  const { orders } = useSelector((state) => state.dashboard);
+  const ordersById = useSelector((state) => state.dashboard.orders);
 
-  const handleDrop = (e) => {
+  const handleDrop = async (e) => {
     e.preventDefault();
 
-    const orderId = e.dataTransfer.getData("orderId");
-    const sourceColId = e.dataTransfer.getData("sourceColId");
+    const orderIdStr = e.dataTransfer.getData("orderId");
+    const sourceColIdStr = e.dataTransfer.getData("sourceColId");
 
-    if (!orderId || !sourceColId) return;
+    if (!orderIdStr || !sourceColIdStr) return;
 
-    // Calcular posición aproximada
-    const rect = e.currentTarget.getBoundingClientRect();
-    const mouseY = e.clientY - rect.top;
-    const cardHeight = 80;
-    const index = Math.floor(mouseY / cardHeight);
+    const orderId = Number(orderIdStr);
+    const sourceColId = Number(sourceColIdStr);
+    const targetColId = Number(column.id);
 
+    // 1) Mover en el front inmediatamente (UX instantáneo)
     dispatch(
       moveOrder({
-        orderId: Number(orderId),
+        orderId,
         sourceColId,
-        targetColId: column.id,
-        targetIndex: index,
+        targetColId,
       })
     );
+
+    try {
+      // 2) Actualizar en backend con POST (tu elección)
+      await updateOrderState(orderId, targetColId);
+
+      console.log(`Estado del pedido #${orderId} actualizado a columna ${targetColId}`);
+      
+    } catch (error) {
+      console.error("Error backend:", error);
+
+      // 3) Revertir cambio en el front si el backend falla
+      dispatch(
+        moveOrder({
+          orderId,
+          sourceColId: targetColId, // revertimos
+          targetColId: sourceColId,
+        })
+      );
+
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: "No se pudo actualizar el estado del pedido",
+      });
+    }
   };
+
+  const orderIds = column.orderIds || [];
 
   return (
     <div
@@ -42,9 +67,18 @@ export default function Column({ column }) {
       <h5 className="mb-3 text-center">{column.title}</h5>
 
       <div className="d-flex flex-column gap-2">
-        {column.orderIds.map((id) => (
-          <OrderCard key={id} order={orders[id]} columnId={column.id} />
-        ))}
+        {orderIds.map((id) => {
+          const order = ordersById[id];
+          if (!order) return null;
+
+          return (
+            <OrderCard
+              key={id}
+              order={order}
+              columnId={column.id}
+            />
+          );
+        })}
       </div>
     </div>
   );

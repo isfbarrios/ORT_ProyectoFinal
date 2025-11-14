@@ -1,7 +1,15 @@
 import { createSlice } from "@reduxjs/toolkit";
 
+// Columnas fijas del tablero
+const BASE_COLUMNS = [
+  { id: 1, title: "Pendiente" },
+  { id: 2, title: "En preparacion" },
+  { id: 3, title: "Listo" },
+  { id: 4, title: "Entregado" },
+];
+
 const initialState = {
-  columns: [],       // vienen del back
+  columns: [],       // columnas del tablero (a partir de BASE_COLUMNS)
   orders: {},        // { [id]: pedido }
   isLoading: false,
   error: null,
@@ -11,55 +19,91 @@ const dashboardSlice = createSlice({
   name: "dashboard",
   initialState,
   reducers: {
+    // Recibe directamente el array de pedidos que viene del backend
+    setBoard: (state, action) => {
+      const ordersArray = action.payload || [];
 
-     setBoard: (state, action) => {
-      // espero recibir 
-      const { columns, orders } = action.payload;
-    
-      // como vienen del back
-      state.columns = columns || [];
-
-        state.orders = {};
-      (orders || []).forEach((o) => {
+      //  Guardar pedidos en un objeto indexado por id
+      state.orders = {};
+      ordersArray.forEach((o) => {
         state.orders[o.id] = o;
       });
+
+      //  Construir columnas fijas + orderIds según cartState.id
+      state.columns = BASE_COLUMNS.map((col) => ({
+        ...col,
+        orderIds: ordersArray
+          .filter((o) => o.cartState?.id === col.id)
+          .map((o) => o.id),
+      }));
+
     },
 
-    // para refresacra solo los pedidos 
+    // Para refrescar solo pedidos, pero manteniendo la lógica de columnas fijas
     setOrders: (state, action) => {
+      const ordersArray = action.payload || [];
 
       state.orders = {};
-      (action.payload || []).forEach((o) => {
+      ordersArray.forEach((o) => {
         state.orders[o.id] = o;
       });
+
+      state.columns = BASE_COLUMNS.map((col) => ({
+        ...col,
+        orderIds: ordersArray
+          .filter((o) => o.cartState?.id === col.id)
+          .map((o) => o.id),
+      }));
     },
 
-     // mover pedido entre columnas (drag & drop)
+    // mover pedido entre columnas (drag & drop) solo a nivel front
     moveOrder: (state, action) => {
-    const { orderId, sourceColId, targetColId } = action.payload;
+    let { orderId, sourceColId, targetColId } = action.payload;
 
-    // Busco el pedido
+    // Fuerzo todo a número por las dudas
+    orderId = Number(orderId);
+    sourceColId = Number(sourceColId);
+    targetColId = Number(targetColId);
+
     const order = state.orders[orderId];
     if (!order) return;
 
-    // Busco la columna origen y destino
-    const sourceCol = state.columns.find(col => col.id === sourceColId);
-    const targetCol = state.columns.find(col => col.id === targetColId);
+    const sourceCol = state.columns.find(
+        (col) => Number(col.id) === sourceColId
+    );
+    const targetCol = state.columns.find(
+        (col) => Number(col.id) === targetColId
+    );
+
     if (!sourceCol || !targetCol) return;
 
-    // Saco el pedido de la columna origen
-    sourceCol.orderIds = sourceCol.orderIds.filter(id => id !== orderId);
+    // Quitar de origen
+    sourceCol.orderIds = (sourceCol.orderIds || []).filter(
+        (id) => Number(id) !== orderId
+    );
 
-    // Lo agrego al final de la columna destino
-    targetCol.orderIds.push(orderId);
+    // Agregar a destino
+    if (!targetCol.orderIds) {
+        targetCol.orderIds = [];
+    }
+    if (!targetCol.orderIds.some((id) => Number(id) === orderId)) {
+        targetCol.orderIds.push(orderId);
+    }
 
-    //  Actualizo el estado del pedido
-    order.status = targetColId;
-    },
+    // Actualizar el "estado" del pedido en memoria
+    if (order.cartState) {
+        order.cartState = {
+        ...order.cartState,
+        id: targetColId,
+        };
+    } else {
+        order.cartState = { id: targetColId };
+    }
+},
+
 
     updateOrder: (state, action) => {
       const { id, changes } = action.payload || {};
-
       if (!id || !changes) return;
       if (!state.orders[id]) return;
 
@@ -73,18 +117,15 @@ const dashboardSlice = createSlice({
       state.isLoading = action.payload;
     },
 
-
-      setError: (state, action) => {
+    setError: (state, action) => {
       state.error = action.payload;
     },
 
     resetDashboard: () => initialState,
+  },
+});
 
-  }
-
-  });
-
-  export const {
+export const {
   setBoard,
   setOrders,
   moveOrder,

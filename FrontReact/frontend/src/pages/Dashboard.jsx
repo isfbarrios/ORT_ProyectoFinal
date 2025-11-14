@@ -21,35 +21,36 @@ export default function Dashboard() {
   const { isLoading, error } = useSelector((state) => state.dashboard);
 
   // Validación de autenticación
+  // Validación de autenticación
   useEffect(() => {
 
-    //if (!auth || !auth.user) {
+    if (!auth?.isLogged) {
       clearAuth();
       navigate("/login", { replace: true });
-    //}
 
+    }
   }, [auth, navigate]);
+
 
   // Cargar tablero desde backend
   useEffect(() => {
+    
     async function cargarTablero() {
       try {
         dispatch(setLoading(true));
 
-        const data = await fetchBoardFromApi(); // cuando habilitemos el token va en los parametros
-        dispatch(setBoard(data));
+        const data = await fetchBoardFromApi(); //  devuelve SOLO array de pedidos
+        dispatch(setBoard(data));              // le paso el array cdirecto
 
       } catch (err) {
         dispatch(setError(err.message));
-
       } finally {
         dispatch(setLoading(false));
       }
     }
 
     cargarTablero();
-
-  }, [dispatch]);
+  }, [dispatch])
 
   return (
   <div className="container-fluid py-4" style={{ minHeight: "100vh" }}>

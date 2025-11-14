@@ -1,7 +1,14 @@
 const KEY = "auth"; // --> luego lo voy a sustituir con lo que me pase springboot
 const BASE_URL = "http://localhost:8080";
-export function saveAuth(auth) {
-  localStorage.setItem(KEY, JSON.stringify(auth));
+
+export function saveAuth(data) {
+  
+  const session = {
+    isLogged: true,
+    user: data.user ?? data, 
+  };
+
+  localStorage.setItem(KEY, JSON.stringify(session));
 }
 
 // leo la sesion guardada
