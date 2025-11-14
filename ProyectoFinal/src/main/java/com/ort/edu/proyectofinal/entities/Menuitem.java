@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import org.hibernate.annotations.ColumnDefault;
 
+import java.math.BigDecimal;
 import java.time.Instant;
 import jakarta.persistence.Table;
 
@@ -23,6 +24,9 @@ public class Menuitem {
 
     @Column(name = "Name", nullable = false, length = 150)
     private String name;
+
+    @Column(name = "BasePrice", nullable = false)
+    private BigDecimal basePrice;
 
     @Lob
     @Column(name = "Description")
@@ -69,6 +73,10 @@ public class Menuitem {
     public void setName(String name) {
         this.name = name;
     }
+
+    public BigDecimal getBasePrice() { return basePrice; }
+
+    public void setBasePrice(BigDecimal basePrice) { this.basePrice = basePrice; }
 
     public String getDescription() {
         return description;

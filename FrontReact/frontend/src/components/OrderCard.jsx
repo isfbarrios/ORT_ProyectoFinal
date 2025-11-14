@@ -1,12 +1,9 @@
 // src/components/OrderCard.jsx
-import { useDispatch } from "react-redux";
-import { updateOrder } from "../redux/features/dashboardSlice";
 import Swal from "sweetalert2";
 import "sweetalert2/dist/sweetalert2.min.css";
 import { fetchOrderServiceFromApi } from "../services/orderService";
 
 export default function OrderCard({ order, columnId }) {
-  const dispatch = useDispatch();
 
   console.log("ordenes: ",order,"columna: " ,columnId);
   const onDragStart = (e) => {

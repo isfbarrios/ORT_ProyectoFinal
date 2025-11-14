@@ -15,6 +15,7 @@ export default function NavBar() {
       <NavLink to="/login" style={linkStyle}>Login</NavLink>
       <NavLink to="/register" style={linkStyle}>Registro</NavLink>
       <NavLink to="/dashboard" style={linkStyle}>Dashboard</NavLink>
+      <NavLink to="/menu" style={linkStyle}>Menu</NavLink>
     </nav>
   );
 }

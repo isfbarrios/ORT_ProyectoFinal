@@ -1,6 +1,5 @@
 package com.ort.edu.proyectofinal.repositories;
 
-import com.ort.edu.proyectofinal.entities.Cart;
 import com.ort.edu.proyectofinal.entities.Cartitem;
 import org.springframework.data.jpa.repository.JpaRepository;
 

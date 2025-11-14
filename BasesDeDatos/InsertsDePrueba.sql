@@ -148,3 +148,12 @@ INSERT INTO Reports (Name, Description, StateId, Query)
 VALUES 
 ('Ventas Diarias', 'Informe de ventas por día', 1, 'SELECT DATE(Date), SUM(Amount) FROM Order GROUP BY DATE(Date);'),
 ('Pedidos Cancelados', 'Pedidos anulados por cliente', 1, 'SELECT * FROM Order WHERE StateId = 5;');
+
+
+ALTER TABLE MenuItem
+ADD COLUMN BasePrice DECIMAL(12,2) NOT NULL DEFAULT 0
+AFTER Description;
+
+
+
+

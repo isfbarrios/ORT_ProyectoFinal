@@ -4,9 +4,11 @@ import com.ort.edu.proyectofinal.entities.Cart;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Date;
+import java.util.Optional;
 
 public interface CartRepository extends JpaRepository<Cart, Integer> {
 
     // Consultas automáticas via Spring Data:
     Cart findByDate(Date date);
+    Optional<Cart> findBySessionId(String sessionId);
 }

@@ -212,6 +212,7 @@ CREATE TABLE MenuItem (
   MenuId          INT UNSIGNED NOT NULL,
   Name            VARCHAR(150) NOT NULL,
   Description     TEXT,
+  BasePrice       DECIMAL(12,2) NOT NULL DEFAULT 0,
   TypeId          INT UNSIGNED NOT NULL,
   StateId         INT UNSIGNED NOT NULL,
   CreatedDate     DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
