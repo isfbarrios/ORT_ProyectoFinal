@@ -42,4 +42,14 @@ public class CartItemController {
 
         return ResponseEntity.ok(items);
     }
+
+    @GetMapping("/cart/{cartId}")
+    public ResponseEntity<List<CartItemDTO>> getAllByCart(@PathVariable int cartId) {
+        List<CartItemDTO> items = repo.findByCartId(cartId)
+                .stream()
+                .map(CartItemDTO::new)
+                .collect(Collectors.toList());
+
+        return ResponseEntity.ok(items);
+    }
 }
