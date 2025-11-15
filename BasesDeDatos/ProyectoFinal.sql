@@ -212,7 +212,6 @@ CREATE TABLE MenuItem (
   MenuId          INT UNSIGNED NOT NULL,
   Name            VARCHAR(150) NOT NULL,
   Description     TEXT,
-  BasePrice       DECIMAL(12,2) NOT NULL DEFAULT 0,
   TypeId          INT UNSIGNED NOT NULL,
   StateId         INT UNSIGNED NOT NULL,
   CreatedDate     DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -434,3 +433,4 @@ INSERT INTO proyectofinal.users
 (name, surname, mail, username, Password, UserStateId, CreatedDate, LastUpdate)
 values
 ('Usuario', 'Administrador', 'fabribarrios@hotmail.com', 'admin', 'pass1234', 1, current_timestamp(), current_timestamp());
+

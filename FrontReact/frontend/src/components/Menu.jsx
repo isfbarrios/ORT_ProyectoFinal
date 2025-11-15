@@ -65,7 +65,7 @@ export default function Menu({ menuId = 1 }) {
     <div className="container mt-4">
       <h2 className="mb-4 text-center">Menú del Restaurante</h2>
 
-      {/* Cards (vista “linda”) */}
+      {/* Cards */}
       <div className="row g-3">
         {items.map((item) => (
           <div className="col-12 col-md-6 col-lg-4" key={item.id}>
@@ -113,7 +113,7 @@ export default function Menu({ menuId = 1 }) {
         )}
       </div>
 
-      {/* Tabla (vista más “admin”) */}
+      {/* Tabla debajo, como vista más administrativa */}
       <div className="table-responsive mt-4">
         <table className="table table-striped table-bordered align-middle">
           <thead className="table-dark">
@@ -157,6 +157,13 @@ export default function Menu({ menuId = 1 }) {
           </tbody>
         </table>
       </div>
+
+      {/* (Opcional) Podés mostrar un resumen rápido del carrito acá abajo */}
+      {/* 
+      <hr className="my-4" />
+      <h3>Carrito</h3>
+      <p>Total: <strong>${cart.totalAmount.toFixed(2)}</strong></p>
+      */}
     </div>
   );
 }
