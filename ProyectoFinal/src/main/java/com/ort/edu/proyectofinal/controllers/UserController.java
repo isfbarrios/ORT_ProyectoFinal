@@ -6,6 +6,7 @@ import com.ort.edu.proyectofinal.entities.User;
 import com.ort.edu.proyectofinal.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
@@ -98,14 +99,30 @@ public class UserController {
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequestDTO request) {
 
+        // Buscar usuario por mail
         User user = repo.findByMail(request.getMail());
 
-        if (user == null || !user.getPassword().equals(request.getPassword())) {
-            return ResponseEntity.status(401).body("Credenciales inválidas");
+        if (user == null) {
+            // No existe usuario con ese mail
+            return ResponseEntity
+                    .status(HttpStatus.UNAUTHORIZED)
+                    .body("Usuario o contraseña incorrectos");
         }
 
-        return ResponseEntity.ok(new UserDTO(user));
+        // Validar password (por ahora texto plano)
+        if (!user.getPassword().equals(request.getPassword())) {
+            return ResponseEntity
+                    .status(HttpStatus.UNAUTHORIZED)
+                    .body("Usuario o contraseña incorrectos");
+        }
+
+        // Armar DTO para no devolver la entidad cruda
+        UserDTO dto = new UserDTO(user);
+
+        // Más adelante acá se puede agregar token, roles, etc.
+        return ResponseEntity.ok(dto);
     }
+
 
     /*
     @GetMapping("/usuarios-test")
