@@ -2,7 +2,6 @@ package com.ort.edu.proyectofinal.services;
 
 import com.ort.edu.proyectofinal.dto.UserDTO;
 import com.ort.edu.proyectofinal.entities.Cart;
-import com.ort.edu.proyectofinal.entities.Session;
 import com.ort.edu.proyectofinal.repositories.CartItemRepository;
 import com.ort.edu.proyectofinal.repositories.CartRepository;
 import com.ort.edu.proyectofinal.repositories.SessionRepository;
@@ -10,7 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 
 @Service
 public class CartService {

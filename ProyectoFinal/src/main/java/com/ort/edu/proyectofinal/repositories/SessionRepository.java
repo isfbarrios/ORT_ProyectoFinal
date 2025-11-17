@@ -9,6 +9,6 @@ import java.util.Optional;
 
 public interface SessionRepository extends JpaRepository<Session, Integer> {
 
-    @Query("SELECT s FROM SessionEntity s WHERE s.sessionId = :sessionId")
+    //@Query("SELECT s FROM SessionEntity s WHERE s.sessionId = :sessionId")
     Optional<Session> findBySessionId(@Param("sessionId") String sessionId);
 }
