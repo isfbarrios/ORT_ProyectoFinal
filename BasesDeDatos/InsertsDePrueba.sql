@@ -106,10 +106,10 @@ VALUES ('Menú principal', 'Carta general del restaurante');
 
 INSERT INTO MenuItem (MenuId, Name, Description, TypeId, StateId)
 VALUES 
-(1, 'Milanesa con papas fritas', 'Plato clásico', 2, 1),
-(1, 'Ensalada César', 'Lechuga, pollo, crutones y aderezo', 1, 1),
-(1, 'Flan casero', 'Con dulce de leche', 3, 1),
-(1, 'Refresco 500ml', 'Coca-Cola o similar', 4, 1);
+(1, 'Milanesa con papas fritas', 'Plato clásico', 450.00, 2, 1),
+(1, 'Ensalada César', 'Lechuga, pollo, crutones y aderezo', 380.00, 1, 1),
+(1, 'Flan casero', 'Con dulce de leche', 220.00, 3, 1),
+(1, 'Refresco 500ml', 'Coca-Cola o similar', 120.00, 4, 1);
 
 INSERT INTO MenuItemHasVariant (MenuItemId, VariantId, PriceDelta) VALUES
 (1,1,150), (2,2,0), (3,3,-20), (4,2,0);

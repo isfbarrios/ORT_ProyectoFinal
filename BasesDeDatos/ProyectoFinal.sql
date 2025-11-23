@@ -74,12 +74,12 @@ CREATE TABLE Sessions (
 /*==========================================================
 =  2) CLIENTES, PREFERENCIAS, RESTRICCIONES
 ==========================================================*/
-CREATE TABLE CustomerState (
+/*CREATE TABLE CustomerState (
   StateId         INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
   Name            VARCHAR(50) NOT NULL,
   Description     TEXT,
   UNIQUE KEY ux_CustomerState_Name (Name)
-) ENGINE=InnoDB;
+) ENGINE=InnoDB;*/
 
 CREATE TABLE Customer (
   CustomerId      INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
@@ -212,6 +212,7 @@ CREATE TABLE MenuItem (
   MenuId          INT UNSIGNED NOT NULL,
   Name            VARCHAR(150) NOT NULL,
   Description     TEXT,
+  BasePrice DECIMAL(12,2) NOT NULL DEFAULT 0,
   TypeId          INT UNSIGNED NOT NULL,
   StateId         INT UNSIGNED NOT NULL,
   CreatedDate     DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -423,14 +424,3 @@ CREATE TABLE Reports (
 ) ENGINE=InnoDB;
 
 SET FOREIGN_KEY_CHECKS = 1;
-
-
-select * from userstate u;
-
-insert into userstate (name) values('Activo');
-
-INSERT INTO proyectofinal.users
-(name, surname, mail, username, Password, UserStateId, CreatedDate, LastUpdate)
-values
-('Usuario', 'Administrador', 'fabribarrios@hotmail.com', 'admin', 'pass1234', 1, current_timestamp(), current_timestamp());
-

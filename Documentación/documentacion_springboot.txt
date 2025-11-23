@@ -3,3 +3,38 @@ https://www.jetbrains.com/guide/java/tutorials/working-with-maven/creating-a-pro
 
 Instalar Spring Boot en proyecto Maven con IntelliJ:
 https://start.spring.io/
+
+Instalar Spring Data JPA:
+
+1. Agregar dependencias en pom.xml
+
+<!-- JPA + Hibernate -->
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-data-jpa</artifactId>
+</dependency>
+
+<!-- Driver MariaDB -->
+<dependency>
+    <groupId>org.mariadb.jdbc</groupId>
+    <artifactId>mariadb-java-client</artifactId>
+    <version>3.3.3</version>
+</dependency>
+
+Esto instala JPA + Hibernate y el driver para MariaDB.
+
+2. Configurar conexión en application.properties o application.yml
+
+spring.datasource.url=jdbc:mariadb://localhost:3306/ProyectoFinal
+spring.datasource.username=root
+spring.datasource.password=TU_PASSWORD
+spring.datasource.driver-class-name=org.mariadb.jdbc.Driver
+
+spring.jpa.hibernate.ddl-auto=none
+spring.jpa.show-sql=true
+spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.MariaDBDialect
+
+
+Se instalan dependencias de Lombok, JWT y Swagger
+
+
