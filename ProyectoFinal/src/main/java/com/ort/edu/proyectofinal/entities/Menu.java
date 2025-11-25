@@ -24,9 +24,6 @@ public class Menu {
     @Column(name = "Name", nullable = false, length = 120)
     private String name;
 
-    @Column(name = "Active", nullable = false)
-    private boolean active;
-
     @Lob
     @Column(name = "Description")
     private String description;

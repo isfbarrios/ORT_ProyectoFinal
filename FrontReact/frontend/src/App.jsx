@@ -5,6 +5,7 @@ export default function App() {
   return (
     <main style={{ padding: "1.5rem", maxWidth: 960, margin: "0 auto" }}>
       <NavBar />
+      <CartModal />
       <Outlet />
     </main>
   );

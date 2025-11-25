@@ -1,5 +1,10 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { apiAddItemToCart, apiGetCart } from "../../services/cartService";
+import {
+  apiAddItemToCart,
+  apiGetCart,
+  apiConfirmCart,
+  apiCloseCart,
+} from "../../services/cartService";
 
 const SESSION_KEY = "restaurant-session-id";
 
@@ -8,59 +13,57 @@ const initialState = {
   totalAmount: 0,
   loading: false,
   error: null,
+  isCartModalOpen: false,
 };
 
 const cartSlice = createSlice({
   name: "cart",
   initialState,
   reducers: {
-
     setCart(state, action) {
       state.items = action.payload.items || [];
       state.totalAmount = action.payload.totalAmount || 0;
       state.error = null;
-
     },
 
     setCartLoading(state, action) {
       state.loading = action.payload;
-
     },
 
     setCartError(state, action) {
       state.error = action.payload;
-
     },
 
     clearCartState(state) {
       state.items = [];
       state.totalAmount = 0;
       state.error = null;
-
     },
 
+    openCartModal(state) {
+      state.isCartModalOpen = true;
+    },
+
+    closeCartModal(state) {
+      state.isCartModalOpen = false;
+    },
   },
 });
 
-export const { setCart, setCartLoading, setCartError, clearCartState } =
-  cartSlice.actions;
+export const {
+  setCart,
+  setCartLoading,
+  setCartError,
+  clearCartState,
+  openCartModal,
+  closeCartModal,
+} = cartSlice.actions;
 
 export default cartSlice.reducer;
 
 // ---------------------------
-// aca van funciones async o manejo de storage. funciones que no son reducers
-/*  
-   - manejo de sessionId
-
-   - lectura de headers
-
-   - guardar en localStorage
-
-   - actualizar Redux
-
-    - manejar loading / error
-
-*/
+// Helpers de sesión
+// ---------------------------
 
 function getSessionId() {
   return localStorage.getItem(SESSION_KEY) || null;
@@ -73,9 +76,15 @@ function saveSessionIdFromHeaders(headers) {
   }
 }
 
+function clearSessionId() {
+  localStorage.removeItem(SESSION_KEY);
+}
+
+
+
 /**
- * Cargar carrito actual (si existe).  
- * Se llama desde un useEffect o cuando se abra el menú.
+ * Cargar carrito actual (si existe).
+ * Se llama desde un useEffect o cuando se abra el menú / carrito.
  */
 export const fetchCartAsync = () => async (dispatch) => {
   dispatch(setCartLoading(true));
@@ -88,7 +97,6 @@ export const fetchCartAsync = () => async (dispatch) => {
     saveSessionIdFromHeaders(headers);
     dispatch(setCart(data));
   } catch (error) {
-    // Acá decidís qué hacer con el error
     dispatch(setCartError(error.message));
   } finally {
     dispatch(setCartLoading(false));
@@ -119,5 +127,55 @@ export const addItemToCartAsync =
     } finally {
       dispatch(setCartLoading(false));
     }
+  };
+
+/**
+ * Confirmar carrito:
+ * - llama al backend (/api/session-cart/confirm)
+ * - genera una Order real para el Dashboard
+ * - limpia el carrito y la sesión local
+ * Devuelve la OrderDTO para que el componente pueda, por ejemplo, navegar al dashboard.
+ */
+export const confirmCartAsync = () => async (dispatch) => {
+  dispatch(setCartLoading(true));
+  dispatch(setCartError(null));
+
+  try {
+    const sessionId = getSessionId();
+    const { data, headers } = await apiConfirmCart({ sessionId });
+
+    saveSessionIdFromHeaders(headers);
+    dispatch(clearCartState());
+    clearSessionId();
+
+    return data; // OrderDTO
+  } catch (error) {
+    dispatch(setCartError(error.message));
+    return null;
+  } finally {
+    dispatch(setCartLoading(false));
+  }
 };
 
+/**
+ * Cerrar carrito sin generar orden:
+ * - llama al backend (/api/session-cart/close)
+ * - limpia carrito y borra sessionId local
+ */
+export const closeCartAsync = () => async (dispatch) => {
+  dispatch(setCartLoading(true));
+  dispatch(setCartError(null));
+
+  try {
+    const sessionId = getSessionId();
+    const { headers } = await apiCloseCart({ sessionId });
+
+    saveSessionIdFromHeaders(headers);
+    dispatch(clearCartState());
+    clearSessionId();
+  } catch (error) {
+    dispatch(setCartError(error.message));
+  } finally {
+    dispatch(setCartLoading(false));
+  }
+};
