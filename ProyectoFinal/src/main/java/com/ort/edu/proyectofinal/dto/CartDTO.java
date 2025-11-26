@@ -3,11 +3,15 @@ package com.ort.edu.proyectofinal.dto;
 import com.ort.edu.proyectofinal.entities.Cart;
 import com.ort.edu.proyectofinal.entities.Cartstate;
 import com.ort.edu.proyectofinal.entities.Tables;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.Objects;
 
+@Setter
+@Getter
 public class CartDTO {
 
     private Integer id;
@@ -26,54 +30,6 @@ public class CartDTO {
         this.date = cart.getDate();
         this.cartState = cart.getCartState();
         this.delayTime = cart.getDelayTime();
-    }
-
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    public Tables getTable() {
-        return table;
-    }
-
-    public void setTable(Tables table) {
-        this.table = table;
-    }
-
-    public BigDecimal getAmount() {
-        return amount;
-    }
-
-    public void setAmount(BigDecimal amount) {
-        this.amount = amount;
-    }
-
-    public Instant getDate() {
-        return date;
-    }
-
-    public void setDate(Instant date) {
-        this.date = date;
-    }
-
-    public Cartstate getCartState() {
-        return cartState;
-    }
-
-    public void setCartState(Cartstate cartState) {
-        this.cartState = cartState;
-    }
-
-    public Integer getDelayTime() {
-        return delayTime;
-    }
-
-    public void setDelayTime(Integer delayTime) {
-        this.delayTime = delayTime;
     }
 
     @Override

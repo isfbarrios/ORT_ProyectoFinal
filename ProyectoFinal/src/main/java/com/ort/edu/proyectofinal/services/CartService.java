@@ -3,24 +3,8 @@ package com.ort.edu.proyectofinal.services;
 import com.ort.edu.proyectofinal.dto.SessionCartDTO;
 import com.ort.edu.proyectofinal.dto.SessionCartItemDTO;
 import com.ort.edu.proyectofinal.dto.OrderDTO;
-import com.ort.edu.proyectofinal.entities.Cart;
-import com.ort.edu.proyectofinal.entities.Cartitem;
-import com.ort.edu.proyectofinal.entities.CartitemId;
-import com.ort.edu.proyectofinal.entities.Order;
-import com.ort.edu.proyectofinal.entities.Ordercanal;
-import com.ort.edu.proyectofinal.entities.Orderitem;
-import com.ort.edu.proyectofinal.entities.OrderitemId;
-import com.ort.edu.proyectofinal.entities.Orderstate;
-import com.ort.edu.proyectofinal.entities.Session;
-import com.ort.edu.proyectofinal.entities.Menuitem;
-import com.ort.edu.proyectofinal.repositories.CartItemRepository;
-import com.ort.edu.proyectofinal.repositories.CartRepository;
-import com.ort.edu.proyectofinal.repositories.SessionRepository;
-import com.ort.edu.proyectofinal.repositories.MenuItemRepository;
-import com.ort.edu.proyectofinal.repositories.OrderRepository;
-import com.ort.edu.proyectofinal.repositories.OrderItemRepository;
-import com.ort.edu.proyectofinal.repositories.OrderStateRepository;
-import com.ort.edu.proyectofinal.repositories.OrderCanalRepository;
+import com.ort.edu.proyectofinal.entities.*;
+import com.ort.edu.proyectofinal.repositories.*;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -59,46 +43,55 @@ public class CartService {
     @Autowired
     private OrderCanalRepository orderCanalRepository;
 
-    //@Autowired
-    //private OrderMapper orderMapper; // asumimos que ya lo tenés
+    @Autowired
+    private CartStateRepository cartStateRepository;
 
-    // ============================
-    // Helpers internos
-    // ============================
+    @Autowired
+    private TablesRepository tablesRepository;
 
     private Session resolveSession(String sessionKey) {
         String key = (sessionKey == null || sessionKey.isBlank())
                 ? UUID.randomUUID().toString()
                 : sessionKey;
 
-        Optional<Session> existing = sessionRepository.findBySessionKey(key);
+        Optional<Session> existing = sessionRepository.findBySessionId(key);
         if (existing.isPresent()) {
             return existing.get();
         }
 
         Session s = new Session();
-        s.setSessionKey(key);
+        s.setSessionId(key);
         s.setCreatedDate(Instant.now());
         return sessionRepository.save(s);
     }
 
     private Cart createNewCart(Session session) {
+
+        Cartstate cartState = cartStateRepository.getReferenceById(1);
+        //TODO: Ajustar para pedir por fecha
+        Tables table = tablesRepository.getReferenceById(1);
+
+        //Traigo mesas disponibles
+
         Cart cart = new Cart();
         cart.setSession(session);
-        cart.setCreatedDate(Instant.now());
+        cart.setDate(Instant.now());
         cart.setLastUpdate(Instant.now());
-        // Si tenés estado del cart (ABIERTO/CERRADO), setear acá
+        cart.setCartState(cartState);
+        cart.setTable(table);
+
         return cartRepository.save(cart);
     }
 
     private Cart getOrCreateCartEntity(String sessionIdHeader) {
         Session session = resolveSession(sessionIdHeader);
-        return cartRepository.findBySession(session)
+
+        return cartRepository.findBySession_SessionId(session.getSessionId())
                 .orElseGet(() -> createNewCart(session));
     }
 
     private SessionCartDTO buildSessionCartDTO(Cart cart) {
-        List<Cartitem> items = cartItemRepository.findByCart(cart);
+        List<Cartitem> items = cartItemRepository.findByCartId(cart.getId());
 
         List<SessionCartItemDTO> dtoItems = items.stream()
                 .map(SessionCartItemDTO::new)
@@ -125,17 +118,20 @@ public class CartService {
     @Transactional
     public SessionCartDTO addItemToCart(String sessionIdHeader, int menuItemId, int quantity) {
 
-        if (quantity <= 0) quantity = 1;
+        if (quantity <= 0) {
+            quantity = 1;
+             //TODO: throw
+        }
 
         Cart cart = getOrCreateCartEntity(sessionIdHeader);
 
         Menuitem menuitem = menuItemRepository.findById(menuItemId)
                 .orElseThrow(() -> new IllegalArgumentException("Menuitem no encontrado"));
 
-        List<Cartitem> items = cartItemRepository.findByCart(cart);
+        List<Cartitem> items = cartItemRepository.findByCartId(cart.getId());
 
         Cartitem existing = items.stream()
-                .filter(ci -> ci.getMenuItem().getMenuItemId().equals(menuItemId))
+                .filter(ci -> ci.getMenuItem().getId().equals(menuItemId))
                 .findFirst()
                 .orElse(null);
 
@@ -172,7 +168,7 @@ public class CartService {
     @Transactional
     public OrderDTO confirmCart(String sessionIdHeader) {
         Cart cart = getOrCreateCartEntity(sessionIdHeader);
-        List<Cartitem> items = cartItemRepository.findByCart(cart);
+        List<Cartitem> items = cartItemRepository.findByCartId(cart.getId());
 
         if (items.isEmpty()) {
             throw new IllegalStateException("El carrito está vacío");
@@ -192,6 +188,8 @@ public class CartService {
                 .orElseThrow(() -> new RuntimeException("Canal por defecto no encontrado"));
 
         Order order = new Order();
+        //TODO: Hay que usar la sesion del usuario
+        //TODO: Number y Id vienen de la db, no los gestionamos
         order.setOrderNumber(UUID.randomUUID().toString());
         order.setDate(Instant.now());
         order.setAmount(total);
@@ -206,7 +204,7 @@ public class CartService {
         int line = 1;
         for (Cartitem ci : items) {
             OrderitemId id = new OrderitemId();
-            id.setOrderId(order.getOrderId());
+            id.setOrderId(order.getId());
             id.setItemId(line++);
 
             Orderitem oi = new Orderitem();
@@ -214,7 +212,7 @@ public class CartService {
             oi.setOrder(order);
             oi.setMenuItem(ci.getMenuItem());
             oi.setQuantity(ci.getQuantity());
-            oi.setExtraData(ci.getExtraData()); // si no usás extraData, podés omitir
+            //oi.setExtraData(ci.getExtraData()); // si no usás extraData, podés omitir
 
             orderItemRepository.save(oi);
         }

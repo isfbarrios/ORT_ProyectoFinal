@@ -2,6 +2,8 @@ package com.ort.edu.proyectofinal.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
@@ -9,6 +11,8 @@ import jakarta.persistence.Table;
 
 import java.math.BigDecimal;
 
+@Setter
+@Getter
 @Entity
 @Table(name = "cartitem", schema = "proyectofinal")
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
@@ -37,53 +41,4 @@ public class Cartitem {
     @ColumnDefault("0")
     @Column(name = "DelayTime", nullable = false)
     private Integer delayTime;
-
-    public CartitemId getId() {
-        return id;
-    }
-
-    public void setId(CartitemId id) {
-        this.id = id;
-    }
-
-    public Cart getCart() {
-        return cart;
-    }
-
-    public void setCart(Cart cart) {
-        this.cart = cart;
-    }
-
-    public Menuitem getMenuItem() {
-        return menuItem;
-    }
-
-    public void setMenuItem(Menuitem menuItem) {
-        this.menuItem = menuItem;
-    }
-
-    public Integer getQuantity() {
-        return quantity;
-    }
-
-    public void setQuantity(Integer quantity) {
-        this.quantity = quantity;
-    }
-
-    public BigDecimal getItemAmount() {
-        return itemAmount;
-    }
-
-    public void setItemAmount(BigDecimal itemAmount) {
-        this.itemAmount = itemAmount;
-    }
-
-    public Integer getDelayTime() {
-        return delayTime;
-    }
-
-    public void setDelayTime(Integer delayTime) {
-        this.delayTime = delayTime;
-    }
-
 }

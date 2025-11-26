@@ -2,11 +2,15 @@ package com.ort.edu.proyectofinal.entities;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
+import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.Hibernate;
 import jakarta.persistence.Table;
 import java.io.Serializable;
 import java.util.Objects;
 
+@Getter
+@Setter
 @Embeddable
 public class OrderitemId implements Serializable {
     private static final long serialVersionUID = -3242071240156899588L;
@@ -15,22 +19,6 @@ public class OrderitemId implements Serializable {
 
     @Column(name = "ItemId", nullable = false)
     private Integer itemId;
-
-    public Integer getOrderId() {
-        return orderId;
-    }
-
-    public void setOrderId(Integer orderId) {
-        this.orderId = orderId;
-    }
-
-    public Integer getItemId() {
-        return itemId;
-    }
-
-    public void setItemId(Integer itemId) {
-        this.itemId = itemId;
-    }
 
     @Override
     public boolean equals(Object o) {

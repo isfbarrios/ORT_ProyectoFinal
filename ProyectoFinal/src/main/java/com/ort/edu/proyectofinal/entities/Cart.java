@@ -2,11 +2,15 @@ package com.ort.edu.proyectofinal.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.annotations.ColumnDefault;
 
 import java.math.BigDecimal;
 import java.time.Instant;
 
+@Setter
+@Getter
 @Entity
 @Table(name = "cart", schema = "proyectofinal")
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
@@ -47,68 +51,15 @@ public class Cart {
     @Column(name = "LastUpdate", nullable = false)
     private Instant lastUpdate;
 
-    public Integer getId() {
-        return id;
-    }
+    public Cart() {}
 
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    public Tables getTable() {
-        return table;
-    }
-
-    public void setTable(Tables table) {
+    public Cart(Tables table, Session session, BigDecimal amount, Cartstate cartState, Integer delayTime) {
         this.table = table;
-    }
-
-    public Session getSession() {
-        return session;
-    }
-
-    public void setSession(Session session) {
         this.session = session;
-    }
-
-    public BigDecimal getAmount() {
-        return amount;
-    }
-
-    public void setAmount(BigDecimal amount) {
         this.amount = amount;
-    }
-
-    public Instant getDate() {
-        return date;
-    }
-
-    public void setDate(Instant date) {
-        this.date = date;
-    }
-
-    public Cartstate getCartState() {
-        return cartState;
-    }
-
-    public void setCartState(Cartstate cartState) {
-        this.cartState = cartState;
-    }
-
-    public Integer getDelayTime() {
-        return delayTime;
-    }
-
-    public void setDelayTime(Integer delayTime) {
         this.delayTime = delayTime;
+        this.cartState = cartState;
+        this.date = Instant.now();
+        this.lastUpdate = Instant.now();
     }
-
-    public Instant getLastUpdate() {
-        return lastUpdate;
-    }
-
-    public void setLastUpdate(Instant lastUpdate) {
-        this.lastUpdate = lastUpdate;
-    }
-
 }

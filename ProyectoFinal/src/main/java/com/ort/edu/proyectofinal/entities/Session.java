@@ -5,10 +5,14 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.annotations.ColumnDefault;
 import jakarta.persistence.Table;
 import java.time.Instant;
 
+@Setter
+@Getter
 @Entity
 @Table(name = "sessions", schema = "proyectofinal")
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
@@ -20,21 +24,4 @@ public class Session {
     @ColumnDefault("current_timestamp()")
     @Column(name = "CreatedDate", nullable = false)
     private Instant createdDate;
-
-    public String getSessionId() {
-        return sessionId;
-    }
-
-    public void setSessionId(String sessionId) {
-        this.sessionId = sessionId;
-    }
-
-    public Instant getCreatedDate() {
-        return createdDate;
-    }
-
-    public void setCreatedDate(Instant createdDate) {
-        this.createdDate = createdDate;
-    }
-
 }

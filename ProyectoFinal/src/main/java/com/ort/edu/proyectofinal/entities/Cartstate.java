@@ -3,7 +3,11 @@ package com.ort.edu.proyectofinal.entities;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import jakarta.persistence.Table;
+import lombok.Getter;
+import lombok.Setter;
 
+@Setter
+@Getter
 @Entity
 @Table(name = "cartstate", schema = "proyectofinal")
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
@@ -19,29 +23,4 @@ public class Cartstate {
     @Lob
     @Column(name = "Description")
     private String description;
-
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
 }

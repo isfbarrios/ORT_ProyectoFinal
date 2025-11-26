@@ -2,11 +2,17 @@ package com.ort.edu.proyectofinal.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.annotations.ColumnDefault;
 import jakarta.persistence.Table;
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 
+@Getter
+@Setter
 @Entity
 @Table(name = "`order`", schema = "proyectofinal")
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
@@ -53,84 +59,11 @@ public class Order {
     @Column(name = "ExtraData")
     private String extraData;
 
-    public Integer getId() {
-        return id;
-    }
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Orderitem> items = new ArrayList<>();
 
-    public void setId(Integer id) {
-        this.id = id;
+    public void addItem(Orderitem item) {
+        item.setOrder(this);
+        items.add(item);
     }
-
-    public String getOrderNumber() {
-        return orderNumber;
-    }
-
-    public void setOrderNumber(String orderNumber) {
-        this.orderNumber = orderNumber;
-    }
-
-    public BigDecimal getAmount() {
-        return amount;
-    }
-
-    public void setAmount(BigDecimal amount) {
-        this.amount = amount;
-    }
-
-    public Instant getDate() {
-        return date;
-    }
-
-    public void setDate(Instant date) {
-        this.date = date;
-    }
-
-    public Orderstate getState() {
-        return state;
-    }
-
-    public void setState(Orderstate state) {
-        this.state = state;
-    }
-
-    public Ordercanal getCanal() {
-        return canal;
-    }
-
-    public void setCanal(Ordercanal canal) {
-        this.canal = canal;
-    }
-
-    public Paymenttype getPaymentType() {
-        return paymentType;
-    }
-
-    public void setPaymentType(Paymenttype paymentType) {
-        this.paymentType = paymentType;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public Instant getLastUpdate() {
-        return lastUpdate;
-    }
-
-    public void setLastUpdate(Instant lastUpdate) {
-        this.lastUpdate = lastUpdate;
-    }
-
-    public String getExtraData() {
-        return extraData;
-    }
-
-    public void setExtraData(String extraData) {
-        this.extraData = extraData;
-    }
-
 }
