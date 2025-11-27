@@ -2,8 +2,10 @@ package com.ort.edu.proyectofinal.controllers;
 
 import com.ort.edu.proyectofinal.dto.LoginRequestDTO;
 import com.ort.edu.proyectofinal.dto.UserDTO;
+import com.ort.edu.proyectofinal.entities.Session;
 import com.ort.edu.proyectofinal.entities.User;
 import com.ort.edu.proyectofinal.repositories.UserRepository;
+import com.ort.edu.proyectofinal.services.SessionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpStatus;
@@ -20,6 +22,9 @@ public class UserController {
 
     @Autowired
     private UserRepository repo;
+
+    @Autowired
+    private SessionService sessionService;
 
     @GetMapping("/{id}")
     public ResponseEntity<UserDTO> getUser(@PathVariable int id) {
@@ -118,6 +123,10 @@ public class UserController {
 
         // Armar DTO para no devolver la entidad cruda
         UserDTO dto = new UserDTO(user);
+
+        Session session = sessionService.resolveSession("");
+
+        if (session != null) dto.setSessionId(session.getSessionId());
 
         // Más adelante acá se puede agregar token, roles, etc.
         return ResponseEntity.ok(dto);

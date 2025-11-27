@@ -1,11 +1,10 @@
 package com.ort.edu.proyectofinal.repositories;
 
-import com.ort.edu.proyectofinal.entities.Cartitem;
 import com.ort.edu.proyectofinal.entities.Cartstate;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
-import java.util.List;
-
+@Repository
 public interface CartStateRepository extends JpaRepository<Cartstate, Integer> {
 
     // Consultas automáticas via Spring Data:

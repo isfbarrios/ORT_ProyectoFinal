@@ -4,6 +4,7 @@ import com.ort.edu.proyectofinal.dto.SessionCartDTO;
 import com.ort.edu.proyectofinal.dto.SessionCartItemDTO;
 import com.ort.edu.proyectofinal.dto.OrderDTO;
 import com.ort.edu.proyectofinal.entities.*;
+import com.ort.edu.proyectofinal.exception.CartException;
 import com.ort.edu.proyectofinal.repositories.*;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,14 +20,13 @@ import java.util.stream.Collectors;
 @Service
 public class CartService {
 
+    private SessionService sessionService;
+
     @Autowired
     private CartRepository cartRepository;
 
     @Autowired
     private CartItemRepository cartItemRepository;
-
-    @Autowired
-    private SessionRepository sessionRepository;
 
     @Autowired
     private MenuItemRepository menuItemRepository;
@@ -49,22 +49,6 @@ public class CartService {
     @Autowired
     private TablesRepository tablesRepository;
 
-    private Session resolveSession(String sessionKey) {
-        String key = (sessionKey == null || sessionKey.isBlank())
-                ? UUID.randomUUID().toString()
-                : sessionKey;
-
-        Optional<Session> existing = sessionRepository.findBySessionId(key);
-        if (existing.isPresent()) {
-            return existing.get();
-        }
-
-        Session s = new Session();
-        s.setSessionId(key);
-        s.setCreatedDate(Instant.now());
-        return sessionRepository.save(s);
-    }
-
     private Cart createNewCart(Session session) {
 
         Cartstate cartState = cartStateRepository.getReferenceById(1);
@@ -84,19 +68,25 @@ public class CartService {
     }
 
     private Cart getOrCreateCartEntity(String sessionIdHeader) {
-        Session session = resolveSession(sessionIdHeader);
+
+        System.out.println(getClass().getName()+".getOrCreateCartEntity.sessionIdHeader: " + sessionIdHeader);
+
+        Session session = sessionService.resolveSession(sessionIdHeader);
 
         return cartRepository.findBySession_SessionId(session.getSessionId())
                 .orElseGet(() -> createNewCart(session));
     }
 
     private SessionCartDTO buildSessionCartDTO(Cart cart) {
+        //Obtengo todos los items del carrito
         List<Cartitem> items = cartItemRepository.findByCartId(cart.getId());
 
         List<SessionCartItemDTO> dtoItems = items.stream()
                 .map(SessionCartItemDTO::new)
                 .collect(Collectors.toList());
 
+
+        //TODO: Ver el tema de los precios de las variantes
         BigDecimal total = items.stream()
                 .map(ci -> ci.getMenuItem().getBasePrice()
                         .multiply(BigDecimal.valueOf(ci.getQuantity())))
@@ -116,11 +106,10 @@ public class CartService {
     }
 
     @Transactional
-    public SessionCartDTO addItemToCart(String sessionIdHeader, int menuItemId, int quantity) {
+    public SessionCartDTO addItemToCart(String sessionIdHeader, int menuItemId, int quantity) throws CartException {
 
         if (quantity <= 0) {
-            quantity = 1;
-             //TODO: throw
+             throw new CartException("Cantidad insuficiente para el item " + menuItemId);
         }
 
         Cart cart = getOrCreateCartEntity(sessionIdHeader);
@@ -149,7 +138,10 @@ public class CartService {
             newItem.setQuantity(quantity);
             // Si tenés itemAmount y delayTime en Cartitem, podés setearlos acá
             cartItemRepository.save(newItem);
-        } else {
+        }
+        else {
+            //TODO: Validar si tiene variantes, xq pueden ser el mismo menuId pero con variantes
+
             existing.setQuantity(existing.getQuantity() + quantity);
             // Si usás itemAmount, recalculalo acá
             cartItemRepository.save(existing);
@@ -164,7 +156,7 @@ public class CartService {
     // ============================
     // Confirmar carrito → crear Order
     // ============================
-
+    /*
     @Transactional
     public OrderDTO confirmCart(String sessionIdHeader) {
         Cart cart = getOrCreateCartEntity(sessionIdHeader);
@@ -226,7 +218,7 @@ public class CartService {
         // Mapear a tu OrderDTO actual (usado por el Kanban)
         return orderMapper.toDto(order);
     }
-
+    */
     // ============================
     // Cerrar carrito sin confirmar
     // ============================
@@ -234,7 +226,7 @@ public class CartService {
     @Transactional
     public void closeCart(String sessionIdHeader) {
         Cart cart = getOrCreateCartEntity(sessionIdHeader);
-        List<Cartitem> items = cartItemRepository.findByCart(cart);
+        List<Cartitem> items = cartItemRepository.findByCartId(cart.getId());
 
         cartItemRepository.deleteAll(items);
         cart.setLastUpdate(Instant.now());

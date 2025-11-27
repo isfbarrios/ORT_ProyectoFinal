@@ -2,10 +2,10 @@ const KEY = "auth"; // --> luego lo voy a sustituir con lo que me pase springboo
 const BASE_URL = "http://localhost:8080";
 
 export function saveAuth(data) {
-  
+
   const session = {
     isLogged: true,
-    user: data.user ?? data, 
+    user: data.user ?? data,
   };
 
   localStorage.setItem(KEY, JSON.stringify(session));
@@ -37,5 +37,10 @@ export async function loginApi({ email, password }) {
   });
 
   const data = await res.json();
+
+  console.log('loginApi.json ini: ');
+  console.log(data);
+  console.log('loginApi.json end: ');
+
   return data;
 }

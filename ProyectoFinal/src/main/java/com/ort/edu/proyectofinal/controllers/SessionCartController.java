@@ -2,13 +2,14 @@ package com.ort.edu.proyectofinal.controllers;
 
 import com.ort.edu.proyectofinal.dto.SessionCartDTO;
 import com.ort.edu.proyectofinal.dto.OrderDTO;
+import com.ort.edu.proyectofinal.exception.CartException;
 import com.ort.edu.proyectofinal.services.CartService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/session-cart")
-@CrossOrigin(origins = "*")
+//@CrossOrigin(origins = "*")
 public class SessionCartController {
 
     private final CartService cartService;
@@ -22,6 +23,8 @@ public class SessionCartController {
             @RequestHeader(name = "X-Session-Id", required = false) String sessionId) {
 
         SessionCartDTO cart = cartService.getOrCreateCart(sessionId);
+
+
         return ResponseEntity.ok(cart);
     }
 
@@ -30,14 +33,26 @@ public class SessionCartController {
             @RequestHeader(name = "X-Session-Id", required = false) String sessionId,
             @RequestBody AddCartItemRequest body) {
 
-        SessionCartDTO cart = cartService.addItemToCart(
-                sessionId,
-                body.getMenuItemId(),
-                body.getQuantity()
-        );
-        return ResponseEntity.ok(cart);
-    }
+        try {
+            SessionCartDTO cart = cartService.addItemToCart(
+                    sessionId,
+                    body.getMenuItemId(),
+                    body.getQuantity()
+            );
 
+            return ResponseEntity.ok(cart);
+        }
+        catch (CartException e) {
+            e.printStackTrace();
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
+
+        return null;
+    }
+    /*
     @PostMapping("/confirm")
     public ResponseEntity<OrderDTO> confirm(
             @RequestHeader(name = "X-Session-Id") String sessionId) {
@@ -45,7 +60,7 @@ public class SessionCartController {
         OrderDTO order = cartService.confirmCart(sessionId);
         return ResponseEntity.ok(order);
     }
-
+    */
     @PostMapping("/close")
     public ResponseEntity<Void> close(
             @RequestHeader(name = "X-Session-Id") String sessionId) {

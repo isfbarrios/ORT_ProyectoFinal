@@ -1,5 +1,6 @@
 import { Outlet } from "react-router-dom"; // muestro el cotenido de la ruta hija ej: log,home
 import NavBar from "./components/NavBar"; 
+import CartModal from "./components/CartModal"; 
 
 export default function App() {
   return (

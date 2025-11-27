@@ -32,6 +32,8 @@ export async function apiGetCart({ sessionId }) {
     },
   });
 
+  console.log('apiGetCart.sessionId: ' + sessionId);
+
   if (!res.ok) {
     const text = await res.text().catch(() => "");
     throw new Error(text || "Error al obtener el carrito");
