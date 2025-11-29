@@ -19,6 +19,8 @@ export function clearSessionId() {
   localStorage.removeItem(SESSION_KEY);
 }
 
+
+
 // ------------------------------------------------------
 // 1) GET /api/session-cart
 // ------------------------------------------------------
@@ -32,17 +34,20 @@ export async function apiGetCart({ sessionId }) {
     },
   });
 
-  console.log('apiGetCart.sessionId: ' + sessionId);
+  let data;
 
-  if (!res.ok) {
-    const text = await res.text().catch(() => "");
-    throw new Error(text || "Error al obtener el carrito");
+  try {
+    data = await res.json();
+  }
+  catch {
+    throw new Error("Respuesta inválida del servidor");
   }
 
-  return {
-    data: await res.json(),
-    headers: res.headers,
-  };
+  if (!res.ok) {
+    throw new Error(data.message || "Error al obtener el carrito");
+  }
+
+  return data;
 }
 
 // ------------------------------------------------------
@@ -59,15 +64,20 @@ export async function apiAddItemToCart({ sessionId, menuItemId, quantity }) {
     body: JSON.stringify({ menuItemId, quantity }),
   });
 
-  if (!res.ok) {
-    const text = await res.text().catch(() => "");
-    throw new Error(text || "Error al agregar ítem al carrito");
+  let data;
+
+  try {
+    data = await res.json();
+  }
+  catch {
+    throw new Error("Respuesta inválida del servidor");
   }
 
-  return {
-    data: await res.json(),
-    headers: res.headers,
-  };
+  if (!res.ok) {
+    throw new Error(data.message || "No pudimos agregar tu pedido");
+  }
+
+  return data;
 }
 
 // ------------------------------------------------------
@@ -83,15 +93,20 @@ export async function apiConfirmCart({ sessionId }) {
     },
   });
 
-  if (!res.ok) {
-    const text = await res.text().catch(() => "");
-    throw new Error(text || "No se pudo confirmar el carrito");
+  let data;
+
+  try {
+    data = await res.json();
+  }
+  catch {
+    throw new Error("Respuesta inválida del servidor");
   }
 
-  return {
-    data: await res.json(), // OrderDTO
-    headers: res.headers,
-  };
+  if (!res.ok) {
+    throw new Error(data.message || "No se pudo confirmar el carrito");
+  }
+
+  return data;
 }
 
 // ------------------------------------------------------
@@ -107,13 +122,18 @@ export async function apiCloseCart({ sessionId }) {
     },
   });
 
-  if (!res.ok) {
-    const text = await res.text().catch(() => "");
-    throw new Error(text || "No se pudo cerrar el carrito");
+  let data;
+
+  try {
+    data = await res.json();
+  }
+  catch {
+    throw new Error("Respuesta inválida del servidor");
   }
 
-  return {
-    ok: true,
-    headers: res.headers,
-  };
+  if (!res.ok) {
+    throw new Error(data.message || "No se pudo cerrar el carrito");
+  }
+
+  return data;
 }

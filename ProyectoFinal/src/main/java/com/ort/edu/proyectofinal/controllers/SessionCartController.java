@@ -4,6 +4,7 @@ import com.ort.edu.proyectofinal.dto.SessionCartDTO;
 import com.ort.edu.proyectofinal.dto.OrderDTO;
 import com.ort.edu.proyectofinal.exception.CartException;
 import com.ort.edu.proyectofinal.services.CartService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 //@CrossOrigin(origins = "*")
 public class SessionCartController {
 
+    @Autowired
     private final CartService cartService;
 
     public SessionCartController(CartService cartService) {
@@ -22,8 +24,9 @@ public class SessionCartController {
     public ResponseEntity<SessionCartDTO> getCart(
             @RequestHeader(name = "X-Session-Id", required = false) String sessionId) {
 
-        SessionCartDTO cart = cartService.getOrCreateCart(sessionId);
+        System.out.println("SessionCartController.getCart.sessionId: " + sessionId);
 
+        SessionCartDTO cart = cartService.getOrCreateCart(sessionId);
 
         return ResponseEntity.ok(cart);
     }

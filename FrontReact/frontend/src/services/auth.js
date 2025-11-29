@@ -1,5 +1,5 @@
 const KEY = "auth"; // --> luego lo voy a sustituir con lo que me pase springboot
-const BASE_URL = "http://localhost:8080";
+const BASE_URL = "http://localhost:8080/api";
 
 export function saveAuth(data) {
 
@@ -25,9 +25,7 @@ export function clearAuth() {
 
 // MOCK login (luego lo vamos a remplazar por fetch al backend)
 export async function loginApi({ email, password }) {
-  console.log('email', email);
-  console.log('password', password);
-  const res = await fetch(BASE_URL + "/api/users/login", {
+  const res = await fetch(BASE_URL + "/users/login", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
@@ -36,11 +34,20 @@ export async function loginApi({ email, password }) {
     })
   });
 
-  const data = await res.json();
+  let data;
 
-  console.log('loginApi.json ini: ');
+  try {
+    data = await res.json();
+  }
+  catch {
+    throw new Error("Respuesta inválida del servidor");
+  }
+
+  if (!res.ok) {
+    throw new Error(data.message || "Credenciales inválidas");
+  }
+
   console.log(data);
-  console.log('loginApi.json end: ');
 
   return data;
 }

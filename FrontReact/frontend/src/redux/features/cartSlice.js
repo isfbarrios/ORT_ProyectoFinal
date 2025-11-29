@@ -69,12 +69,12 @@ function getSessionId() {
   return localStorage.getItem(SESSION_KEY) || null;
 }
 
-function saveSessionIdFromHeaders(headers) {
+/*function saveSessionIdFromHeaders(headers) {
   const sessionId = headers.get("X-Session-Id");
   if (sessionId) {
     localStorage.setItem(SESSION_KEY, sessionId);
   }
-}
+}*/
 
 function clearSessionId() {
   localStorage.removeItem(SESSION_KEY);
@@ -92,9 +92,8 @@ export const fetchCartAsync = () => async (dispatch) => {
 
   try {
     const sessionId = getSessionId();
-    const { data, headers } = await apiGetCart({ sessionId });
+    const { data } = await apiGetCart({ sessionId });
 
-    saveSessionIdFromHeaders(headers);
     dispatch(setCart(data));
   } catch (error) {
     dispatch(setCartError(error.message));
@@ -106,21 +105,14 @@ export const fetchCartAsync = () => async (dispatch) => {
 /**
  * Agregar ítem al carrito.
  */
-export const addItemToCartAsync =
-  (menuItemId, quantity = 1) =>
+export const addItemToCartAsync = (menuItemId, quantity = 1) =>
   async (dispatch) => {
     dispatch(setCartLoading(true));
     dispatch(setCartError(null));
 
     try {
-      const sessionId = getSessionId();
-      const { data, headers } = await apiAddItemToCart({
-        sessionId,
-        menuItemId,
-        quantity,
-      });
+      const data = await apiAddItemToCart({ menuItemId, quantity });
 
-      saveSessionIdFromHeaders(headers);
       dispatch(setCart(data));
     } catch (error) {
       dispatch(setCartError(error.message));
@@ -142,9 +134,8 @@ export const confirmCartAsync = () => async (dispatch) => {
 
   try {
     const sessionId = getSessionId();
-    const { data, headers } = await apiConfirmCart({ sessionId });
+    const data = await apiConfirmCart({ sessionId });
 
-    saveSessionIdFromHeaders(headers);
     dispatch(clearCartState());
     clearSessionId();
 
@@ -168,9 +159,10 @@ export const closeCartAsync = () => async (dispatch) => {
 
   try {
     const sessionId = getSessionId();
-    const { headers } = await apiCloseCart({ sessionId });
+    const data = await apiCloseCart({ sessionId });
 
-    saveSessionIdFromHeaders(headers);
+    console.log(data);
+
     dispatch(clearCartState());
     clearSessionId();
   } catch (error) {

@@ -20,6 +20,7 @@ import java.util.stream.Collectors;
 @Service
 public class CartService {
 
+    @Autowired
     private SessionService sessionService;
 
     @Autowired
@@ -64,6 +65,12 @@ public class CartService {
         cart.setCartState(cartState);
         cart.setTable(table);
 
+        BigDecimal amount = BigDecimal.ZERO;
+
+        //TODO: Recalcular
+        cart.setAmount(amount);
+        cart.setDelayTime(120);
+
         return cartRepository.save(cart);
     }
 
@@ -72,6 +79,9 @@ public class CartService {
         System.out.println(getClass().getName()+".getOrCreateCartEntity.sessionIdHeader: " + sessionIdHeader);
 
         Session session = sessionService.resolveSession(sessionIdHeader);
+
+        System.out.println("CartService.getOrCreateCartEntity.sessionIdHeader: " + sessionIdHeader);
+        System.out.println("CartService.getOrCreateCartEntity.session: " + session.getSessionId());
 
         return cartRepository.findBySession_SessionId(session.getSessionId())
                 .orElseGet(() -> createNewCart(session));
@@ -136,7 +146,10 @@ public class CartService {
             newItem.setCart(cart);
             newItem.setMenuItem(menuitem);
             newItem.setQuantity(quantity);
-            // Si tenés itemAmount y delayTime en Cartitem, podés setearlos acá
+
+            newItem.setItemAmount(new BigDecimal("250"));
+            newItem.setDelayTime(45);
+
             cartItemRepository.save(newItem);
         }
         else {

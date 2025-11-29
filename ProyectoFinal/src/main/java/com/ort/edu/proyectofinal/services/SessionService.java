@@ -17,6 +17,8 @@ public class SessionService {
 
     public Session resolveSession(String sessionId) {
 
+        System.out.println("SessionService.resolveSession.sessionId: " + sessionId);
+
         if (sessionId == null || sessionId.isBlank()) {
 
             Session s = new Session();
@@ -24,7 +26,8 @@ public class SessionService {
             s.setCreatedDate(Instant.now());
 
             repo.save(s);
-            System.out.println("Generated sessionId: " + UUID.randomUUID().toString());
+
+            System.out.println("SessionService.resolveSession.s.getSessionId: " + s.getSessionId());
 
             return s;
         }
@@ -35,6 +38,8 @@ public class SessionService {
         if (existing.isPresent()) {
             return existing.get();
         }
+
+        System.out.println("SessionService.resolveSession.sessionId: null");
 
         return null;
     }
