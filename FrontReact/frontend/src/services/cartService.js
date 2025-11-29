@@ -1,31 +1,15 @@
-const API_URL = "http://localhost:8080/api";
-
-// ------------------------------------------------------
-// HELPER PARA EL SESSION ID
-// ------------------------------------------------------
-
-const SESSION_KEY = "restaurant-session-id";
-
-export function getSessionId() {
-  return localStorage.getItem(SESSION_KEY) || null;
-}
-
-export function saveSessionIdFromHeaders(headers) {
-  const sessionId = headers.get("X-Session-Id");
-  if (sessionId) localStorage.setItem(SESSION_KEY, sessionId);
-}
-
-export function clearSessionId() {
-  localStorage.removeItem(SESSION_KEY);
-}
-
+import {
+  API_URL,
+  SESSION_KEY,
+  getFromLocalStorage
+} from "../functions/localStorage"
 
 
 // ------------------------------------------------------
 // 1) GET /api/session-cart
 // ------------------------------------------------------
 
-export async function apiGetCart({ sessionId }) {
+export async function apiGetCart(sessionId) {
   const res = await fetch(`${API_URL}/session-cart`, {
     method: "GET",
     headers: {
@@ -54,14 +38,18 @@ export async function apiGetCart({ sessionId }) {
 // 2) POST /api/session-cart/items
 // ------------------------------------------------------
 
-export async function apiAddItemToCart({ sessionId, menuItemId, quantity }) {
+export async function apiAddItemToCart(menuItemId, quantity) {
+  let sessionId = getFromLocalStorage(SESSION_KEY);
   const res = await fetch(`${API_URL}/session-cart/items`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
       ...(sessionId ? { "X-Session-Id": sessionId } : {}),
     },
-    body: JSON.stringify({ menuItemId, quantity }),
+    body: JSON.stringify({
+      menuItemId: menuItemId,
+      quantity: quantity
+    }),
   });
 
   let data;
@@ -84,7 +72,7 @@ export async function apiAddItemToCart({ sessionId, menuItemId, quantity }) {
 // 3) POST /api/session-cart/confirm
 // ------------------------------------------------------
 
-export async function apiConfirmCart({ sessionId }) {
+export async function apiConfirmCart(sessionId) {
   const res = await fetch(`${API_URL}/session-cart/confirm`, {
     method: "POST",
     headers: {
@@ -113,7 +101,7 @@ export async function apiConfirmCart({ sessionId }) {
 // 4) POST /api/session-cart/close
 // ------------------------------------------------------
 
-export async function apiCloseCart({ sessionId }) {
+export async function apiCloseCart(sessionId) {
   const res = await fetch(`${API_URL}/session-cart/close`, {
     method: "POST",
     headers: {

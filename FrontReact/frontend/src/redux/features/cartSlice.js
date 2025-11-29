@@ -5,8 +5,11 @@ import {
   apiConfirmCart,
   apiCloseCart,
 } from "../../services/cartService";
-
-const SESSION_KEY = "restaurant-session-id";
+import {
+  SESSION_KEY,
+  getFromLocalStorage,
+  clearLocalStorage
+} from "../../functions/localStorage"
 
 const initialState = {
   items: [],
@@ -61,27 +64,6 @@ export const {
 
 export default cartSlice.reducer;
 
-// ---------------------------
-// Helpers de sesión
-// ---------------------------
-
-function getSessionId() {
-  return localStorage.getItem('SESSION_KEY') || null;
-}
-
-/*function saveSessionIdFromHeaders(headers) {
-  const sessionId = headers.get("X-Session-Id");
-  if (sessionId) {
-    localStorage.setItem(SESSION_KEY, sessionId);
-  }
-}*/
-
-function clearSessionId() {
-  localStorage.removeItem(SESSION_KEY);
-}
-
-
-
 /**
  * Cargar carrito actual (si existe).
  * Se llama desde un useEffect o cuando se abra el menú / carrito.
@@ -91,13 +73,13 @@ export const fetchCartAsync = () => async (dispatch) => {
   dispatch(setCartError(null));
 
   try {
-    const sessionId = getSessionId();
-    const { data } = await apiGetCart({ sessionId });
-
+    const data = await apiGetCart(getFromLocalStorage(SESSION_KEY));
     dispatch(setCart(data));
-  } catch (error) {
+  }
+  catch (error) {
     dispatch(setCartError(error.message));
-  } finally {
+  }
+  finally {
     dispatch(setCartLoading(false));
   }
 };
@@ -105,18 +87,20 @@ export const fetchCartAsync = () => async (dispatch) => {
 /**
  * Agregar ítem al carrito.
  */
-export const addItemToCartAsync = (menuItemId, quantity = 1) =>
+export const addItemToCartAsync = (menuItemId, quantity) =>
   async (dispatch) => {
     dispatch(setCartLoading(true));
     dispatch(setCartError(null));
 
     try {
-      const data = await apiAddItemToCart({ menuItemId, quantity });
+      const data = await apiAddItemToCart(menuItemId, quantity);
 
       dispatch(setCart(data));
-    } catch (error) {
+    }
+    catch (error) {
       dispatch(setCartError(error.message));
-    } finally {
+    }
+    finally {
       dispatch(setCartLoading(false));
     }
   };
@@ -133,17 +117,19 @@ export const confirmCartAsync = () => async (dispatch) => {
   dispatch(setCartError(null));
 
   try {
-    const sessionId = getSessionId();
-    const data = await apiConfirmCart({ sessionId });
+    const sessionId = getFromLocalStorage(SESSION_KEY);
+    const data = await apiConfirmCart(sessionId);
 
     dispatch(clearCartState());
-    clearSessionId();
+    clearLocalStorage();
 
     return data; // OrderDTO
-  } catch (error) {
+  }
+  catch (error) {
     dispatch(setCartError(error.message));
     return null;
-  } finally {
+  }
+  finally {
     dispatch(setCartLoading(false));
   }
 };
@@ -158,16 +144,18 @@ export const closeCartAsync = () => async (dispatch) => {
   dispatch(setCartError(null));
 
   try {
-    const sessionId = getSessionId();
-    const data = await apiCloseCart({ sessionId });
+    const sessionId = getFromLocalStorage(SESSION_KEY);
+    const data = await apiCloseCart(sessionId);
 
     console.log(data);
 
     dispatch(clearCartState());
-    clearSessionId();
-  } catch (error) {
+    clearLocalStorage();
+  }
+  catch (error) {
     dispatch(setCartError(error.message));
-  } finally {
+  }
+  finally {
     dispatch(setCartLoading(false));
   }
 };

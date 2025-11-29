@@ -1,31 +1,45 @@
-const KEY = "auth"; // --> luego lo voy a sustituir con lo que me pase springboot
-const BASE_URL = "http://localhost:8080/api";
+import {
+  KEY,
+  SESSION_KEY,
+  API_URL,
+  saveToLocalStorage,
+  getFromLocalStorage,
+  removeFromLocalStorage
+} from "../functions/localStorage"
 
+// guardo la session del usuario
 export function saveAuth(data) {
-
   const session = {
     isLogged: true,
     user: data.user ?? data,
   };
 
-  localStorage.setItem(KEY, JSON.stringify(session));
+  saveToLocalStorage(KEY, session);
+
+  // si el back me  devolvió sessionId, lo guardo para el carrito
+  const sessionId = session.user?.sessionId;
+  if (session !== undefined && sessionId != null) {
+
+    console.log('saveAuth.sessionId: ' + sessionId);
+
+    saveToLocalStorage(SESSION_KEY, String(sessionId));
+  }
 }
 
 // leo la sesion guardada
 export function getAuth() {
-  const raw = localStorage.getItem(KEY);
-  return raw ? JSON.parse(raw) : null;
+  return getFromLocalStorage(KEY);
 }
 
 //borro la sesion guardada en storage
 export function clearAuth() {
-  localStorage.removeItem(KEY);
+  removeFromLocalStorage(KEY);
+  removeFromLocalStorage(SESSION_KEY);
 }
-
 
 // MOCK login (luego lo vamos a remplazar por fetch al backend)
 export async function loginApi({ email, password }) {
-  const res = await fetch(BASE_URL + "/users/login", {
+  const res = await fetch(API_URL + "/users/login", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
@@ -46,9 +60,6 @@ export async function loginApi({ email, password }) {
   if (!res.ok) {
     throw new Error(data.message || "Credenciales inválidas");
   }
-
-  //TODO: Ver de hacer un js de funciones para manejar funciones globales de login
-  localStorage.setItem('SESSION_KEY', data.sessionId);
 
   return data;
 }

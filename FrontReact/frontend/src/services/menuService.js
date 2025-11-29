@@ -1,5 +1,6 @@
-// src/services/menuService.js
-const API_URL = "http://localhost:8080/api";
+import {
+  API_URL
+} from "../functions/localStorage"
 
 export async function getMenuItemsByMenu(menuId) {
   const res = await fetch(`${API_URL}/menu_item/menu/${menuId}`, {
