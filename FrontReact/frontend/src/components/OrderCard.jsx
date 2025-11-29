@@ -5,7 +5,6 @@ import { fetchOrderServiceFromApi } from "../services/orderService";
 
 export default function OrderCard({ order, columnId }) {
 
-  console.log("ordenes: ",order,"columna: " ,columnId);
   const onDragStart = (e) => {
     e.dataTransfer.setData("orderId", String(order.id));
     e.dataTransfer.setData("sourceColId", String(columnId));

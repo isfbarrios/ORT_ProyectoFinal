@@ -47,7 +47,8 @@ export async function loginApi({ email, password }) {
     throw new Error(data.message || "Credenciales inválidas");
   }
 
-  console.log(data);
+  //TODO: Ver de hacer un js de funciones para manejar funciones globales de login
+  localStorage.setItem('SESSION_KEY', data.sessionId);
 
   return data;
 }

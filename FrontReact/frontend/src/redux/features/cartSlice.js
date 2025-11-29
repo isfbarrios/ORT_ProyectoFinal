@@ -66,7 +66,7 @@ export default cartSlice.reducer;
 // ---------------------------
 
 function getSessionId() {
-  return localStorage.getItem(SESSION_KEY) || null;
+  return localStorage.getItem('SESSION_KEY') || null;
 }
 
 /*function saveSessionIdFromHeaders(headers) {

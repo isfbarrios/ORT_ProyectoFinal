@@ -12,7 +12,6 @@ export async function fetchBoardFromApi() {
   }
 
   const data = await res.json();
-  console.log("Respuesta del backend:", data);
 
   return data;   //  devolvemos el array como viene del backend
 }
