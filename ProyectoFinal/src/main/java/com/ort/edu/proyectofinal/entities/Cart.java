@@ -8,6 +8,7 @@ import org.hibernate.annotations.ColumnDefault;
 
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.time.LocalDateTime;
 
 @Setter
 @Getter
@@ -36,7 +37,7 @@ public class Cart {
 
     @ColumnDefault("current_timestamp()")
     @Column(name = "Date", nullable = false)
-    private Instant date;
+    private LocalDateTime date;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "CartStateId", nullable = false)
@@ -49,7 +50,7 @@ public class Cart {
 
     @ColumnDefault("current_timestamp()")
     @Column(name = "LastUpdate", nullable = false)
-    private Instant lastUpdate;
+    private LocalDateTime lastUpdate;
 
     public Cart() {}
 
@@ -59,7 +60,7 @@ public class Cart {
         this.amount = amount;
         this.delayTime = delayTime;
         this.cartState = cartState;
-        this.date = Instant.now();
-        this.lastUpdate = Instant.now();
+        this.date = LocalDateTime.now();
+        this.lastUpdate = LocalDateTime.now();
     }
 }

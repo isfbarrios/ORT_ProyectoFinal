@@ -4,10 +4,14 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.ort.edu.proyectofinal.entities.Order;
 import com.ort.edu.proyectofinal.entities.Ordercanal;
 import com.ort.edu.proyectofinal.entities.Orderstate;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.util.Objects;
 
+@Getter
+@Setter
 public class OrderDTO {
 
     private Integer id;
@@ -26,54 +30,6 @@ public class OrderDTO {
         this.state = order.getState();
         this.canal = order.getCanal();
         this.description = order.getDescription();
-    }
-
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    public String getOrderNumber() {
-        return orderNumber;
-    }
-
-    public void setOrderNumber(String orderNumber) {
-        this.orderNumber = orderNumber;
-    }
-
-    public BigDecimal getAmount() {
-        return amount;
-    }
-
-    public void setAmount(BigDecimal amount) {
-        this.amount = amount;
-    }
-
-    public Orderstate getState() {
-        return state;
-    }
-
-    public void setState(Orderstate state) {
-        this.state = state;
-    }
-
-    public Ordercanal getCanal() {
-        return canal;
-    }
-
-    public void setCanal(Ordercanal canal) {
-        this.canal = canal;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
     }
 
     @Override

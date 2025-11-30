@@ -3,10 +3,14 @@ package com.ort.edu.proyectofinal.dto;
 import com.ort.edu.proyectofinal.entities.Cartitem;
 import com.ort.edu.proyectofinal.entities.CartitemId;
 import com.ort.edu.proyectofinal.entities.Menuitem;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.util.Objects;
 
+@Getter
+@Setter
 public class CartItemDTO {
 
     private CartitemId id;
@@ -23,46 +27,6 @@ public class CartItemDTO {
         this.quantity = item.getQuantity();
         this.itemAmount = item.getItemAmount();
         this.delayTime = item.getDelayTime();
-    }
-
-    public CartitemId getId() {
-        return id;
-    }
-
-    public void setId(CartitemId id) {
-        this.id = id;
-    }
-
-    public Menuitem getMenuItem() {
-        return menuItem;
-    }
-
-    public void setMenuItem(Menuitem menuItem) {
-        this.menuItem = menuItem;
-    }
-
-    public Integer getQuantity() {
-        return quantity;
-    }
-
-    public void setQuantity(Integer quantity) {
-        this.quantity = quantity;
-    }
-
-    public BigDecimal getItemAmount() {
-        return itemAmount;
-    }
-
-    public void setItemAmount(BigDecimal itemAmount) {
-        this.itemAmount = itemAmount;
-    }
-
-    public Integer getDelayTime() {
-        return delayTime;
-    }
-
-    public void setDelayTime(Integer delayTime) {
-        this.delayTime = delayTime;
     }
 
     @Override

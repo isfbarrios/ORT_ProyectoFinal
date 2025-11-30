@@ -4,10 +4,14 @@ import com.ort.edu.proyectofinal.entities.Menu;
 import com.ort.edu.proyectofinal.entities.Menuitem;
 import com.ort.edu.proyectofinal.entities.Menuitemstate;
 import com.ort.edu.proyectofinal.entities.Menuitemtype;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.util.Objects;
 
+@Getter
+@Setter
 public class MenuItemDTO {
 
     private Integer id;
@@ -28,62 +32,6 @@ public class MenuItemDTO {
         this.type = item.getType();
         this.state = item.getState();
         this.basePrice = item.getBasePrice();
-    }
-
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    public Menu getMenu() {
-        return menu;
-    }
-
-    public void setMenu(Menu menu) {
-        this.menu = menu;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public Menuitemtype getType() {
-        return type;
-    }
-
-    public void setType(Menuitemtype type) {
-        this.type = type;
-    }
-
-    public Menuitemstate getState() {
-        return state;
-    }
-
-    public void setState(Menuitemstate state) {
-        this.state = state;
-    }
-
-    public BigDecimal getBasePrice() {
-        return basePrice;
-    }
-
-    public void setBasePrice(BigDecimal basePrice) {
-        this.basePrice = basePrice;
     }
 
     @Override

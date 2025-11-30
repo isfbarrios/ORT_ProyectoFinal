@@ -2,12 +2,18 @@ package com.ort.edu.proyectofinal.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.annotations.ColumnDefault;
 
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.time.LocalDateTime;
+
 import jakarta.persistence.Table;
 
+@Getter
+@Setter
 @Entity
 @Table(name = "menuitem", schema = "proyectofinal")
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
@@ -44,78 +50,9 @@ public class Menuitem {
 
     @ColumnDefault("current_timestamp()")
     @Column(name = "CreatedDate", nullable = false)
-    private Instant createdDate;
+    private LocalDateTime createdDate;
 
     @ColumnDefault("current_timestamp()")
     @Column(name = "LastUpdate", nullable = false)
-    private Instant lastUpdate;
-
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    public Menu getMenu() {
-        return menu;
-    }
-
-    public void setMenu(Menu menu) {
-        this.menu = menu;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public BigDecimal getBasePrice() { return basePrice; }
-
-    public void setBasePrice(BigDecimal basePrice) { this.basePrice = basePrice; }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public Menuitemtype getType() {
-        return type;
-    }
-
-    public void setType(Menuitemtype type) {
-        this.type = type;
-    }
-
-    public Menuitemstate getState() {
-        return state;
-    }
-
-    public void setState(Menuitemstate state) {
-        this.state = state;
-    }
-
-    public Instant getCreatedDate() {
-        return createdDate;
-    }
-
-    public void setCreatedDate(Instant createdDate) {
-        this.createdDate = createdDate;
-    }
-
-    public Instant getLastUpdate() {
-        return lastUpdate;
-    }
-
-    public void setLastUpdate(Instant lastUpdate) {
-        this.lastUpdate = lastUpdate;
-    }
-
+    private LocalDateTime lastUpdate;
 }

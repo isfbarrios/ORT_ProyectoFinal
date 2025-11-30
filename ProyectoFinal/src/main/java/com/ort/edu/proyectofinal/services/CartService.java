@@ -14,10 +14,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -70,8 +68,8 @@ public class CartService {
 
         Cart cart = new Cart();
         cart.setSession(session);
-        cart.setDate(Instant.now());
-        cart.setLastUpdate(Instant.now());
+        cart.setDate(LocalDateTime.now());
+        cart.setLastUpdate(LocalDateTime.now());
         cart.setCartState(cartState);
         cart.setTable(table);
 
@@ -99,7 +97,7 @@ public class CartService {
 
     private SessionCartDTO buildSessionCartDTO(Cart cart) {
         //Obtengo todos los items del carrito
-        List<Cartitem> items = cartItemRepository.findByCart_CartId(cart.getId());
+        List<Cartitem> items = cartItemRepository.findByCartId(cart.getId());
 
         List<SessionCartItemDTO> dtoItems = items.stream()
                 .map(SessionCartItemDTO::new)
@@ -137,7 +135,7 @@ public class CartService {
         Menuitem menuitem = menuItemRepository.findById(menuItemId)
                 .orElseThrow(() -> new IllegalArgumentException("Menuitem no encontrado"));
 
-        List<Cartitem> items = cartItemRepository.findByCart_CartId(cart.getId());
+        List<Cartitem> items = cartItemRepository.findByCartId(cart.getId());
 
         Cartitem existing = items.stream()
                 .filter(ci -> ci.getMenuItem().getId().equals(menuItemId))
@@ -170,18 +168,16 @@ public class CartService {
             cartItemRepository.save(existing);
         }
 
-        cart.setLastUpdate(Instant.now());
+        cart.setLastUpdate(LocalDateTime.now());
         cartRepository.save(cart);
 
         return buildSessionCartDTO(cart);
     }
 
-
     // ============================
     // Confirmar carrito → crear Order
     // ============================
-
-    public OrderDTO confirmCart(String sessionId) {
+    public OrderDTO confirmCart(String sessionId) throws CartException {
 
         if (sessionId == null || sessionId.isBlank()) {
             throw new CartException("No se recibió el identificador de sesión");
@@ -193,7 +189,7 @@ public class CartService {
         Cart cart = cartRepository.findBySession_SessionId(sessionId)
                 .orElseThrow(() -> new CartException("No existe un carrito abierto para la sesión"));
 
-        List<Cartitem> items = cartItemRepository.findById(cart.getId());
+        List<Cartitem> items = cartItemRepository.findByCartId(cart.getId());
 
         if (items.isEmpty()) {
             throw new CartException("El carrito está vacío, no se puede confirmar");
@@ -205,10 +201,11 @@ public class CartService {
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
         cart.setAmount(total);
-        cart.setLastUpdate(Instant.now());
+        cart.setLastUpdate(LocalDateTime.now());
 
         // Obtener estado "Confirmado"
-        Cartstate confirmedState = cartStateRepository.findByName("Confirmado");
+        Cartstate confirmedState = cartStateRepository.findByName("Cerrado");
+
         if (confirmedState == null) {
             throw new RuntimeException("El estado de carrito 'Confirmado' no está configurado en la base");
         }
@@ -294,7 +291,7 @@ public class CartService {
     @Transactional
     public void closeCart(String sessionIdHeader) {
         Cart cart = getOrCreateCartEntity(sessionIdHeader);
-        cart.setLastUpdate(Instant.now());
+        cart.setLastUpdate(LocalDateTime.now());
         // Si tenés estado de cart, marcarlo CERRADO
         cartRepository.save(cart);
     }

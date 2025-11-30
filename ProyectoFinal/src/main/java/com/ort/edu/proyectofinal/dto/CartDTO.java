@@ -7,7 +7,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.math.BigDecimal;
-import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.Objects;
 
 @Setter
@@ -17,7 +17,7 @@ public class CartDTO {
     private Integer id;
     private Tables table;
     private BigDecimal amount;
-    private Instant date;
+    private LocalDateTime date;
     private Cartstate cartState;
     private Integer delayTime;
 

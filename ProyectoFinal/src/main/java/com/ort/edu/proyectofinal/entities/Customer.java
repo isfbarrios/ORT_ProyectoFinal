@@ -7,7 +7,7 @@ import lombok.Setter;
 import org.hibernate.annotations.ColumnDefault;
 import jakarta.persistence.Table;
 
-import java.time.Instant;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -28,9 +28,9 @@ public class Customer {
 
     @ColumnDefault("current_timestamp()")
     @Column(name = "CreatedDate", nullable = false)
-    private Instant createdDate;
+    private LocalDateTime createdDate;
 
     @ColumnDefault("current_timestamp()")
     @Column(name = "LastUpdate", nullable = false)
-    private Instant lastUpdate;
+    private LocalDateTime lastUpdate;
 }

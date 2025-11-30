@@ -3,6 +3,7 @@ package com.ort.edu.proyectofinal.controllers;
 import com.ort.edu.proyectofinal.dto.SessionCartDTO;
 import com.ort.edu.proyectofinal.dto.OrderDTO;
 import com.ort.edu.proyectofinal.exception.CartException;
+import com.ort.edu.proyectofinal.exception.OrderException;
 import com.ort.edu.proyectofinal.services.CartService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -59,23 +60,35 @@ public class SessionCartController {
 
     @PostMapping("/confirm")
     public ResponseEntity<OrderDTO> confirm(
-            @RequestHeader(name = "X-Session-Id") String sessionId) {
+            @RequestHeader(name = "X-Session-Id") String sessionId) throws OrderException {
 
-        OrderDTO order = cartService.confirmCart(sessionId);
+        OrderDTO order = null;
+
+        try {
+            order = cartService.confirmCart(sessionId);
+        }
+        catch (CartException ce) {
+            throw new OrderException("No pudimos confirmar tu orden");
+        }
+        catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+        if (order == null) {
+            return ResponseEntity.notFound().build();
+        }
+
         return ResponseEntity.ok(order);
     }
 
-
     @PostMapping("/close")
-    public ResponseEntity<Void> close(
-            @RequestHeader(name = "X-Session-Id") String sessionId) {
+    public ResponseEntity<Void> close(@RequestHeader(name = "X-Session-Id") String sessionId) {
 
         cartService.closeCart(sessionId);
         return ResponseEntity.ok().build();
     }
 
     // ====== DTO interno para el body de /items ======
-
     public static class AddCartItemRequest {
         private int menuItemId;
         private int quantity;

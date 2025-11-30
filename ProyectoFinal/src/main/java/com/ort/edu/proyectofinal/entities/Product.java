@@ -2,12 +2,16 @@ package com.ort.edu.proyectofinal.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.annotations.ColumnDefault;
 import jakarta.persistence.Table;
 import java.math.BigDecimal;
-import java.time.Instant;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
+@Getter
+@Setter
 @Entity
 @Table(name = "products", schema = "proyectofinal")
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
@@ -36,62 +40,5 @@ public class Product {
 
     @ColumnDefault("current_timestamp()")
     @Column(name = "CreatedDate", nullable = false)
-    private Instant createdDate;
-
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public LocalDate getExpirationDate() {
-        return expirationDate;
-    }
-
-    public void setExpirationDate(LocalDate expirationDate) {
-        this.expirationDate = expirationDate;
-    }
-
-    public BigDecimal getStock() {
-        return stock;
-    }
-
-    public void setStock(BigDecimal stock) {
-        this.stock = stock;
-    }
-
-    public LocalDate getIncomeDate() {
-        return incomeDate;
-    }
-
-    public void setIncomeDate(LocalDate incomeDate) {
-        this.incomeDate = incomeDate;
-    }
-
-    public Productcategory getCategory() {
-        return category;
-    }
-
-    public void setCategory(Productcategory category) {
-        this.category = category;
-    }
-
-    public Instant getCreatedDate() {
-        return createdDate;
-    }
-
-    public void setCreatedDate(Instant createdDate) {
-        this.createdDate = createdDate;
-    }
-
+    private LocalDateTime createdDate;
 }

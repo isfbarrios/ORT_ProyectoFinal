@@ -9,6 +9,4 @@ public class TablesService {
 
     @Autowired
     private TablesRepository tablesRepository;
-
-
 }

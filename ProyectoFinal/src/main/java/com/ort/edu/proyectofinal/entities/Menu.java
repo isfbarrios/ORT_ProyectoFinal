@@ -6,9 +6,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.ColumnDefault;
 import jakarta.persistence.Table;
-
-import java.time.Instant;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -30,9 +28,9 @@ public class Menu {
 
     @ColumnDefault("curdate()")
     @Column(name = "Date", nullable = false)
-    private LocalDate date;
+    private LocalDateTime date;
 
     @ColumnDefault("current_timestamp()")
     @Column(name = "LastUpdate", nullable = false)
-    private Instant lastUpdate;
+    private LocalDateTime lastUpdate;
 }

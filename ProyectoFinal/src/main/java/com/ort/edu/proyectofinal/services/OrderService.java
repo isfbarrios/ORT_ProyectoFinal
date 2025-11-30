@@ -9,7 +9,6 @@ import com.ort.edu.proyectofinal.repositories.OrderCanalRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.time.Instant;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -34,8 +33,8 @@ public class OrderService {
         }
 
         Order order = new Order();
-        order.setDate(Instant.now());
-        order.setLastUpdate(Instant.now());
+        order.setDate(LocalDateTime.now());
+        order.setLastUpdate(LocalDateTime.now());
 
         // Número de orden simple (podés cambiar la estrategia)
         order.setOrderNumber(generateOrderNumber());
@@ -95,7 +94,7 @@ public class OrderService {
                 .orElseThrow(() -> new RuntimeException("State not found"));
 
         order.setState(state);
-        order.setLastUpdate(java.time.Instant.now());
+        order.setLastUpdate(LocalDateTime.now());
 
         return orderRepo.save(order);
     }

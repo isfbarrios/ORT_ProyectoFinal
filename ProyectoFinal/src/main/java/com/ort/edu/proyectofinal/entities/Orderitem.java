@@ -2,10 +2,14 @@ package com.ort.edu.proyectofinal.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 import jakarta.persistence.Table;
 
+@Getter
+@Setter
 @Entity
 @Table(name = "orderitem", schema = "proyectofinal")
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
@@ -31,45 +35,4 @@ public class Orderitem {
     @Lob
     @Column(name = "ExtraData")
     private String extraData;
-
-    public OrderitemId getId() {
-        return id;
-    }
-
-    public void setId(OrderitemId id) {
-        this.id = id;
-    }
-
-    public Order getOrder() {
-        return order;
-    }
-
-    public void setOrder(Order order) {
-        this.order = order;
-    }
-
-    public Menuitem getMenuItem() {
-        return menuItem;
-    }
-
-    public void setMenuItem(Menuitem menuItem) {
-        this.menuItem = menuItem;
-    }
-
-    public Integer getQuantity() {
-        return quantity;
-    }
-
-    public void setQuantity(Integer quantity) {
-        this.quantity = quantity;
-    }
-
-    public String getExtraData() {
-        return extraData;
-    }
-
-    public void setExtraData(String extraData) {
-        this.extraData = extraData;
-    }
-
 }

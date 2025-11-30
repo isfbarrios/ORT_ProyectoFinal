@@ -1,8 +1,8 @@
 package com.ort.edu.proyectofinal.controllers;
 
 import com.ort.edu.proyectofinal.dto.CartItemDTO;
-import com.ort.edu.proyectofinal.dto.OrderStateDTO;
 import com.ort.edu.proyectofinal.entities.Cartitem;
+import com.ort.edu.proyectofinal.entities.CartitemId;
 import com.ort.edu.proyectofinal.repositories.CartItemRepository;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -30,15 +30,13 @@ public class CartItemController {
             description = "Obtener item del carrito (menu_item) por su id"
     )
     @GetMapping("/{cartId}/{menuItemId}")
-    public ResponseEntity<CartItemDTO> get(
-            @PathVariable int cartId,
-            @PathVariable int menuItemId) {
+    public ResponseEntity<CartItemDTO> get(@PathVariable int cartId, @PathVariable int menuItemId) {
 
-        CartitemId pk = new CartitemId();
-        pk.setCartId(cartId);
-        pk.setMenuItemId(menuItemId);
+        CartitemId cartitemId = new CartitemId();
+        cartitemId.setCartId(cartId);
+        cartitemId.setItemId(menuItemId);
 
-        Optional<Cartitem> optional = repo.findById(pk);
+        Optional<Cartitem> optional = repo.findById(cartitemId);
 
         if (optional.isEmpty()) {
             return ResponseEntity.notFound().build();
@@ -47,9 +45,9 @@ public class CartItemController {
         return ResponseEntity.ok(new CartItemDTO(optional.get()));
     }
 
-
     @GetMapping
     public ResponseEntity<List<CartItemDTO>> getAll() {
+
         List<CartItemDTO> items = repo.findAll()
                 .stream()
                 .map(CartItemDTO::new)
@@ -60,7 +58,7 @@ public class CartItemController {
 
     @GetMapping("/cart/{cartId}")
     public ResponseEntity<List<CartItemDTO>> getAllByCart(@PathVariable int cartId) {
-        List<CartItemDTO> items = repo.findByCart_CartId(cartId)
+        List<CartItemDTO> items = repo.findByCartId(cartId)
                 .stream()
                 .map(CartItemDTO::new)
                 .collect(Collectors.toList());

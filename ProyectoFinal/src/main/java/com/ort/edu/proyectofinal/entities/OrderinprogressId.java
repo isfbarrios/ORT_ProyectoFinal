@@ -2,11 +2,14 @@ package com.ort.edu.proyectofinal.entities;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
+import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.Hibernate;
-import jakarta.persistence.Table;
 import java.io.Serializable;
 import java.util.Objects;
 
+@Getter
+@Setter
 @Embeddable
 public class OrderinprogressId implements Serializable {
     private static final long serialVersionUID = 1800169105774616881L;
@@ -45,5 +48,4 @@ public class OrderinprogressId implements Serializable {
     public int hashCode() {
         return Objects.hash(orderId, stepId);
     }
-
 }

@@ -2,12 +2,16 @@ package com.ort.edu.proyectofinal.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 import jakarta.persistence.Table;
 import java.time.Instant;
 
+@Getter
+@Setter
 @Entity
 @Table(name = "menuitempreparationtime", schema = "proyectofinal")
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
@@ -29,37 +33,4 @@ public class Menuitempreparationtime {
     @ColumnDefault("current_timestamp()")
     @Column(name = "CreatedDate", nullable = false)
     private Instant createdDate;
-
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    public Menuitem getMenuitem() {
-        return menuitem;
-    }
-
-    public void setMenuitem(Menuitem menuitem) {
-        this.menuitem = menuitem;
-    }
-
-    public Integer getTime() {
-        return time;
-    }
-
-    public void setTime(Integer time) {
-        this.time = time;
-    }
-
-    public Instant getCreatedDate() {
-        return createdDate;
-    }
-
-    public void setCreatedDate(Instant createdDate) {
-        this.createdDate = createdDate;
-    }
-
 }

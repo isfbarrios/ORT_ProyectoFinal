@@ -2,11 +2,14 @@ package com.ort.edu.proyectofinal.entities;
 
 import jakarta.persistence.*;
 import jakarta.persistence.Table;
+import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.annotations.ColumnDefault;
-import jakarta.persistence.Table;
 
-import java.time.Instant;
+import java.time.LocalDateTime;
 
+@Getter
+@Setter
 @Entity
 @Table(name = "users", schema = "proyectofinal")
 public class User {
@@ -32,74 +35,9 @@ public class User {
 
     @ColumnDefault("current_timestamp()")
     @Column(name = "CreatedDate", nullable = false)
-    private Instant createdDate;
+    private LocalDateTime createdDate;
 
     @ColumnDefault("current_timestamp()")
     @Column(name = "LastUpdate", nullable = false)
-    private Instant lastUpdate;
-
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getSurname() {
-        return surname;
-    }
-
-    public void setSurname(String surname) {
-        this.surname = surname;
-    }
-
-    public String getMail() {
-        return mail;
-    }
-
-    public void setMail(String mail) {
-        this.mail = mail;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public Instant getCreatedDate() {
-        return createdDate;
-    }
-
-    public void setCreatedDate(Instant createdDate) {
-        this.createdDate = createdDate;
-    }
-
-    public Instant getLastUpdate() {
-        return lastUpdate;
-    }
-
-    public void setLastUpdate(Instant lastUpdate) {
-        this.lastUpdate = lastUpdate;
-    }
-
+    private LocalDateTime lastUpdate;
 }

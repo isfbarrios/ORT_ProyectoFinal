@@ -3,37 +3,26 @@ package com.ort.edu.proyectofinal.entities;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
+import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.Hibernate;
-import jakarta.persistence.Table;
 import java.io.Serializable;
-import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.Objects;
 
+@Getter
+@Setter
 @Embeddable
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class TableavailabilityId implements Serializable {
+
     private static final long serialVersionUID = -8234248950412676069L;
+
     @Column(name = "TableId", nullable = false)
     private Integer tableId;
 
     @Column(name = "ReservedTimestamp", nullable = false)
-    private Instant reservedTimestamp;
-
-    public Integer getTableId() {
-        return tableId;
-    }
-
-    public void setTableId(Integer tableId) {
-        this.tableId = tableId;
-    }
-
-    public Instant getReservedTimestamp() {
-        return reservedTimestamp;
-    }
-
-    public void setReservedTimestamp(Instant reservedTimestamp) {
-        this.reservedTimestamp = reservedTimestamp;
-    }
+    private LocalDateTime reservedTimestamp;
 
     @Override
     public boolean equals(Object o) {
@@ -48,5 +37,4 @@ public class TableavailabilityId implements Serializable {
     public int hashCode() {
         return Objects.hash(tableId, reservedTimestamp);
     }
-
 }

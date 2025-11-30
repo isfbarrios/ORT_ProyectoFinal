@@ -1,8 +1,6 @@
 package com.ort.edu.proyectofinal.controllers;
 
-import com.ort.edu.proyectofinal.dto.CartDTO;
 import com.ort.edu.proyectofinal.dto.CartStateDTO;
-import com.ort.edu.proyectofinal.entities.Cart;
 import com.ort.edu.proyectofinal.entities.Cartstate;
 import com.ort.edu.proyectofinal.repositories.CartStateRepository;
 import org.springframework.beans.factory.annotation.Autowired;

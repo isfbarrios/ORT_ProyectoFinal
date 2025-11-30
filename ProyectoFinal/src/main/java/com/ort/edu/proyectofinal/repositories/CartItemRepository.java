@@ -12,6 +12,6 @@ import java.util.List;
 public interface CartItemRepository extends JpaRepository<Cartitem, CartitemId>  {
 
     // Consultas automáticas via Spring Data:
-    Optional<Cartitem> findById(CartitemId id);
-
+    //Optional<Cartitem> findById(CartitemId id);
+    List<Cartitem> findByCartId(int cartId);
 }

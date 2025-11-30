@@ -1,7 +1,12 @@
 package com.ort.edu.proyectofinal.dto;
 
+import lombok.Getter;
+import lombok.Setter;
+
 import java.util.Objects;
 
+@Getter
+@Setter
 public class OrderUpdateDTO {
 
     private int orderId;
@@ -11,22 +16,6 @@ public class OrderUpdateDTO {
 
     public OrderUpdateDTO(int orderId, int orderStateId) {
         this.orderId = orderId;
-        this.orderStateId = orderStateId;
-    }
-
-    public int getOrderId() {
-        return orderId;
-    }
-
-    public void setOrderId(int orderId) {
-        this.orderId = orderId;
-    }
-
-    public int getOrderStateId() {
-        return orderStateId;
-    }
-
-    public void setOrderStateId(int orderStateId) {
         this.orderStateId = orderStateId;
     }
 

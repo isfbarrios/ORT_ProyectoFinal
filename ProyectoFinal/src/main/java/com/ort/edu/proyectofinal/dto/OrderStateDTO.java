@@ -3,9 +3,13 @@ package com.ort.edu.proyectofinal.dto;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.ort.edu.proyectofinal.entities.Orderstate;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.Objects;
 
+@Getter
+@Setter
 public class OrderStateDTO {
 
     @JsonProperty("id")
@@ -21,30 +25,6 @@ public class OrderStateDTO {
         this.id = orderState.getId();
         this.name = orderState.getName();
         this.description = orderState.getDescription();
-    }
-
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
     }
 
     @Override

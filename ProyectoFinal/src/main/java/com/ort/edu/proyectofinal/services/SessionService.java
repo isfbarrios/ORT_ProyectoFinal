@@ -5,7 +5,7 @@ import com.ort.edu.proyectofinal.repositories.SessionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -17,17 +17,13 @@ public class SessionService {
 
     public Session resolveSession(String sessionId) {
 
-        System.out.println("SessionService.resolveSession.sessionId: " + sessionId);
-
         if (sessionId == null || sessionId.isBlank()) {
 
             Session s = new Session();
             s.setSessionId(UUID.randomUUID().toString());
-            s.setCreatedDate(Instant.now());
+            s.setCreatedDate(LocalDateTime.now());
 
             repo.save(s);
-
-            System.out.println("SessionService.resolveSession.s.getSessionId: " + s.getSessionId());
 
             return s;
         }
@@ -38,8 +34,6 @@ public class SessionService {
         if (existing.isPresent()) {
             return existing.get();
         }
-
-        System.out.println("SessionService.resolveSession.sessionId: null");
 
         return null;
     }

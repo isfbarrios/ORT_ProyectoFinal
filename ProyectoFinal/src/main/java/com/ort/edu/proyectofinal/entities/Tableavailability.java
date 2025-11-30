@@ -3,9 +3,13 @@ package com.ort.edu.proyectofinal.entities;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import jakarta.persistence.Table;
+import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
+@Setter
+@Getter
 @Entity
 @Table(name = "tableavailability", schema = "proyectofinal")
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
@@ -24,29 +28,4 @@ public class Tableavailability {
     @JoinColumn(name = "StateId", nullable = false)
     @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private Tablestate state;
-
-    public TableavailabilityId getId() {
-        return id;
-    }
-
-    public void setId(TableavailabilityId id) {
-        this.id = id;
-    }
-
-    public Tables getTable() {
-        return table;
-    }
-
-    public void setTable(Tables table) {
-        this.table = table;
-    }
-
-    public Tablestate getState() {
-        return state;
-    }
-
-    public void setState(Tablestate state) {
-        this.state = state;
-    }
-
 }

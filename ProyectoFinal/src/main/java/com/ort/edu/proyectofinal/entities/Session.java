@@ -8,8 +8,8 @@ import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.ColumnDefault;
-import jakarta.persistence.Table;
-import java.time.Instant;
+
+import java.time.LocalDateTime;
 
 @Setter
 @Getter
@@ -23,5 +23,5 @@ public class Session {
 
     @ColumnDefault("current_timestamp()")
     @Column(name = "CreatedDate", nullable = false)
-    private Instant createdDate;
+    private LocalDateTime createdDate;
 }

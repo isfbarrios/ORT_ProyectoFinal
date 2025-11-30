@@ -7,7 +7,7 @@ import lombok.Setter;
 import org.hibernate.annotations.ColumnDefault;
 import jakarta.persistence.Table;
 import java.math.BigDecimal;
-import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,7 +30,7 @@ public class Order {
 
     @ColumnDefault("current_timestamp()")
     @Column(name = "Date", nullable = false)
-    private Instant date;
+    private LocalDateTime date;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "StateId", nullable = false)
@@ -53,7 +53,7 @@ public class Order {
 
     @ColumnDefault("current_timestamp()")
     @Column(name = "LastUpdate", nullable = false)
-    private Instant lastUpdate;
+    private LocalDateTime lastUpdate;
 
     @Lob
     @Column(name = "ExtraData")

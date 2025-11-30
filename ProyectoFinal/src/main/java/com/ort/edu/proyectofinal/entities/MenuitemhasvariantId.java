@@ -2,36 +2,25 @@ package com.ort.edu.proyectofinal.entities;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
+import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.Hibernate;
-import jakarta.persistence.Table;
 
 import java.io.Serializable;
 import java.util.Objects;
 
+@Getter
+@Setter
 @Embeddable
 public class MenuitemhasvariantId implements Serializable {
+
     private static final long serialVersionUID = 5723731278691599715L;
+
     @Column(name = "MenuItemId", nullable = false)
     private Integer menuItemId;
 
     @Column(name = "VariantId", nullable = false)
     private Integer variantId;
-
-    public Integer getMenuItemId() {
-        return menuItemId;
-    }
-
-    public void setMenuItemId(Integer menuItemId) {
-        this.menuItemId = menuItemId;
-    }
-
-    public Integer getVariantId() {
-        return variantId;
-    }
-
-    public void setVariantId(Integer variantId) {
-        this.variantId = variantId;
-    }
 
     @Override
     public boolean equals(Object o) {
@@ -46,5 +35,4 @@ public class MenuitemhasvariantId implements Serializable {
     public int hashCode() {
         return Objects.hash(variantId, menuItemId);
     }
-
 }

@@ -2,10 +2,14 @@ package com.ort.edu.proyectofinal.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 import jakarta.persistence.Table;
 
+@Getter
+@Setter
 @Entity
 @Table(name = "customerpreference", schema = "proyectofinal")
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
@@ -25,29 +29,4 @@ public class Customerpreference {
     @JoinColumn(name = "PreferenceId", nullable = false)
     @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private Preference preference;
-
-    public CustomerpreferenceId getId() {
-        return id;
-    }
-
-    public void setId(CustomerpreferenceId id) {
-        this.id = id;
-    }
-
-    public Customer getCustomer() {
-        return customer;
-    }
-
-    public void setCustomer(Customer customer) {
-        this.customer = customer;
-    }
-
-    public Preference getPreference() {
-        return preference;
-    }
-
-    public void setPreference(Preference preference) {
-        this.preference = preference;
-    }
-
 }

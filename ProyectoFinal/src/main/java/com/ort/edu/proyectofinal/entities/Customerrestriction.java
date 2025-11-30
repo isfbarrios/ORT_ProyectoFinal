@@ -2,10 +2,14 @@ package com.ort.edu.proyectofinal.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 import jakarta.persistence.Table;
 
+@Getter
+@Setter
 @Entity
 @Table(name = "customerrestriction", schema = "proyectofinal")
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
@@ -25,29 +29,4 @@ public class Customerrestriction {
     @JoinColumn(name = "RestrictionId", nullable = false)
     @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private Restriction restriction;
-
-    public CustomerrestrictionId getId() {
-        return id;
-    }
-
-    public void setId(CustomerrestrictionId id) {
-        this.id = id;
-    }
-
-    public Customer getCustomer() {
-        return customer;
-    }
-
-    public void setCustomer(Customer customer) {
-        this.customer = customer;
-    }
-
-    public Restriction getRestriction() {
-        return restriction;
-    }
-
-    public void setRestriction(Restriction restriction) {
-        this.restriction = restriction;
-    }
-
 }
