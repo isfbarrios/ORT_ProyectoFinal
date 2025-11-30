@@ -3,6 +3,9 @@ package com.ort.edu.proyectofinal.services;
 import com.ort.edu.proyectofinal.dto.SessionCartDTO;
 import com.ort.edu.proyectofinal.dto.SessionCartItemDTO;
 import com.ort.edu.proyectofinal.dto.OrderDTO;
+import com.ort.edu.proyectofinal.entities.Cart;
+import com.ort.edu.proyectofinal.entities.Cartitem;
+import com.ort.edu.proyectofinal.entities.Session;
 import com.ort.edu.proyectofinal.entities.*;
 import com.ort.edu.proyectofinal.exception.CartException;
 import com.ort.edu.proyectofinal.repositories.*;
@@ -48,7 +51,14 @@ public class CartService {
     private CartStateRepository cartStateRepository;
 
     @Autowired
+    private SessionRepository sessionRepository;
+
+    @Autowired
     private TablesRepository tablesRepository;
+
+    @Autowired
+    private OrderService orderService;
+
 
     private Cart createNewCart(Session session) {
 
@@ -89,7 +99,7 @@ public class CartService {
 
     private SessionCartDTO buildSessionCartDTO(Cart cart) {
         //Obtengo todos los items del carrito
-        List<Cartitem> items = cartItemRepository.findByCartId(cart.getId());
+        List<Cartitem> items = cartItemRepository.findByCart_CartId(cart.getId());
 
         List<SessionCartItemDTO> dtoItems = items.stream()
                 .map(SessionCartItemDTO::new)
@@ -127,7 +137,7 @@ public class CartService {
         Menuitem menuitem = menuItemRepository.findById(menuItemId)
                 .orElseThrow(() -> new IllegalArgumentException("Menuitem no encontrado"));
 
-        List<Cartitem> items = cartItemRepository.findByCartId(cart.getId());
+        List<Cartitem> items = cartItemRepository.findByCart_CartId(cart.getId());
 
         Cartitem existing = items.stream()
                 .filter(ci -> ci.getMenuItem().getId().equals(menuItemId))
@@ -166,9 +176,53 @@ public class CartService {
         return buildSessionCartDTO(cart);
     }
 
+
     // ============================
     // Confirmar carrito → crear Order
     // ============================
+
+    public OrderDTO confirmCart(String sessionId) {
+
+        if (sessionId == null || sessionId.isBlank()) {
+            throw new CartException("No se recibió el identificador de sesión");
+        }
+
+        Session session = sessionRepository.findBySessionId(sessionId)
+                .orElseThrow(() -> new CartException("Sesión no encontrada"));
+
+        Cart cart = cartRepository.findBySession_SessionId(sessionId)
+                .orElseThrow(() -> new CartException("No existe un carrito abierto para la sesión"));
+
+        List<Cartitem> items = cartItemRepository.findById(cart.getId());
+
+        if (items.isEmpty()) {
+            throw new CartException("El carrito está vacío, no se puede confirmar");
+        }
+
+        // Recalcular total
+        BigDecimal total = items.stream()
+                .map(Cartitem::getItemAmount)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        cart.setAmount(total);
+        cart.setLastUpdate(Instant.now());
+
+        // Obtener estado "Confirmado"
+        Cartstate confirmedState = cartStateRepository.findByName("Confirmado");
+        if (confirmedState == null) {
+            throw new RuntimeException("El estado de carrito 'Confirmado' no está configurado en la base");
+        }
+
+        cart.setCartState(confirmedState);
+        cartRepository.save(cart);
+
+        // Crear orden
+        Order order = orderService.createOrder(items);
+
+        // Devolver DTO al frontend
+        return new OrderDTO(order);
+    }
+
     /*
     @Transactional
     public OrderDTO confirmCart(String sessionIdHeader) {
@@ -236,12 +290,10 @@ public class CartService {
     // Cerrar carrito sin confirmar
     // ============================
 
+    // TODO: revisar
     @Transactional
     public void closeCart(String sessionIdHeader) {
         Cart cart = getOrCreateCartEntity(sessionIdHeader);
-        List<Cartitem> items = cartItemRepository.findByCartId(cart.getId());
-
-        cartItemRepository.deleteAll(items);
         cart.setLastUpdate(Instant.now());
         // Si tenés estado de cart, marcarlo CERRADO
         cartRepository.save(cart);

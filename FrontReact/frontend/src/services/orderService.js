@@ -6,7 +6,7 @@ import {
 //Get items de la orden 
 export async function fetchOrderServiceFromApi(cartId) {
 
-  const res = await fetch(`${API_URL}/api/cart_items/cart/${cartId}`, {
+  const res = await fetch(`${API_URL}/cart_items/cart/${cartId}`, {
     headers: { "Content-Type": "application/json" }
 
   });
@@ -30,7 +30,7 @@ export async function fetchOrderServiceFromApi(cartId) {
 // POST (actualizo) estado del pedido
 export async function updateOrderState(orderId, stateId) {
 
-  const res = await fetch(`${API_URL}/api/orders/update_state`, {
+  const res = await fetch(`${API_URL}/orders/update_state`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({

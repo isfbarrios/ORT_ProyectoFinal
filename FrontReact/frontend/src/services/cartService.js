@@ -95,6 +95,7 @@ export async function apiConfirmCart(sessionId) {
   }
 
   return data;
+  
 }
 
 // ------------------------------------------------------

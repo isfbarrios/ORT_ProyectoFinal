@@ -29,9 +29,16 @@ public class CartItemController {
             summary = "Obtener item del carrito por su id",
             description = "Obtener item del carrito (menu_item) por su id"
     )
-    @GetMapping("/{id}")
-    public ResponseEntity<CartItemDTO> get(@PathVariable int id) {
-        Optional<Cartitem> optional = repo.findById(id);
+    @GetMapping("/{cartId}/{menuItemId}")
+    public ResponseEntity<CartItemDTO> get(
+            @PathVariable int cartId,
+            @PathVariable int menuItemId) {
+
+        CartitemId pk = new CartitemId();
+        pk.setCartId(cartId);
+        pk.setMenuItemId(menuItemId);
+
+        Optional<Cartitem> optional = repo.findById(pk);
 
         if (optional.isEmpty()) {
             return ResponseEntity.notFound().build();
@@ -39,6 +46,7 @@ public class CartItemController {
 
         return ResponseEntity.ok(new CartItemDTO(optional.get()));
     }
+
 
     @GetMapping
     public ResponseEntity<List<CartItemDTO>> getAll() {
@@ -52,7 +60,7 @@ public class CartItemController {
 
     @GetMapping("/cart/{cartId}")
     public ResponseEntity<List<CartItemDTO>> getAllByCart(@PathVariable int cartId) {
-        List<CartItemDTO> items = repo.findByCartId(cartId)
+        List<CartItemDTO> items = repo.findByCart_CartId(cartId)
                 .stream()
                 .map(CartItemDTO::new)
                 .collect(Collectors.toList());

@@ -55,7 +55,8 @@ public class SessionCartController {
 
         return null;
     }
-    /*
+
+
     @PostMapping("/confirm")
     public ResponseEntity<OrderDTO> confirm(
             @RequestHeader(name = "X-Session-Id") String sessionId) {
@@ -63,7 +64,8 @@ public class SessionCartController {
         OrderDTO order = cartService.confirmCart(sessionId);
         return ResponseEntity.ok(order);
     }
-    */
+
+
     @PostMapping("/close")
     public ResponseEntity<Void> close(
             @RequestHeader(name = "X-Session-Id") String sessionId) {
