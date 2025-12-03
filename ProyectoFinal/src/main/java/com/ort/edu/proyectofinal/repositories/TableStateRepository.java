@@ -7,4 +7,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface TableStateRepository extends JpaRepository<Tablestate, Integer>  {
 
+    //Repository
 }
