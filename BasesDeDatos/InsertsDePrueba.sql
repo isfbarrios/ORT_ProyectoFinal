@@ -82,6 +82,27 @@ VALUES
 ('Mesa 2', 'Patio interno', 2),
 ('Mesa 3', 'Sector principal', 6);
 
+INSERT INTO tableshift
+(TableId, ShiftId, StateId, OpenTime, CloseTime)
+VALUES(1, 1, 1, '19', '20'),
+VALUES(1, 2, 1, '20', '21'),
+VALUES(1, 3, 1, '21', '22'),
+VALUES(1, 4, 1, '22', '23'),
+VALUES(1, 5, 1, '23', '24'),
+
+VALUES(2, 1, 1, '19', '20'),
+VALUES(2, 2, 1, '20', '21'),
+VALUES(2, 3, 1, '21', '22'),
+VALUES(2, 4, 1, '22', '23'),
+VALUES(2, 5, 1, '23', '24'),
+
+VALUES(3, 1, 1, '19', '20'),
+VALUES(3, 2, 1, '20', '21'),
+VALUES(3, 3, 1, '21', '22'),
+VALUES(3, 4, 1, '22', '23'),
+VALUES(3, 5, 1, '23', '24'),
+;
+
 INSERT INTO TableAvailability (TableId, StateId, ReservedTimestamp)
 VALUES 
 (1,1,NOW()),

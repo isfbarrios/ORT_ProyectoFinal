@@ -1,12 +1,22 @@
-SELECT * FROM Cart;
+SELECT * FROM Cartstate;
 
-select * from sessions s;
+select * from cart s order by s.CartId desc;
 
-select * from menu m;
+select * from cartitem s order by s.CartId desc;
+
+select * from tableavailability t;
+
+delete from tableavailability where TableId = 1;
+
+select * from tablestate t;
+
+SELECT *
+FROM tableavailability
+WHERE DATE(ReservedTimestamp) = '2025-11-30';
 
 select * from productcategory p;
 
-select * from Cart;
+select * from menu s;
 
 select * from `order`;
 

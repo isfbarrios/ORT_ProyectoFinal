@@ -148,11 +148,13 @@ CREATE TABLE `Table` (
   UNIQUE KEY ux_Table_Name (Name)
 ) ENGINE=InnoDB;
 
-CREATE TABLE TableAvailability (
-  TableId         INT UNSIGNED NOT NULL,
-  StateId         INT UNSIGNED NOT NULL,
-  ReservedTimestamp DATETIME NOT NULL,
-  PRIMARY KEY (TableId, ReservedTimestamp),
+CREATE TABLE TableShift (
+  TableId   INT UNSIGNED NOT NULL,
+  ShiftId   INT UNSIGNED NOT NULL,
+  StateId	INT UNSIGNED NOT NULL,
+  OpenTime	VARCHAR(10) NOT NULL,
+  CloseTime	VARCHAR(10) NOT null,
+  PRIMARY KEY (TableId, ShiftId),
   CONSTRAINT fk_TableAvailability_Table
     FOREIGN KEY (TableId) REFERENCES `Table`(TableId) ON DELETE CASCADE,
   CONSTRAINT fk_TableAvailability_State

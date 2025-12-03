@@ -11,11 +11,11 @@ import org.hibernate.annotations.OnDeleteAction;
 @Setter
 @Getter
 @Entity
-@Table(name = "tableavailability", schema = "proyectofinal")
+@Table(name = "tableshift", schema = "proyectofinal")
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
-public class Tableavailability {
+public class Tableshift {
     @EmbeddedId
-    private TableavailabilityId id;
+    private TableshiftId id;
 
     @MapsId("tableId")
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
@@ -28,4 +28,10 @@ public class Tableavailability {
     @JoinColumn(name = "StateId", nullable = false)
     @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private Tablestate state;
+
+    @Column(name = "OpenTime", nullable = false, length = 10)
+    private String openTime;
+
+    @Column(name = "CloseTime", nullable = false, length = 10)
+    private String closeTime;
 }

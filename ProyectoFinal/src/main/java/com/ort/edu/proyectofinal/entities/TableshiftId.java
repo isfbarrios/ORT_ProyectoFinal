@@ -14,27 +14,32 @@ import java.util.Objects;
 @Setter
 @Embeddable
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
-public class TableavailabilityId implements Serializable {
+public class TableshiftId implements Serializable {
 
     private static final long serialVersionUID = -8234248950412676069L;
 
     @Column(name = "TableId", nullable = false)
-    private Integer tableId;
+    private int tableId;
 
-    @Column(name = "ReservedTimestamp", nullable = false)
-    private LocalDateTime reservedTimestamp;
+    @Column(name = "ShiftId", nullable = false)
+    private int shiftId;
+
+    public TableshiftId() {}
+
+    public TableshiftId(int tableId, int shiftId) {
+        this.tableId = tableId;
+        this.shiftId = shiftId;
+    }
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
-        TableavailabilityId entity = (TableavailabilityId) o;
-        return Objects.equals(this.tableId, entity.tableId) &&
-                Objects.equals(this.reservedTimestamp, entity.reservedTimestamp);
+        if (o == null || getClass() != o.getClass()) return false;
+        TableshiftId that = (TableshiftId) o;
+        return Objects.equals(tableId, that.tableId) && Objects.equals(shiftId, that.shiftId);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(tableId, reservedTimestamp);
+        return Objects.hash(tableId, shiftId);
     }
 }
