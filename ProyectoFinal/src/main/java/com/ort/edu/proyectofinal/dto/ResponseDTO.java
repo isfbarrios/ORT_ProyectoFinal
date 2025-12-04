@@ -5,19 +5,19 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class ErrorResponseDTO {
+public class ResponseDTO {
 
     private String message;
 
-    public ErrorResponseDTO() {}
+    public ResponseDTO() {}
 
-    public ErrorResponseDTO(String message) {
+    public ResponseDTO(String message) {
         this.message = message;
     }
 
     @Override
     public String toString() {
-        return "ErrorResponseDTO{" +
+        return "ResponseDTO{" +
                 "message='" + message + '\'' +
                 '}';
     }

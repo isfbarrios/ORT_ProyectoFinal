@@ -39,7 +39,7 @@ public class TableShiftService {
         List<Tableshift> shifts = tableShiftRepo.findByTableId(tableId);
 
         if (!shifts.isEmpty()) {
-            shifts.forEach(shift -> {
+            for (Tableshift shift : shifts) {
                 if (shift.getId().getShiftId() == shiftId) {
                     if (shift.getState().getId() == CoreManager._AVAILABLE_STATE_ID) {
                         shift.setState(busyState);
@@ -50,7 +50,7 @@ public class TableShiftService {
                         throw new TableException("La mesa ya no está disponible para ese horario");
                     }
                 }
-            });
+            }
         }
 
         return false;

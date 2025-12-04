@@ -28,6 +28,8 @@ public final class CoreManager {
     public static final int _BUSY_STATE_ID = 2;
     public static final int _RESERVE_STATE_ID = 3;
 
+    public static final String genericErrorResponse = "Error al procesar la solicitud. Intente nuevamente";
+
     private CoreManager() {}
 
     public static CoreManager getInstance() {

@@ -1,6 +1,6 @@
 package com.ort.edu.proyectofinal.controllers;
 
-import com.ort.edu.proyectofinal.dto.ErrorResponseDTO;
+import com.ort.edu.proyectofinal.dto.ResponseDTO;
 import com.ort.edu.proyectofinal.dto.LoginRequestDTO;
 import com.ort.edu.proyectofinal.dto.UserDTO;
 import com.ort.edu.proyectofinal.entities.Session;
@@ -112,14 +112,14 @@ public class UserController {
             // No existe usuario con ese mail
             return ResponseEntity
                     .status(HttpStatus.UNAUTHORIZED)
-                    .body(new ErrorResponseDTO("Usuario o contraseña incorrectos"));
+                    .body(new ResponseDTO("Usuario o contraseña incorrectos"));
         }
 
         // Validar password (por ahora texto plano)
         if (!user.getPassword().equals(request.getPassword())) {
             return ResponseEntity
                     .status(HttpStatus.UNAUTHORIZED)
-                    .body(new ErrorResponseDTO("Usuario o contraseña incorrectos"));
+                    .body(new ResponseDTO("Usuario o contraseña incorrectos"));
         }
 
         // Armar DTO para no devolver la entidad cruda
