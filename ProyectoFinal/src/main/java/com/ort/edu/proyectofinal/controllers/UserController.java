@@ -3,10 +3,13 @@ package com.ort.edu.proyectofinal.controllers;
 import com.ort.edu.proyectofinal.dto.ResponseDTO;
 import com.ort.edu.proyectofinal.dto.LoginRequestDTO;
 import com.ort.edu.proyectofinal.dto.UserDTO;
+import com.ort.edu.proyectofinal.dto.LoginResponseDTO;
 import com.ort.edu.proyectofinal.entities.Session;
 import com.ort.edu.proyectofinal.entities.User;
 import com.ort.edu.proyectofinal.repositories.UserRepository;
 import com.ort.edu.proyectofinal.services.SessionService;
+import com.ort.edu.proyectofinal.security.JwtUtil;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpStatus;
@@ -26,6 +29,12 @@ public class UserController {
 
     @Autowired
     private SessionService sessionService;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private JwtUtil jwtUtil;
 
     @GetMapping("/{id}")
     public ResponseEntity<UserDTO> getUser(@PathVariable int id) {
@@ -63,6 +72,11 @@ public class UserController {
             return ResponseEntity.status(409).build();
         }
 
+        // Encriptar contraseña antes de guardar
+        if (user.getPassword() != null && !user.getPassword().isBlank()) {
+            user.setPassword(passwordEncoder.encode(user.getPassword()));
+        }
+
         User saved = repo.save(user);
         UserDTO dto = new UserDTO(saved);
 
@@ -83,7 +97,10 @@ public class UserController {
         existing.setSurname(updatedUser.getSurname());
         existing.setMail(updatedUser.getMail());
         existing.setUsername(updatedUser.getUsername());
-        existing.setPassword(updatedUser.getPassword());
+        // Actualizar contraseña solo si viene y codificarla
+        if (updatedUser.getPassword() != null && !updatedUser.getPassword().isBlank()) {
+            existing.setPassword(passwordEncoder.encode(updatedUser.getPassword()));
+        }
 
         User saved = repo.save(existing);
 
@@ -115,8 +132,8 @@ public class UserController {
                     .body(new ResponseDTO("Usuario o contraseña incorrectos"));
         }
 
-        // Validar password (por ahora texto plano)
-        if (!user.getPassword().equals(request.getPassword())) {
+        // Validar password con BCrypt
+        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
             return ResponseEntity
                     .status(HttpStatus.UNAUTHORIZED)
                     .body(new ResponseDTO("Usuario o contraseña incorrectos"));
@@ -126,11 +143,13 @@ public class UserController {
         UserDTO dto = new UserDTO(user);
 
         Session session = sessionService.resolveSession("");
-
         if (session != null) dto.setSessionId(session.getSessionId());
 
-        // Más adelante acá se puede agregar token, roles, etc.
-        return ResponseEntity.ok(dto);
+        // Generar token JWT con el username como subject
+        String token = jwtUtil.generateToken(user.getUsername());
+
+        LoginResponseDTO resp = new LoginResponseDTO(token, dto);
+        return ResponseEntity.ok(resp);
     }
 
     /*

@@ -2,7 +2,6 @@ package com.ort.edu.proyectofinal.controllers;
 
 import com.ort.edu.proyectofinal.CoreManager;
 import com.ort.edu.proyectofinal.dto.*;
-import com.ort.edu.proyectofinal.entities.Tables;
 import com.ort.edu.proyectofinal.exception.TableException;
 import com.ort.edu.proyectofinal.repositories.TableShiftRepository;
 import com.ort.edu.proyectofinal.repositories.TablesRepository;
@@ -54,7 +53,6 @@ public class TableShiftController {
 
         try {
             boolean isReserved = service.reserveTableShift(tableId, shiftId);
-
             return ResponseEntity.ok(new ResponseDTO("Reserva realizada"));
         }
         catch (TableException te) {
