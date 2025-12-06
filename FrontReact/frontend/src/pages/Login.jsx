@@ -45,7 +45,7 @@ export default function Login() {
     <div className="d-flex justify-content-center align-items-center mt-5">
       <div className="card shadow p-4" style={{ width: "350px" }}>
         <h3 className="text-center mb-4">Iniciar Sesión</h3>
-        <span>fabribarrios@hotmail.com</span>
+        <span>fbarrios@hotmail.com</span>
         <span>pass1234</span>
         <form onSubmit={handleLogin}>
           <div className="mb-3">

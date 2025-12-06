@@ -1,5 +1,5 @@
 export const KEY = "auth";
-export const SESSION_KEY = "restaurant-session-id";
+export const SESSION_KEY = "API_TOKEN";
 export const API_URL = "http://localhost:8080/api";
 
 // GUARDAR DATO 
@@ -43,4 +43,17 @@ export function removeFromLocalStorage(key) {
   catch (error) {
     console.error("Error eliminando localStorage:", error);
   }
+}
+
+export function buildFetchHeader(useToken = true) {
+  const token = getFromLocalStorage("API_TOKEN");
+  const headers = {
+    "Content-Type": "application/json",
+  };
+
+  if (useToken && token) {
+    headers["Authorization"] = `Bearer ${token}`;
+  }
+
+  return headers;
 }

@@ -6,6 +6,7 @@ import com.ort.edu.proyectofinal.dto.UserDTO;
 import com.ort.edu.proyectofinal.dto.LoginResponseDTO;
 import com.ort.edu.proyectofinal.entities.Session;
 import com.ort.edu.proyectofinal.entities.User;
+import com.ort.edu.proyectofinal.entities.Userstate;
 import com.ort.edu.proyectofinal.repositories.UserRepository;
 import com.ort.edu.proyectofinal.services.SessionService;
 import com.ort.edu.proyectofinal.security.JwtUtil;
@@ -29,6 +30,9 @@ public class UserController {
 
     @Autowired
     private SessionService sessionService;
+
+    @Autowired
+    private com.ort.edu.proyectofinal.repositories.UserstateRepository userstateRepository;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -75,6 +79,18 @@ public class UserController {
         // Encriptar contraseña antes de guardar
         if (user.getPassword() != null && !user.getPassword().isBlank()) {
             user.setPassword(passwordEncoder.encode(user.getPassword()));
+        }
+
+        // Asignar Userstate por defecto si no viene
+        if (user.getUserstate() == null) {
+            // intenta obtener estado con id=1, si no existe lo crea con nombre 'CREATED'
+            Userstate defaultState = userstateRepository.findById(1).orElse(null);
+            if (defaultState == null) {
+                defaultState = new Userstate();
+                defaultState.setName("CREATED");
+                defaultState = userstateRepository.save(defaultState);
+            }
+            user.setUserstate(defaultState);
         }
 
         User saved = repo.save(user);

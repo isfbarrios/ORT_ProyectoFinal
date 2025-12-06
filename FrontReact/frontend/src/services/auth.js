@@ -17,12 +17,12 @@ export function saveAuth(data) {
   saveToLocalStorage(KEY, session);
 
   // si el back me  devolvió sessionId, lo guardo para el carrito
-  const sessionId = session.user?.sessionId;
-  if (session !== undefined && sessionId != null) {
+  const token = data?.token;
+  if (token) {
+    console.log('saveAuth.sessionId: ' + token);
 
-    console.log('saveAuth.sessionId: ' + sessionId);
-
-    saveToLocalStorage(SESSION_KEY, String(sessionId));
+    saveToLocalStorage(SESSION_KEY, String(token));
+    //TODO: Si no tenemos el token, deberiamos cerrar sesion
   }
 }
 

@@ -8,6 +8,12 @@ import org.hibernate.annotations.ColumnDefault;
 
 import java.time.LocalDateTime;
 
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.PreUpdate;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+
 @Getter
 @Setter
 @Entity
@@ -40,4 +46,20 @@ public class User {
     @ColumnDefault("current_timestamp()")
     @Column(name = "LastUpdate", nullable = false)
     private LocalDateTime lastUpdate;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "UserStateId", nullable = false)
+    private Userstate userstate;
+
+    @PrePersist
+    protected void onCreate() {
+        LocalDateTime now = LocalDateTime.now();
+        if (this.createdDate == null) this.createdDate = now;
+        if (this.lastUpdate == null) this.lastUpdate = now;
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        this.lastUpdate = LocalDateTime.now();
+    }
 }
