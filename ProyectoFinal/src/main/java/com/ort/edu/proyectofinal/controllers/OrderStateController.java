@@ -1,16 +1,18 @@
 package com.ort.edu.proyectofinal.controllers;
 
+import com.ort.edu.proyectofinal.CoreManager;
 import com.ort.edu.proyectofinal.dto.CartDTO;
 import com.ort.edu.proyectofinal.dto.OrderStateDTO;
+import com.ort.edu.proyectofinal.dto.ResponseDTO;
 import com.ort.edu.proyectofinal.entities.Cart;
 import com.ort.edu.proyectofinal.entities.Orderstate;
+import com.ort.edu.proyectofinal.exception.AuthException;
 import com.ort.edu.proyectofinal.repositories.OrderStateRepository;
+import com.ort.edu.proyectofinal.security.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
@@ -23,8 +25,23 @@ public class OrderStateController {
     @Autowired
     private OrderStateRepository repo;
 
+    @Autowired
+    private JwtUtil jwtUtil;
+
+    private CoreManager manager = CoreManager.getInstance();
+
     @GetMapping("/{id}")
-    public ResponseEntity<OrderStateDTO> get(@PathVariable int id) {
+    public ResponseEntity<?> get(@PathVariable int id, @RequestHeader(value = "Authorization", required = false) String authHeader) {
+
+        // Validar token JWT
+        try {
+            manager.validateTokenJWT(jwtUtil, authHeader);
+        }
+        catch (AuthException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new ResponseDTO(e.getMessage()));
+        }
+
         Optional<Orderstate> optionalOrderState = repo.findById(id);
 
         if (optionalOrderState.isEmpty()) {
@@ -35,7 +52,17 @@ public class OrderStateController {
     }
 
     @GetMapping
-    public ResponseEntity<List<OrderStateDTO>> getAll() {
+    public ResponseEntity<?> getAll(@RequestHeader(value = "Authorization", required = false) String authHeader) {
+
+        // Validar token JWT
+        try {
+            manager.validateTokenJWT(jwtUtil, authHeader);
+        }
+        catch (AuthException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new ResponseDTO(e.getMessage()));
+        }
+
         List<OrderStateDTO> states = repo.findAll()
                 .stream()
                 .map(OrderStateDTO::new)

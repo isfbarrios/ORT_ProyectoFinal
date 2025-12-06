@@ -1,8 +1,10 @@
 package com.ort.edu.proyectofinal.controllers;
 
+import com.ort.edu.proyectofinal.CoreManager;
 import com.ort.edu.proyectofinal.dto.MenuDTO;
 import com.ort.edu.proyectofinal.dto.ResponseDTO;
 import com.ort.edu.proyectofinal.entities.Menu;
+import com.ort.edu.proyectofinal.exception.AuthException;
 import com.ort.edu.proyectofinal.repositories.MenuRepository;
 import com.ort.edu.proyectofinal.security.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,25 +30,18 @@ public class MenuController {
     @Autowired
     private JwtUtil jwtUtil;
 
+    private CoreManager manager = CoreManager.getInstance();
+
     @GetMapping("/{id}")
     public ResponseEntity<?> get(@PathVariable int id, @RequestHeader(value = "Authorization", required = false) String authHeader) {
+
         // Validar token JWT
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(new ResponseDTO("Token no proporcionado o formato inválido"));
-        }
-
-        String token = authHeader.substring(7); // extrae el token sin "Bearer "
-
         try {
-            String username = jwtUtil.extractUsername(token);
-            if (!jwtUtil.isTokenValid(token, username)) {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                        .body(new ResponseDTO("Token inválido o expirado"));
-            }
-        } catch (Exception ex) {
+            manager.validateTokenJWT(jwtUtil, authHeader);
+        }
+        catch (AuthException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(new ResponseDTO("Token inválido o error al validar"));
+                    .body(new ResponseDTO(e.getMessage()));
         }
 
         Optional<Menu> optional = repo.findById(id);
@@ -59,7 +54,17 @@ public class MenuController {
     }
 
     @GetMapping
-    public ResponseEntity<List<MenuDTO>> getAll() {
+    public ResponseEntity<?> getAll(@RequestHeader(value = "Authorization", required = false) String authHeader) {
+
+        // Validar token JWT
+        try {
+            manager.validateTokenJWT(jwtUtil, authHeader);
+        }
+        catch (AuthException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new ResponseDTO(e.getMessage()));
+        }
+
         List<MenuDTO> items = repo.findAll()
                 .stream()
                 .map(MenuDTO::new)

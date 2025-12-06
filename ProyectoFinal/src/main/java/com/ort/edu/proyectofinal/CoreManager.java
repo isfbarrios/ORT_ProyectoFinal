@@ -1,8 +1,13 @@
 package com.ort.edu.proyectofinal;
 
+import com.ort.edu.proyectofinal.dto.ResponseDTO;
+import com.ort.edu.proyectofinal.exception.AuthException;
+import com.ort.edu.proyectofinal.security.JwtUtil;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 
 import java.util.HashMap;
 import java.util.List;
@@ -38,5 +43,24 @@ public final class CoreManager {
         }
 
         return instance;
+    }
+
+    // Validar token JWT
+    public void validateTokenJWT(JwtUtil jwtUtil, String authHeader) throws AuthException {
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            throw new AuthException("Token no proporcionado o formato inválido");
+        }
+        // Extrae el token sin "Bearer "
+        String token = authHeader.substring(7);
+
+        try {
+            String username = jwtUtil.extractUsername(token);
+            if (!jwtUtil.isTokenValid(token, username)) {
+                throw new AuthException("Token inválido o expirado");
+            }
+        }
+        catch (Exception ex) {
+            throw new AuthException("Token inválido o error al validar");
+        }
     }
 }

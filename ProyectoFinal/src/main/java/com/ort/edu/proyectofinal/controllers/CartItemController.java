@@ -1,17 +1,19 @@
 package com.ort.edu.proyectofinal.controllers;
 
+import com.ort.edu.proyectofinal.CoreManager;
 import com.ort.edu.proyectofinal.dto.CartItemDTO;
+import com.ort.edu.proyectofinal.dto.ResponseDTO;
 import com.ort.edu.proyectofinal.entities.Cartitem;
 import com.ort.edu.proyectofinal.entities.CartitemId;
+import com.ort.edu.proyectofinal.exception.AuthException;
 import com.ort.edu.proyectofinal.repositories.CartItemRepository;
+import com.ort.edu.proyectofinal.security.JwtUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
@@ -25,12 +27,27 @@ public class CartItemController {
     @Autowired
     private CartItemRepository repo;
 
+    @Autowired
+    private JwtUtil jwtUtil;
+
+    private CoreManager manager = CoreManager.getInstance();
+
     @Operation(
             summary = "Obtener item del carrito por su id",
             description = "Obtener item del carrito (menu_item) por su id"
     )
     @GetMapping("/{cartId}/{menuItemId}")
-    public ResponseEntity<CartItemDTO> get(@PathVariable int cartId, @PathVariable int menuItemId) {
+    public ResponseEntity<?> get(@PathVariable int cartId,
+        @PathVariable int menuItemId, @RequestHeader(value = "Authorization", required = false) String authHeader) {
+
+        // Validar token JWT
+        try {
+            manager.validateTokenJWT(jwtUtil, authHeader);
+        }
+        catch (AuthException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new ResponseDTO(e.getMessage()));
+        }
 
         CartitemId cartitemId = new CartitemId();
         cartitemId.setCartId(cartId);
@@ -46,7 +63,16 @@ public class CartItemController {
     }
 
     @GetMapping
-    public ResponseEntity<List<CartItemDTO>> getAll() {
+    public ResponseEntity<?> getAll(@RequestHeader(value = "Authorization", required = false) String authHeader) {
+
+        // Validar token JWT
+        try {
+            manager.validateTokenJWT(jwtUtil, authHeader);
+        }
+        catch (AuthException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new ResponseDTO(e.getMessage()));
+        }
 
         List<CartItemDTO> items = repo.findAll()
                 .stream()
@@ -57,7 +83,18 @@ public class CartItemController {
     }
 
     @GetMapping("/cart/{cartId}")
-    public ResponseEntity<List<CartItemDTO>> getAllByCart(@PathVariable int cartId) {
+    public ResponseEntity<?> getAllByCart(@PathVariable int cartId,
+                                          @RequestHeader(value = "Authorization", required = false) String authHeader) {
+
+        // Validar token JWT
+        try {
+            manager.validateTokenJWT(jwtUtil, authHeader);
+        }
+        catch (AuthException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new ResponseDTO(e.getMessage()));
+        }
+
         List<CartItemDTO> items = repo.findByCartId(cartId)
                 .stream()
                 .map(CartItemDTO::new)

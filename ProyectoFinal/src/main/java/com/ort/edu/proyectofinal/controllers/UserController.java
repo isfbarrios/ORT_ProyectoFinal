@@ -1,5 +1,6 @@
 package com.ort.edu.proyectofinal.controllers;
 
+import com.ort.edu.proyectofinal.CoreManager;
 import com.ort.edu.proyectofinal.dto.ResponseDTO;
 import com.ort.edu.proyectofinal.dto.LoginRequestDTO;
 import com.ort.edu.proyectofinal.dto.UserDTO;
@@ -7,6 +8,7 @@ import com.ort.edu.proyectofinal.dto.LoginResponseDTO;
 import com.ort.edu.proyectofinal.entities.Session;
 import com.ort.edu.proyectofinal.entities.User;
 import com.ort.edu.proyectofinal.entities.Userstate;
+import com.ort.edu.proyectofinal.exception.AuthException;
 import com.ort.edu.proyectofinal.repositories.UserRepository;
 import com.ort.edu.proyectofinal.services.SessionService;
 import com.ort.edu.proyectofinal.security.JwtUtil;
@@ -40,8 +42,20 @@ public class UserController {
     @Autowired
     private JwtUtil jwtUtil;
 
+    private CoreManager manager = CoreManager.getInstance();
+
     @GetMapping("/{id}")
-    public ResponseEntity<UserDTO> getUser(@PathVariable int id) {
+    public ResponseEntity<?> getUser(@PathVariable int id, @RequestHeader(value = "Authorization", required = false) String authHeader) {
+
+        // Validar token JWT
+        try {
+            manager.validateTokenJWT(jwtUtil, authHeader);
+        }
+        catch (AuthException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new ResponseDTO(e.getMessage()));
+        }
+
         Optional<User> optionalUser = repo.findById(id);
 
         if (optionalUser.isEmpty()) {
@@ -52,7 +66,17 @@ public class UserController {
     }
 
     @GetMapping
-    public ResponseEntity<List<UserDTO>> getAllUsers() {
+    public ResponseEntity<?> getAllUsers(@RequestHeader(value = "Authorization", required = false) String authHeader) {
+
+        // Validar token JWT
+        try {
+            manager.validateTokenJWT(jwtUtil, authHeader);
+        }
+        catch (AuthException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new ResponseDTO(e.getMessage()));
+        }
+
         List<UserDTO> users = repo.findAll()
                 .stream()
                 .map(UserDTO::new)
@@ -62,7 +86,17 @@ public class UserController {
     }
 
     @PostMapping
-    public ResponseEntity<UserDTO> createUser(@RequestBody User user) {
+    public ResponseEntity<?> createUser(@RequestBody User user, @RequestHeader(value = "Authorization", required = false) String authHeader) {
+
+        // Validar token JWT
+        try {
+            manager.validateTokenJWT(jwtUtil, authHeader);
+        }
+        catch (AuthException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new ResponseDTO(e.getMessage()));
+        }
+
         // Validaciones básicas (podés mejorar con @Valid más adelante)
         if (user.getUsername() == null || user.getUsername().isBlank()) {
             return ResponseEntity.badRequest().build();
@@ -100,7 +134,18 @@ public class UserController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<UserDTO> updateUser(@PathVariable int id, @RequestBody User updatedUser) {
+    public ResponseEntity<?> updateUser(@PathVariable int id,
+        @RequestBody User updatedUser, @RequestHeader(value = "Authorization", required = false) String authHeader) {
+
+        // Validar token JWT
+        try {
+            manager.validateTokenJWT(jwtUtil, authHeader);
+        }
+        catch (AuthException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new ResponseDTO(e.getMessage()));
+        }
+
         Optional<User> optional = repo.findById(id);
 
         if (optional.isEmpty()) {
@@ -124,7 +169,17 @@ public class UserController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteUser(@PathVariable int id) {
+    public ResponseEntity<?> deleteUser(@PathVariable int id, @RequestHeader(value = "Authorization", required = false) String authHeader) {
+
+        // Validar token JWT
+        try {
+            manager.validateTokenJWT(jwtUtil, authHeader);
+        }
+        catch (AuthException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new ResponseDTO(e.getMessage()));
+        }
+
         Optional<User> optional = repo.findById(id);
 
         if (optional.isEmpty()) {
@@ -136,7 +191,16 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody LoginRequestDTO request) {
+    public ResponseEntity<?> login(@RequestBody LoginRequestDTO request, @RequestHeader(value = "Authorization", required = false) String authHeader) {
+
+        // Validar token JWT
+        try {
+            manager.validateTokenJWT(jwtUtil, authHeader);
+        }
+        catch (AuthException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new ResponseDTO(e.getMessage()));
+        }
 
         // Buscar usuario por mail
         User user = repo.findByMail(request.getMail());
@@ -167,11 +231,4 @@ public class UserController {
         LoginResponseDTO resp = new LoginResponseDTO(token, dto);
         return ResponseEntity.ok(resp);
     }
-
-    /*
-    @GetMapping("/usuarios-test")
-    public User getUsers() {
-        return repo.findByUsername("admin");
-    }
-    */
 }
