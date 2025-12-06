@@ -1,24 +1,16 @@
-import {
-  API_URL
-} from "../functions/localStorage"
+import { API_URL, buildFetchHeader } from "../functions/localStorage";
 
 
-//Get items de la orden 
+//GET items de la orden
 export async function fetchOrderServiceFromApi(cartId) {
 
   const res = await fetch(`${API_URL}/cart_items/cart/${cartId}`, {
-    headers: { "Content-Type": "application/json" }
+    method: "GET",
+    headers: buildFetchHeader(false)
 
   });
 
-  let data;
-
-  try {
-    data = await res.json();
-  }
-  catch {
-    throw new Error("Respuesta inválida del servidor");
-  }
+  const data = await safeJson(res);
 
   if (!res.ok) {
     throw new Error(data.message || "No se pudieron obtener los ítems de la orden");
@@ -27,16 +19,19 @@ export async function fetchOrderServiceFromApi(cartId) {
   return data;
 }
 
-// POST (actualizo) estado del pedido
+// POST actualizar estado
 export async function updateOrderState(orderId, stateId) {
 
   const res = await fetch(`${API_URL}/orders/update_state`, {
+
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: buildFetchHeader(false),
     body: JSON.stringify({
-      "orderId": orderId,
-      "orderStateId": stateId
-    }),
+      orderId,
+      orderStateId: stateId
+
+    })
+
   });
 
   if (!res.ok) {
@@ -45,3 +40,12 @@ export async function updateOrderState(orderId, stateId) {
 
   return true;
 }
+
+async function safeJson(res) {
+    try {
+        return await res.json();
+    } catch {
+        throw new Error("Respuesta inválida del servidor");
+    }
+}
+

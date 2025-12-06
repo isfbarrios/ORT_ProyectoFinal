@@ -1,128 +1,107 @@
 import {
   API_URL,
   SESSION_KEY,
-  getFromLocalStorage
-} from "../functions/localStorage"
+  getFromLocalStorage,
+  buildFetchHeader,
+} from "../functions/localStorage";
 
 
-// ------------------------------------------------------
-// 1) GET /api/session-cart
-// ------------------------------------------------------
+// ===============================================
+// Helper: sessionId
+// ===============================================
+function getSession() {
+  return getFromLocalStorage(SESSION_KEY);
+}
 
-export async function apiGetCart(sessionId) {
+// ===============================================
+// Helper: parse JSON seguro
+// ===============================================
+async function safeJson(res) {
+  const text = await res.text();
+  try {
+    return JSON.parse(text);
+  } catch {
+    return { message: text || "Respuesta inválida del servidor" };
+  }
+}
+
+// ===============================================
+// GET /session-cart
+// ===============================================
+export async function cartGet() {
+  const sessionId = getSession();
+
   const res = await fetch(`${API_URL}/session-cart`, {
     method: "GET",
     headers: {
-      "Content-Type": "application/json",
+      ...buildFetchHeader(false),
       ...(sessionId ? { "X-Session-Id": sessionId } : {}),
     },
   });
 
-  let data;
-
-  try {
-    data = await res.json();
-  }
-  catch {
-    throw new Error("Respuesta inválida del servidor");
-  }
-
-  if (!res.ok) {
-    throw new Error(data.message || "Error al obtener el carrito");
-  }
+  const data = await safeJson(res);
+  if (!res.ok) throw new Error(data.message);
 
   return data;
 }
 
-// ------------------------------------------------------
-// 2) POST /api/session-cart/items
-// ------------------------------------------------------
+// ===============================================
+// POST /session-cart/items  (agregar item)
+// ===============================================
+export async function cartAddItem(menuItemId, quantity = 1) {
+  const sessionId = getSession();
 
-export async function apiAddItemToCart(menuItemId, quantity) {
-  let sessionId = getFromLocalStorage(SESSION_KEY);
   const res = await fetch(`${API_URL}/session-cart/items`, {
     method: "POST",
     headers: {
-      "Content-Type": "application/json",
+      ...buildFetchHeader(false),
       ...(sessionId ? { "X-Session-Id": sessionId } : {}),
     },
-    body: JSON.stringify({
-      menuItemId: menuItemId,
-      quantity: quantity
-    }),
+    body: JSON.stringify({ menuItemId, quantity }),
   });
 
-  let data;
-
-  try {
-    data = await res.json();
-  }
-  catch {
-    throw new Error("Respuesta inválida del servidor");
-  }
-
-  if (!res.ok) {
-    throw new Error(data.message || "No pudimos agregar tu pedido");
-  }
+  const data = await safeJson(res);
+  if (!res.ok) throw new Error(data.message);
 
   return data;
 }
 
-// ------------------------------------------------------
-// 3) POST /api/session-cart/confirm
-// ------------------------------------------------------
+// ===============================================
+// POST /session-cart/confirm  (confirmar carrito)
+// ===============================================
+export async function cartConfirm() {
+  const sessionId = getSession();
 
-export async function apiConfirmCart(sessionId) {
   const res = await fetch(`${API_URL}/session-cart/confirm`, {
     method: "POST",
     headers: {
-      "Content-Type": "application/json",
+      ...buildFetchHeader(false),
       ...(sessionId ? { "X-Session-Id": sessionId } : {}),
     },
   });
 
-  let data;
-
-  try {
-    data = await res.json();
-  }
-  catch {
-    throw new Error("Respuesta inválida del servidor");
-  }
-
-  if (!res.ok) {
-    throw new Error(data.message || "No se pudo confirmar el carrito");
-  }
+  const data = await safeJson(res);
+  if (!res.ok) throw new Error(data.message);
 
   return data;
-  
 }
 
-// ------------------------------------------------------
-// 4) POST /api/session-cart/close
-// ------------------------------------------------------
+// ===============================================
+// POST /session-cart/close  (cerrar carrito)
+// ===============================================
+export async function cartClose() {
+  const sessionId = getSession();
 
-export async function apiCloseCart(sessionId) {
   const res = await fetch(`${API_URL}/session-cart/close`, {
     method: "POST",
     headers: {
-      "Content-Type": "application/json",
+      ...buildFetchHeader(false),
       ...(sessionId ? { "X-Session-Id": sessionId } : {}),
     },
   });
 
-  let data;
-
-  try {
-    data = await res.json();
-  }
-  catch {
-    throw new Error("Respuesta inválida del servidor");
-  }
-
-  if (!res.ok) {
-    throw new Error(data.message || "No se pudo cerrar el carrito");
-  }
+  const data = await safeJson(res);
+  if (!res.ok) throw new Error(data.message);
 
   return data;
 }
