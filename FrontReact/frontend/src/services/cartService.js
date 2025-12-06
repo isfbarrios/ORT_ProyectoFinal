@@ -28,7 +28,7 @@ async function safeJson(res) {
 // ===============================================
 // GET /session-cart
 // ===============================================
-export async function cartGet() {
+export async function apiGetCart() {
   const sessionId = getSession();
 
   const res = await fetch(`${API_URL}/session-cart`, {
@@ -48,7 +48,7 @@ export async function cartGet() {
 // ===============================================
 // POST /session-cart/items  (agregar item)
 // ===============================================
-export async function cartAddItem(menuItemId, quantity = 1) {
+export async function apiAddItemToCart(menuItemId, quantity = 1) {
   const sessionId = getSession();
 
   const res = await fetch(`${API_URL}/session-cart/items`, {
@@ -69,7 +69,7 @@ export async function cartAddItem(menuItemId, quantity = 1) {
 // ===============================================
 // POST /session-cart/confirm  (confirmar carrito)
 // ===============================================
-export async function cartConfirm() {
+export async function apiConfirmCart() {
   const sessionId = getSession();
 
   const res = await fetch(`${API_URL}/session-cart/confirm`, {
@@ -89,7 +89,7 @@ export async function cartConfirm() {
 // ===============================================
 // POST /session-cart/close  (cerrar carrito)
 // ===============================================
-export async function cartClose() {
+export async function apiCloseCart() {
   const sessionId = getSession();
 
   const res = await fetch(`${API_URL}/session-cart/close`, {
