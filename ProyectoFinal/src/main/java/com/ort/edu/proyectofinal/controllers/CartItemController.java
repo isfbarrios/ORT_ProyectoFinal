@@ -83,8 +83,7 @@ public class CartItemController {
     }
 
     @GetMapping("/cart/{cartId}")
-    public ResponseEntity<?> getAllByCart(@PathVariable int cartId,
-                                          @RequestHeader(value = "Authorization", required = false) String authHeader) {
+    public ResponseEntity<?> getAllByCart(@PathVariable int cartId, @RequestHeader(value = "Authorization", required = false) String authHeader) {
 
         // Validar token JWT
         try {

@@ -4,15 +4,18 @@ import com.ort.edu.proyectofinal.CoreManager;
 import com.ort.edu.proyectofinal.dto.*;
 import com.ort.edu.proyectofinal.exception.AuthException;
 import com.ort.edu.proyectofinal.exception.TableException;
+import com.ort.edu.proyectofinal.repositories.TableReservationRepository;
 import com.ort.edu.proyectofinal.repositories.TableShiftRepository;
 import com.ort.edu.proyectofinal.repositories.TablesRepository;
 import com.ort.edu.proyectofinal.security.JwtUtil;
+import com.ort.edu.proyectofinal.services.TableReservationService;
 import com.ort.edu.proyectofinal.services.TableShiftService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -27,7 +30,10 @@ public class TableShiftController {
     private TableShiftRepository tableShiftRepo;
 
     @Autowired
-    private TableShiftService service;
+    private TableReservationRepository tableReservationRepo;
+
+    @Autowired
+    private TableReservationService service;
 
     @Autowired
     private JwtUtil jwtUtil;
@@ -54,8 +60,8 @@ public class TableShiftController {
     }
 
     @GetMapping("/table/{tableId}/shift/{shiftId}")
-    public ResponseEntity<?> reserveTableShift(@PathVariable int tableId,
-                @PathVariable int shiftId, @RequestHeader(value = "Authorization", required = false) String authHeader) {
+    public ResponseEntity<?> reserveTableShift(@PathVariable int tableId, @PathVariable int shiftId, @PathVariable LocalDate date,
+            @PathVariable String customerName, @RequestHeader(value = "Authorization", required = false) String authHeader) {
 
         // Validar token JWT
         try {
@@ -67,8 +73,10 @@ public class TableShiftController {
         }
 
         try {
-            boolean isReserved = service.reserveTableShift(tableId, shiftId);
-            return ResponseEntity.ok(new ResponseDTO("Reserva realizada"));
+            boolean isReserved = service.reserve(tableId, shiftId, date, customerName);
+
+            return isReserved ? ResponseEntity.ok(new ResponseDTO("Reserva realizada"))
+                    : ResponseEntity.ok(new ResponseDTO(CoreManager.genericErrorResponse));
         }
         catch (TableException te) {
             te.printStackTrace();

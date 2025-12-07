@@ -3,7 +3,7 @@ import { API_URL, buildFetchHeader } from "../functions/localStorage";
 export async function fetchBoardFromApi() {
   const res = await fetch(`${API_URL}/cart`, {
     method: "GET",
-    headers: buildFetchHeader(false) // no requiere token
+    headers: buildFetchHeader()
   });
 
   if (!res.ok) {

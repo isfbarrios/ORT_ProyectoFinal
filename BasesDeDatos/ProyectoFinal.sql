@@ -161,6 +161,18 @@ CREATE TABLE TableShift (
     FOREIGN KEY (StateId) REFERENCES TableState(StateId)
 ) ENGINE=InnoDB;
 
+CREATE TABLE TableReservation (
+  ReservationId     INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  TableId           INT UNSIGNED NOT NULL,
+  ShiftId           INT UNSIGNED NOT NULL,
+  CustomerName      VARCHAR(30) NOT NULL,
+  ReservationDate   DATE NOT NULL,
+  CreatedDate       DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  LastUpdate        DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  CONSTRAINT fk_TableReservation_TableShift FOREIGN KEY (TableId, ShiftId) REFERENCES TableShift(TableId, ShiftId) ON DELETE CASCADE,
+  CONSTRAINT ux_TableReservation UNIQUE KEY (TableId, ReservationDate)
+) ENGINE=InnoDB;
+
 CREATE TABLE TableCustomer (
   TableId         INT UNSIGNED NOT NULL,
   CustomerId      INT UNSIGNED NOT NULL,
