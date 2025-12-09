@@ -107,6 +107,72 @@
           ]
         }
       }
+    },
+    {
+      "name": "Get table shifts (protegido)",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{jwt}}"
+          }
+        ],
+        "url": {
+          "raw": "http://localhost:8080/api/table_shift",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "api",
+            "table_shift"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Reserve table shift (protegido)",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{jwt}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "http://localhost:8080/api/table_shift/table/1/shift/1?date=2025-12-10&customerName=Fabri",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "api",
+            "table_shift",
+            "table",
+            "1",
+            "shift",
+            "1"
+          ],
+          "query": [
+            {
+              "key": "date",
+              "value": "2025-12-10"
+            },
+            {
+              "key": "customerName",
+              "value": "Fabri"
+            }
+          ]
+        }
+      }
     }
   ]
 }
