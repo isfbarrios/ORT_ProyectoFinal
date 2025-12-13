@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/api/table_shift")
+@RequestMapping("/api/table_reservation")
 public class TableReservationController {
 
     @Autowired
@@ -42,9 +42,9 @@ public class TableReservationController {
                 .collect(Collectors.toList());
 
         items.forEach(item -> {
-            List<TableShiftDTO> itemShifts = tableShiftRepo.findByTableId(item.getId())
+            List<TableReservationDTO> itemShifts = tableShiftRepo.findByTableId(item.getId())
                     .stream()
-                    .map(TableShiftDTO::new)
+                    .map(com.ort.edu.proyectofinal.dto.TableReservationDTO::new)
                     .toList();
 
             item.setShifts(itemShifts);
@@ -53,7 +53,7 @@ public class TableReservationController {
         return ResponseEntity.ok(items);
     }
 
-    @GetMapping("/table/{tableId}/shift/{shiftId}")
+    @GetMapping("/table/{tableId}/reservation/{shiftId}")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> reserveTableShift(@PathVariable int tableId,
                                                @PathVariable int shiftId,

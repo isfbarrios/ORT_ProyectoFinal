@@ -15,7 +15,7 @@ public class TablesDTO {
     private String name;
     private String description;
     private Integer chairsAmount;
-    private List<TableShiftDTO> shifts;
+    private List<TableReservationDTO> shifts;
 
     public TablesDTO() {}
 
