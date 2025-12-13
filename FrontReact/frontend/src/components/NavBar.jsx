@@ -50,6 +50,9 @@ export default function NavBar() {
         <NavLink to="/menu" style={linkStyle}>
           Menu
         </NavLink>
+        <NavLink to="/reserva" style={linkStyle}>
+          Reservas
+        </NavLink>
       </div>
 
       {/* Botón de carrito, alineado a la derecha */}
