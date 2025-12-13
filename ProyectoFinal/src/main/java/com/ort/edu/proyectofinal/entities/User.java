@@ -1,103 +1,65 @@
 package com.ort.edu.proyectofinal.entities;
 
 import jakarta.persistence.*;
+import jakarta.persistence.Table;
+import lombok.Getter;
+import lombok.Setter;
+import org.hibernate.annotations.ColumnDefault;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.PreUpdate;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+
+@Getter
+@Setter
 @Entity
-@Table(name = "users")
+@Table(name = "users", schema = "proyectofinal")
 public class User {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int userId;
+    @Column(name = "UserId", nullable = false)
+    private Integer id;
 
-    @Column(name = "Name")
+    @Column(name = "Name", nullable = false, length = 100)
     private String name;
-    @Column(name = "Surname")
+
+    @Column(name = "Surname", nullable = false, length = 100)
     private String surname;
-    @Column(name = "Mail")
+
+    @Column(name = "Mail", nullable = false, length = 150)
     private String mail;
-    @Column(name = "Username")
+
+    @Column(name = "Username", nullable = false, length = 100)
     private String username;
-    @Column(name = "Password")
+
+    @Column(name = "Password", nullable = false)
     private String password;
-    @Column(name = "UserStateId")
-    private int userStateId;
-    @Column(name = "CreatedDate")
-    private Date createdDate;
-    @Column(name = "LastUpdate")
-    private Date lastUpdate;
 
-    public int getUserId() {
-        return userId;
+    @ColumnDefault("current_timestamp()")
+    @Column(name = "CreatedDate", nullable = false)
+    private LocalDateTime createdDate;
+
+    @ColumnDefault("current_timestamp()")
+    @Column(name = "LastUpdate", nullable = false)
+    private LocalDateTime lastUpdate;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "UserStateId", nullable = false)
+    private Userstate userstate;
+
+    @PrePersist
+    protected void onCreate() {
+        LocalDateTime now = LocalDateTime.now();
+        if (this.createdDate == null) this.createdDate = now;
+        if (this.lastUpdate == null) this.lastUpdate = now;
     }
 
-    public void setUserId(int userId) {
-        this.userId = userId;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getSurname() {
-        return surname;
-    }
-
-    public void setSurname(String surname) {
-        this.surname = surname;
-    }
-
-    public String getMail() {
-        return mail;
-    }
-
-    public void setMail(String mail) {
-        this.mail = mail;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public int getUserStateId() {
-        return userStateId;
-    }
-
-    public void setUserStateId(int userStateId) {
-        this.userStateId = userStateId;
-    }
-
-    public Date getCreatedDate() {
-        return createdDate;
-    }
-
-    public void setCreatedDate(Date createdDate) {
-        this.createdDate = createdDate;
-    }
-
-    public Date getLastUpdate() {
-        return lastUpdate;
-    }
-
-    public void setLastUpdate(Date lastUpdate) {
-        this.lastUpdate = lastUpdate;
+    @PreUpdate
+    protected void onUpdate() {
+        this.lastUpdate = LocalDateTime.now();
     }
 }

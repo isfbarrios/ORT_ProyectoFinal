@@ -74,12 +74,12 @@ CREATE TABLE Sessions (
 /*==========================================================
 =  2) CLIENTES, PREFERENCIAS, RESTRICCIONES
 ==========================================================*/
-CREATE TABLE CustomerState (
+/*CREATE TABLE CustomerState (
   StateId         INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
   Name            VARCHAR(50) NOT NULL,
   Description     TEXT,
   UNIQUE KEY ux_CustomerState_Name (Name)
-) ENGINE=InnoDB;
+) ENGINE=InnoDB;*/
 
 CREATE TABLE Customer (
   CustomerId      INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
@@ -148,15 +148,29 @@ CREATE TABLE `Table` (
   UNIQUE KEY ux_Table_Name (Name)
 ) ENGINE=InnoDB;
 
-CREATE TABLE TableAvailability (
-  TableId         INT UNSIGNED NOT NULL,
-  StateId         INT UNSIGNED NOT NULL,
-  ReservedTimestamp DATETIME NOT NULL,
-  PRIMARY KEY (TableId, ReservedTimestamp),
+CREATE TABLE TableShift (
+  TableId   INT UNSIGNED NOT NULL,
+  ShiftId   INT UNSIGNED NOT NULL,
+  StateId	INT UNSIGNED NOT NULL,
+  OpenTime	VARCHAR(10) NOT NULL,
+  CloseTime	VARCHAR(10) NOT null,
+  PRIMARY KEY (TableId, ShiftId),
   CONSTRAINT fk_TableAvailability_Table
     FOREIGN KEY (TableId) REFERENCES `Table`(TableId) ON DELETE CASCADE,
   CONSTRAINT fk_TableAvailability_State
     FOREIGN KEY (StateId) REFERENCES TableState(StateId)
+) ENGINE=InnoDB;
+
+CREATE TABLE TableReservation (
+  ReservationId     INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  TableId           INT UNSIGNED NOT NULL,
+  ShiftId           INT UNSIGNED NOT NULL,
+  CustomerName      VARCHAR(30) NOT NULL,
+  ReservationDate   DATE NOT NULL,
+  CreatedDate       DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  LastUpdate        DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  CONSTRAINT fk_TableReservation_TableShift FOREIGN KEY (TableId, ShiftId) REFERENCES TableShift(TableId, ShiftId) ON DELETE CASCADE,
+  CONSTRAINT ux_TableReservation UNIQUE KEY (TableId, ReservationDate)
 ) ENGINE=InnoDB;
 
 CREATE TABLE TableCustomer (
@@ -212,6 +226,7 @@ CREATE TABLE MenuItem (
   MenuId          INT UNSIGNED NOT NULL,
   Name            VARCHAR(150) NOT NULL,
   Description     TEXT,
+  BasePrice DECIMAL(12,2) NOT NULL DEFAULT 0,
   TypeId          INT UNSIGNED NOT NULL,
   StateId         INT UNSIGNED NOT NULL,
   CreatedDate     DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
