@@ -9,6 +9,7 @@ import com.ort.edu.proyectofinal.entities.Session;
 import com.ort.edu.proyectofinal.entities.User;
 import com.ort.edu.proyectofinal.entities.Userstate;
 import com.ort.edu.proyectofinal.exception.AuthException;
+import org.springframework.security.access.prepost.PreAuthorize;
 import com.ort.edu.proyectofinal.repositories.UserRepository;
 import com.ort.edu.proyectofinal.services.SessionService;
 import com.ort.edu.proyectofinal.security.JwtUtil;
@@ -42,19 +43,10 @@ public class UserController {
     @Autowired
     private JwtUtil jwtUtil;
 
-    private CoreManager manager = CoreManager.getInstance();
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> getUser(@PathVariable int id, @RequestHeader(value = "Authorization", required = false) String authHeader) {
-
-        // Validar token JWT
-        try {
-            manager.validateTokenJWT(jwtUtil, authHeader);
-        }
-        catch (AuthException e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(new ResponseDTO(e.getMessage()));
-        }
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<?> getUser(@PathVariable int id) {
 
         Optional<User> optionalUser = repo.findById(id);
 
@@ -66,16 +58,8 @@ public class UserController {
     }
 
     @GetMapping
-    public ResponseEntity<?> getAllUsers(@RequestHeader(value = "Authorization", required = false) String authHeader) {
-
-        // Validar token JWT
-        try {
-            manager.validateTokenJWT(jwtUtil, authHeader);
-        }
-        catch (AuthException e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(new ResponseDTO(e.getMessage()));
-        }
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<?> getAllUsers() {
 
         List<UserDTO> users = repo.findAll()
                 .stream()
@@ -86,16 +70,7 @@ public class UserController {
     }
 
     @PostMapping
-    public ResponseEntity<?> createUser(@RequestBody User user, @RequestHeader(value = "Authorization", required = false) String authHeader) {
-
-        // Validar token JWT
-        try {
-            manager.validateTokenJWT(jwtUtil, authHeader);
-        }
-        catch (AuthException e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(new ResponseDTO(e.getMessage()));
-        }
+    public ResponseEntity<?> createUser(@RequestBody User user) {
 
         // Validaciones básicas (podés mejorar con @Valid más adelante)
         if (user.getUsername() == null || user.getUsername().isBlank()) {
@@ -134,17 +109,9 @@ public class UserController {
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> updateUser(@PathVariable int id,
-        @RequestBody User updatedUser, @RequestHeader(value = "Authorization", required = false) String authHeader) {
-
-        // Validar token JWT
-        try {
-            manager.validateTokenJWT(jwtUtil, authHeader);
-        }
-        catch (AuthException e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(new ResponseDTO(e.getMessage()));
-        }
+        @RequestBody User updatedUser) {
 
         Optional<User> optional = repo.findById(id);
 
@@ -169,16 +136,8 @@ public class UserController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteUser(@PathVariable int id, @RequestHeader(value = "Authorization", required = false) String authHeader) {
-
-        // Validar token JWT
-        try {
-            manager.validateTokenJWT(jwtUtil, authHeader);
-        }
-        catch (AuthException e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(new ResponseDTO(e.getMessage()));
-        }
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<?> deleteUser(@PathVariable int id) {
 
         Optional<User> optional = repo.findById(id);
 

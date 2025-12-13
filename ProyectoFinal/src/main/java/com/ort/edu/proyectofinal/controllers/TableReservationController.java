@@ -2,16 +2,13 @@ package com.ort.edu.proyectofinal.controllers;
 
 import com.ort.edu.proyectofinal.CoreManager;
 import com.ort.edu.proyectofinal.dto.*;
-import com.ort.edu.proyectofinal.exception.AuthException;
 import com.ort.edu.proyectofinal.exception.TableException;
 import com.ort.edu.proyectofinal.repositories.TableReservationRepository;
 import com.ort.edu.proyectofinal.repositories.TableShiftRepository;
 import com.ort.edu.proyectofinal.repositories.TablesRepository;
-import com.ort.edu.proyectofinal.security.JwtUtil;
+import org.springframework.security.access.prepost.PreAuthorize;
 import com.ort.edu.proyectofinal.services.TableReservationService;
-import com.ort.edu.proyectofinal.services.TableShiftService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,7 +18,7 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/table_shift")
-public class TableShiftController {
+public class TableReservationController {
 
     @Autowired
     private TablesRepository repo;
@@ -34,9 +31,6 @@ public class TableShiftController {
 
     @Autowired
     private TableReservationService service;
-
-    @Autowired
-    private JwtUtil jwtUtil;
 
     private CoreManager manager = CoreManager.getInstance();
 
@@ -60,17 +54,11 @@ public class TableShiftController {
     }
 
     @GetMapping("/table/{tableId}/shift/{shiftId}")
-    public ResponseEntity<?> reserveTableShift(@PathVariable int tableId, @PathVariable int shiftId, @PathVariable LocalDate date,
-            @PathVariable String customerName, @RequestHeader(value = "Authorization", required = false) String authHeader) {
-
-        // Validar token JWT
-        try {
-            manager.validateTokenJWT(jwtUtil, authHeader);
-        }
-        catch (AuthException e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(new ResponseDTO(e.getMessage()));
-        }
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<?> reserveTableShift(@PathVariable int tableId,
+                                               @PathVariable int shiftId,
+                                               @RequestParam LocalDate date,
+                                               @RequestParam String customerName) {
 
         try {
             boolean isReserved = service.reserve(tableId, shiftId, date, customerName);

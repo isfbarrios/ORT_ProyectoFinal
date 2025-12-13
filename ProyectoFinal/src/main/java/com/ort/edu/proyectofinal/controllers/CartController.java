@@ -6,7 +6,7 @@ import com.ort.edu.proyectofinal.dto.ResponseDTO;
 import com.ort.edu.proyectofinal.entities.Cart;
 import com.ort.edu.proyectofinal.exception.AuthException;
 import com.ort.edu.proyectofinal.repositories.CartRepository;
-import com.ort.edu.proyectofinal.security.JwtUtil;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,20 +25,9 @@ public class CartController {
 
     private CoreManager manager = CoreManager.getInstance();
 
-    @Autowired
-    private JwtUtil jwtUtil;
-
     @GetMapping("/{id}")
-    public ResponseEntity<?> get(@PathVariable int id, @RequestHeader(value = "Authorization", required = false) String authHeader) {
-
-        // Validar token JWT
-        try {
-            manager.validateTokenJWT(jwtUtil, authHeader);
-        }
-        catch (AuthException e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(new ResponseDTO(e.getMessage()));
-        }
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<?> get(@PathVariable int id) {
 
         Optional<Cart> optionalCart = repo.findById(id);
 
@@ -50,15 +39,8 @@ public class CartController {
     }
 
     @GetMapping
-    public ResponseEntity<List<CartDTO>> getAll(@RequestHeader(value = "Authorization", required = false) String authHeader) {
-
-        // Validar token JWT
-        try {
-            manager.validateTokenJWT(jwtUtil, authHeader);
-        }
-        catch (AuthException e) {
-            return ResponseEntity.notFound().build();
-        }
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<List<CartDTO>> getAll() {
 
         List<CartDTO> carts = repo.findAll()
                 .stream()
