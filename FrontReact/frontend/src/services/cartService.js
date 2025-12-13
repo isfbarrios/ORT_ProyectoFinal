@@ -1,17 +1,7 @@
 import {
   API_URL,
-  SESSION_KEY,
-  getFromLocalStorage,
   buildFetchHeader,
 } from "../functions/localStorage";
-
-
-// ===============================================
-// Helper: sessionId
-// ===============================================
-function getSession() {
-  return getFromLocalStorage(SESSION_KEY);
-}
 
 // ===============================================
 // Helper: parse JSON seguro
@@ -29,14 +19,9 @@ async function safeJson(res) {
 // GET /session-cart
 // ===============================================
 export async function apiGetCart() {
-  const sessionId = getSession();
-
   const res = await fetch(`${API_URL}/session-cart`, {
     method: "GET",
-    headers: {
-      ...buildFetchHeader(false),
-      ...(sessionId ? { "X-Session-Id": sessionId } : {}),
-    },
+    headers: buildFetchHeader(),
   });
 
   const data = await safeJson(res);
@@ -49,14 +34,9 @@ export async function apiGetCart() {
 // POST /session-cart/items  (agregar item)
 // ===============================================
 export async function apiAddItemToCart(menuItemId, quantity = 1) {
-  const sessionId = getSession();
-
   const res = await fetch(`${API_URL}/session-cart/items`, {
     method: "POST",
-    headers: {
-      ...buildFetchHeader(false),
-      ...(sessionId ? { "X-Session-Id": sessionId } : {}),
-    },
+    headers: buildFetchHeader(),
     body: JSON.stringify({ menuItemId, quantity }),
   });
 
@@ -70,14 +50,9 @@ export async function apiAddItemToCart(menuItemId, quantity = 1) {
 // POST /session-cart/confirm  (confirmar carrito)
 // ===============================================
 export async function apiConfirmCart() {
-  const sessionId = getSession();
-
   const res = await fetch(`${API_URL}/session-cart/confirm`, {
     method: "POST",
-    headers: {
-      ...buildFetchHeader(false),
-      ...(sessionId ? { "X-Session-Id": sessionId } : {}),
-    },
+    headers: buildFetchHeader()
   });
 
   const data = await safeJson(res);
@@ -90,14 +65,9 @@ export async function apiConfirmCart() {
 // POST /session-cart/close  (cerrar carrito)
 // ===============================================
 export async function apiCloseCart() {
-  const sessionId = getSession();
-
   const res = await fetch(`${API_URL}/session-cart/close`, {
     method: "POST",
-    headers: {
-      ...buildFetchHeader(false),
-      ...(sessionId ? { "X-Session-Id": sessionId } : {}),
-    },
+    headers: buildFetchHeader()
   });
 
   const data = await safeJson(res);

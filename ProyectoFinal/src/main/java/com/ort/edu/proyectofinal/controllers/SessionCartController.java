@@ -7,7 +7,7 @@ import com.ort.edu.proyectofinal.dto.OrderDTO;
 import com.ort.edu.proyectofinal.exception.AuthException;
 import com.ort.edu.proyectofinal.exception.CartException;
 import com.ort.edu.proyectofinal.exception.OrderException;
-import org.springframework.security.access.prepost.PreAuthorize;
+import com.ort.edu.proyectofinal.security.JwtUtil;
 import com.ort.edu.proyectofinal.services.CartService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -22,23 +22,46 @@ public class SessionCartController {
     @Autowired
     private final CartService cartService;
 
-    
+    @Autowired
+    private JwtUtil jwtUtil;
+
+    private CoreManager manager = CoreManager.getInstance();
 
     public SessionCartController(CartService cartService) {
         this.cartService = cartService;
     }
 
     @GetMapping
-    @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<?> getCart(@RequestHeader(value = "Authorization", required = false) String authHeader) {
+    public ResponseEntity<?> getCart(
+            @RequestHeader(value = "Authorization", required = false) String authHeader) {
+
+        // Validar token JWT
+        try {
+            manager.validateTokenJWT(jwtUtil, authHeader);
+        }
+        catch (AuthException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new ResponseDTO(e.getMessage()));
+        }
+
         SessionCartDTO cart = cartService.getOrCreateCart(authHeader);
+
         return ResponseEntity.ok(cart);
     }
 
     @PostMapping("/items")
-    @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<?> addItem(@RequestHeader(value = "Authorization", required = false) String authHeader,
+    public ResponseEntity<?> addItem(
+            @RequestHeader(value = "Authorization", required = false) String authHeader,
             @RequestBody AddCartItemRequest body) {
+
+        // Validar token JWT
+        try {
+            manager.validateTokenJWT(jwtUtil, authHeader);
+        }
+        catch (AuthException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new ResponseDTO(e.getMessage()));
+        }
 
         try {
             SessionCartDTO cart = cartService.addItemToCart(
@@ -62,8 +85,17 @@ public class SessionCartController {
 
 
     @PostMapping("/confirm")
-    @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<?> confirm(@RequestHeader(value = "Authorization", required = false) String authHeader) throws OrderException {
+    public ResponseEntity<?> confirm(
+            @RequestHeader(value = "Authorization", required = false) String authHeader) throws OrderException {
+
+        // Validar token JWT
+        try {
+            manager.validateTokenJWT(jwtUtil, authHeader);
+        }
+        catch (AuthException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new ResponseDTO(e.getMessage()));
+        }
 
         OrderDTO order = null;
 

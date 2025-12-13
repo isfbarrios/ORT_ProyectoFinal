@@ -2,10 +2,13 @@ package com.ort.edu.proyectofinal.controllers;
 
 import com.ort.edu.proyectofinal.CoreManager;
 import com.ort.edu.proyectofinal.dto.*;
+import com.ort.edu.proyectofinal.exception.AuthException;
 import com.ort.edu.proyectofinal.exception.TableException;
 import com.ort.edu.proyectofinal.repositories.TableReservationRepository;
 import com.ort.edu.proyectofinal.repositories.TableShiftRepository;
 import com.ort.edu.proyectofinal.repositories.TablesRepository;
+import com.ort.edu.proyectofinal.security.JwtUtil;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import com.ort.edu.proyectofinal.services.TableReservationService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,10 +35,23 @@ public class TableReservationController {
     @Autowired
     private TableReservationService service;
 
-    private CoreManager manager = CoreManager.getInstance();
+    private final CoreManager manager = CoreManager.getInstance();
+
+    @Autowired
+    private JwtUtil jwtUtil;
 
     @GetMapping
-    public ResponseEntity<List<TablesDTO>> getAll() {
+    public ResponseEntity<?> getAll(@RequestHeader(value = "Authorization", required = false) String authHeader) {
+
+        // Validar token JWT
+        try {
+            manager.validateTokenJWT(jwtUtil, authHeader);
+        }
+        catch (AuthException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new ResponseDTO(e.getMessage()));
+        }
+
         List<TablesDTO> items = repo.findAll()
                 .stream()
                 .map(TablesDTO::new)
@@ -55,21 +71,18 @@ public class TableReservationController {
 
     @PostMapping("/reserve")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<?> reserveTableShift(@RequestBody int tableId,
-                                               @RequestBody int shiftId,
-                                               @RequestBody LocalDate date,
-                                               @RequestBody String customerName) {
+    public ResponseEntity<?> reserveTableShift(
+        @RequestBody int tableId, @RequestBody int shiftId, @RequestBody LocalDate date,
+        @RequestBody String customerName, @RequestHeader(value = "Authorization", required = false) String authHeader) {
 
-        System.out.println();
-        System.out.println();
-
-        System.out.println("tableId: "+ tableId);
-        System.out.println("shiftId: "+ shiftId);
-        System.out.println("date: "+ date);
-        System.out.println("customerName: "+ customerName);
-
-        System.out.println();
-        System.out.println();
+        // Validar token JWT
+        try {
+            manager.validateTokenJWT(jwtUtil, authHeader);
+        }
+        catch (AuthException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new ResponseDTO(e.getMessage()));
+        }
 
         try {
             boolean isReserved = service.reserve(tableId, shiftId, date, customerName);
