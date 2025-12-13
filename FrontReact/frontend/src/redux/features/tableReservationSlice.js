@@ -1,5 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { getTableAvailability, reserveTable } from "../services/tableReservationService";
+import { getTableAvailability, reserveTable } from "../../services/tableReservationService";
 
 const initialState = {
     tables: [],
@@ -55,7 +55,7 @@ export const fetchAvailability = (date, shiftId) => async (dispatch) => {
     try {
         const data = await getTableAvailability(date, shiftId);
         dispatch({ type: "tableReservation/setTables", payload: data });
-        
+
     } catch (err) {
         dispatch({ type: "tableReservation/error", payload: err.message });
     }

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { submitReservation } from "../../redux/features/tableReservationSlice";
+import { submitReservation } from "../redux/features/tableReservationSlice";
 
 const ModalReserva = ({ mesa, turno, onClose }) => {
 

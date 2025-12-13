@@ -1,6 +1,6 @@
 import { useDispatch, useSelector } from "react-redux";
-import { setDate, setShift, fetchAvailability } from "../../redux/features/tableReservationSlice";
-import MesasGrid from "./MesasGrid";
+import { setDate, setShift, fetchAvailability } from "../redux/features/tableReservationSlice";
+import MesasGrid from "../components/MesaGrid";
 
 const shifts = [
     { id: 1, label: "19:00 - 20:00" },
@@ -13,7 +13,10 @@ const shifts = [
 const ReservaPage = () => {
 
     const dispatch = useDispatch();
-    const { tables, selectedDate, selectedShiftId, loading } = useSelector((state) => state.tableReservation);
+    const tableReservationState = useSelector((state) => state.tableReservation);
+
+    // Validación de seguridad
+    const { tables = [], selectedDate = "", selectedShiftId = null, loading = false } = tableReservationState || {};
 
     const handleBuscar = () => {
         if (!selectedDate || !selectedShiftId) return;

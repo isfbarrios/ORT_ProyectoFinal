@@ -53,12 +53,23 @@ public class TableReservationController {
         return ResponseEntity.ok(items);
     }
 
-    @GetMapping("/table/{tableId}/reservation/{shiftId}")
+    @PostMapping("/reserve")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<?> reserveTableShift(@PathVariable int tableId,
-                                               @PathVariable int shiftId,
-                                               @RequestParam LocalDate date,
-                                               @RequestParam String customerName) {
+    public ResponseEntity<?> reserveTableShift(@RequestBody int tableId,
+                                               @RequestBody int shiftId,
+                                               @RequestBody LocalDate date,
+                                               @RequestBody String customerName) {
+
+        System.out.println();
+        System.out.println();
+
+        System.out.println("tableId: "+ tableId);
+        System.out.println("shiftId: "+ shiftId);
+        System.out.println("date: "+ date);
+        System.out.println("customerName: "+ customerName);
+
+        System.out.println();
+        System.out.println();
 
         try {
             boolean isReserved = service.reserve(tableId, shiftId, date, customerName);
