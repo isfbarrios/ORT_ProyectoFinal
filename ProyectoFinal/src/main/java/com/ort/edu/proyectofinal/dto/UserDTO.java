@@ -15,6 +15,7 @@ public class UserDTO {
     private String surname;
     private String mail;
     private String username;
+    private String jwtToken;
     private String sessionId;
 
     public UserDTO() {}

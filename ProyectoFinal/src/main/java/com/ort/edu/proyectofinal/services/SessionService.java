@@ -1,40 +1,45 @@
 package com.ort.edu.proyectofinal.services;
 
+import com.ort.edu.proyectofinal.CoreManager;
 import com.ort.edu.proyectofinal.entities.Session;
+import com.ort.edu.proyectofinal.entities.User;
 import com.ort.edu.proyectofinal.repositories.SessionRepository;
+import com.ort.edu.proyectofinal.security.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
-import java.util.UUID;
 
 @Service
 public class SessionService {
 
     @Autowired
+    private JwtUtil jwtUtil;
+
+    @Autowired
     private SessionRepository repo;
 
-    public Session resolveSession(String sessionId) {
+    private final CoreManager manager = CoreManager.getInstance();
 
-        if (sessionId == null || sessionId.isBlank()) {
+    public Session resolveSession(String authHeader) {
+        if (authHeader == null || authHeader.isBlank()) return null;
 
-            Session s = new Session();
-            s.setSessionId(UUID.randomUUID().toString());
-            s.setCreatedDate(LocalDateTime.now());
+        String sessionId = manager.getToken(authHeader);
 
-            repo.save(s);
-
-            return s;
-        }
-
-        //TODO: Revisar esto
         Optional<Session> existing = repo.findBySessionId(sessionId);
 
         if (existing.isPresent()) {
             return existing.get();
         }
 
-        return null;
+        return createSession(manager.getUser());
+    }
+
+    public Session createSession(User user) {
+        String token = manager.generateToken(jwtUtil, user);
+        String sessionKey = manager.hashString(token);
+
+        return new Session(sessionKey, LocalDateTime.now());
     }
 }

@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -57,7 +58,6 @@ public class CartService {
     @Autowired
     private OrderService orderService;
 
-
     private Cart createNewCart(Session session) {
 
         Cartstate cartState = cartStateRepository.getReferenceById(1);
@@ -82,55 +82,50 @@ public class CartService {
         return cartRepository.save(cart);
     }
 
-    private Cart getOrCreateCartEntity(String sessionIdHeader) {
+    private Cart getOrCreateCartEntity(String authHeader) {
+        System.out.println(getClass().getSimpleName() + ".getOrCreateCartEntity.token: " + authHeader);
 
-        System.out.println(getClass().getName()+".getOrCreateCartEntity.sessionIdHeader: " + sessionIdHeader);
+        Session session = sessionService.resolveSession(authHeader);
 
-        Session session = sessionService.resolveSession(sessionIdHeader);
+        if (session == null) {
+            session = sessionService.resolveSession(null);
+        }
 
-        System.out.println("CartService.getOrCreateCartEntity.sessionIdHeader: " + sessionIdHeader);
-        System.out.println("CartService.getOrCreateCartEntity.session: " + session.getSessionId());
+        Optional<Cart> cart = cartRepository.findBySession_SessionId(session.getSessionId());
 
-        return cartRepository.findBySession_SessionId(session.getSessionId())
-                .orElseGet(() -> createNewCart(session));
+        return cart.isPresent() ? cart.get() : createNewCart(session);
     }
 
     private SessionCartDTO buildSessionCartDTO(Cart cart) {
-        //Obtengo todos los items del carrito
         List<Cartitem> items = cartItemRepository.findByCartId(cart.getId());
 
         List<SessionCartItemDTO> dtoItems = items.stream()
                 .map(SessionCartItemDTO::new)
                 .collect(Collectors.toList());
 
-
         //TODO: Ver el tema de los precios de las variantes
         BigDecimal total = items.stream()
                 .map(ci -> ci.getMenuItem().getBasePrice()
-                        .multiply(BigDecimal.valueOf(ci.getQuantity())))
+                .multiply(BigDecimal.valueOf(ci.getQuantity())))
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
         return new SessionCartDTO(dtoItems, total);
     }
 
-    // ============================
-    // API carrito de sesión
-    // ============================
-
     @Transactional
-    public SessionCartDTO getOrCreateCart(String sessionIdHeader) {
-        Cart cart = getOrCreateCartEntity(sessionIdHeader);
+    public SessionCartDTO getOrCreateCart(String authHeader) {
+        Cart cart = getOrCreateCartEntity(authHeader);
         return buildSessionCartDTO(cart);
     }
 
     @Transactional
-    public SessionCartDTO addItemToCart(String sessionIdHeader, int menuItemId, int quantity) throws CartException {
+    public SessionCartDTO addItemToCart(String authHeader, int menuItemId, int quantity) throws CartException {
 
         if (quantity <= 0) {
              throw new CartException("Cantidad insuficiente para el item " + menuItemId);
         }
 
-        Cart cart = getOrCreateCartEntity(sessionIdHeader);
+        Cart cart = getOrCreateCartEntity(authHeader);
 
         Menuitem menuitem = menuItemRepository.findById(menuItemId)
                 .orElseThrow(() -> new IllegalArgumentException("Menuitem no encontrado"));

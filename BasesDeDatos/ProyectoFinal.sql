@@ -66,7 +66,7 @@ CREATE TABLE UserInGroup (
 /* Sesiones: usamos CHAR(36) con UUID(). Si tu versión no soporta DEFAULT (UUID()),
    generá el UUID desde la app o usa un TRIGGER BEFORE INSERT. */
 CREATE TABLE Sessions (
-  SessionId       CHAR(36) PRIMARY KEY,
+  SessionId       VARCHAR(50) PRIMARY KEY,
   CreatedDate     DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   KEY ix_Sessions_Created (CreatedDate)
 ) ENGINE=InnoDB;
@@ -83,7 +83,7 @@ CREATE TABLE Sessions (
 
 CREATE TABLE Customer (
   CustomerId      INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-  SessionId       CHAR(36) NULL,
+  SessionId       VARCHAR(50) NULL,
   CreatedDate     DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   StateId         INT UNSIGNED NOT NULL,
   LastUpdate      DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -296,7 +296,7 @@ CREATE TABLE CartState (
 CREATE TABLE Cart (
   CartId          INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
   TableId         INT UNSIGNED NULL,
-  SessionId       CHAR(36) NOT NULL,
+  SessionId       VARCHAR(50) NOT NULL,
   Amount          DECIMAL(12,2) NOT NULL DEFAULT 0,
   Date            DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   CartStateId     INT UNSIGNED NOT NULL,

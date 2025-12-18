@@ -1,5 +1,6 @@
 package com.ort.edu.proyectofinal;
 
+import com.ort.edu.proyectofinal.entities.User;
 import com.ort.edu.proyectofinal.exception.AuthException;
 import com.ort.edu.proyectofinal.security.JwtUtil;
 import lombok.Getter;
@@ -16,10 +17,11 @@ public final class CoreManager {
     public static final int _BUSY_STATE_ID = 2;
     public static final int _RESERVE_STATE_ID = 3;
 
-    
     public static final double RESERVE_LIMIT = 0.40;
 
     public static final String genericErrorResponse = "Error al procesar la solicitud. Intente nuevamente";
+
+    private User user;
 
     private CoreManager() {
     }
@@ -38,7 +40,7 @@ public final class CoreManager {
         }
 
         // Extrae el token sin "Bearer "
-        String token = authHeader.substring(7);
+        String token = getToken(authHeader);
 
         try {
             String username = jwtUtil.extractUsername(token);
@@ -48,5 +50,43 @@ public final class CoreManager {
         } catch (Exception ex) {
             throw new AuthException("Token inválido o error al validar");
         }
+    }
+
+    public String generateToken(JwtUtil jwtUtil, User user) {
+        return jwtUtil.generateToken(user.getUsername());
+    }
+
+    public String getToken(String authHeader) {
+        return authHeader.substring(7);
+    }
+
+    public String hashString(String input) {
+        try {
+            java.security.MessageDigest digest = java.security.MessageDigest.getInstance("SHA-256");
+            byte[] encodedhash = digest.digest(input.getBytes(java.nio.charset.StandardCharsets.UTF_8));
+            return bytesToHex(encodedhash);
+        } catch (Exception e) {
+            throw new RuntimeException("Error hashing token", e);
+        }
+    }
+
+    public String bytesToHex(byte[] hash) {
+        StringBuilder hexString = new StringBuilder(2 * hash.length);
+        for (int i = 0; i < hash.length; i++) {
+            String hex = Integer.toHexString(0xff & hash[i]);
+            if(hex.length() == 1) {
+                hexString.append('0');
+            }
+            hexString.append(hex);
+        }
+        return hexString.toString();
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
     }
 }

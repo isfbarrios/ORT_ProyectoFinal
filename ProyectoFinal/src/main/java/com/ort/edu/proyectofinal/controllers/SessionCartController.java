@@ -1,6 +1,7 @@
 package com.ort.edu.proyectofinal.controllers;
 
 import com.ort.edu.proyectofinal.CoreManager;
+import com.ort.edu.proyectofinal.dto.AddCartItemRequestDTO;
 import com.ort.edu.proyectofinal.dto.ResponseDTO;
 import com.ort.edu.proyectofinal.dto.SessionCartDTO;
 import com.ort.edu.proyectofinal.dto.OrderDTO;
@@ -15,25 +16,19 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/session-cart")
-//@CrossOrigin(origins = "*")
+@RequestMapping("/api/session_cart")
 public class SessionCartController {
 
     @Autowired
-    private final CartService cartService;
+    private CartService cartService;
 
     @Autowired
     private JwtUtil jwtUtil;
 
-    private CoreManager manager = CoreManager.getInstance();
-
-    public SessionCartController(CartService cartService) {
-        this.cartService = cartService;
-    }
+    private final CoreManager manager = CoreManager.getInstance();
 
     @GetMapping
-    public ResponseEntity<?> getCart(
-            @RequestHeader(value = "Authorization", required = false) String authHeader) {
+    public ResponseEntity<?> getCart(@RequestHeader(value = "Authorization", required = false) String authHeader) {
 
         // Validar token JWT
         try {
@@ -44,15 +39,16 @@ public class SessionCartController {
                     .body(new ResponseDTO(e.getMessage()));
         }
 
-        SessionCartDTO cart = cartService.getOrCreateCart(authHeader);
+        System.out.println(getClass().getSimpleName() + ".getCart.token: " + manager.getToken(authHeader));
+
+        SessionCartDTO cart = cartService.getOrCreateCart(manager.getToken(authHeader));
 
         return ResponseEntity.ok(cart);
     }
 
     @PostMapping("/items")
-    public ResponseEntity<?> addItem(
-            @RequestHeader(value = "Authorization", required = false) String authHeader,
-            @RequestBody AddCartItemRequest body) {
+    public ResponseEntity<?> addItem(@RequestBody AddCartItemRequestDTO body,
+                                     @RequestHeader(value = "Authorization", required = false) String authHeader) {
 
         // Validar token JWT
         try {
@@ -117,31 +113,9 @@ public class SessionCartController {
     }
 
     @PostMapping("/close")
-    public ResponseEntity<Void> close(@RequestHeader(name = "X-Session-Id") String sessionId) {
+    public ResponseEntity<Void> close(@RequestHeader(value = "Authorization", required = false) String authHeader) {
 
-        cartService.closeCart(sessionId);
+        cartService.closeCart(authHeader);
         return ResponseEntity.ok().build();
-    }
-
-    // ====== DTO interno para el body de /items ======
-    public static class AddCartItemRequest {
-        private int menuItemId;
-        private int quantity;
-
-        public int getMenuItemId() {
-            return menuItemId;
-        }
-
-        public void setMenuItemId(int menuItemId) {
-            this.menuItemId = menuItemId;
-        }
-
-        public int getQuantity() {
-            return quantity;
-        }
-
-        public void setQuantity(int quantity) {
-            this.quantity = quantity;
-        }
     }
 }

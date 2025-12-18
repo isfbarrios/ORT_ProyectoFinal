@@ -5,7 +5,7 @@ import {
   apiConfirmCart,
   apiCloseCart,
 } from "../../services/cartService";
- 
+
 import {
   SESSION_KEY,
   getFromLocalStorage,
