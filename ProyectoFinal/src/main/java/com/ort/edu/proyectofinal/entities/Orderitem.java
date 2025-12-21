@@ -11,7 +11,7 @@ import jakarta.persistence.Table;
 @Getter
 @Setter
 @Entity
-@Table(name = "orderitem", schema = "proyectofinal")
+@Table(name = "OrderItem", schema = "proyectofinal")
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Orderitem {
     @EmbeddedId

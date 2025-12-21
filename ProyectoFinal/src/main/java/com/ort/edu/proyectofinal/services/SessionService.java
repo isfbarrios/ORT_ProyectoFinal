@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class SessionService {
@@ -22,24 +23,28 @@ public class SessionService {
 
     private final CoreManager manager = CoreManager.getInstance();
 
-    public Session resolveSession(String authHeader) {
-        if (authHeader == null || authHeader.isBlank()) return null;
+    public Session resolveSession(String sessionId) {
 
-        String sessionId = manager.getToken(authHeader);
+        if (sessionId == null || sessionId.isBlank()) {
+            return createSession();
+        }
 
+        //TODO: Revisar esto
         Optional<Session> existing = repo.findBySessionId(sessionId);
 
         if (existing.isPresent()) {
             return existing.get();
         }
-
-        return createSession(manager.getUser());
+        else {
+            return createSession();
+        }
     }
 
-    public Session createSession(User user) {
-        String token = manager.generateToken(jwtUtil, user);
-        String sessionKey = manager.hashString(token);
+    public Session createSession() {
+        Session s = new Session(UUID.randomUUID().toString(), LocalDateTime.now());
 
-        return new Session(sessionKey, LocalDateTime.now());
+        repo.saveAndFlush(s);
+
+        return s;
     }
 }

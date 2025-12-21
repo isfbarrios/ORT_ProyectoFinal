@@ -8,7 +8,7 @@ select * from tableavailability t;
 
 drop table if exists tablereservation;
 
-select * from tablestate t;
+select * from Users t;
 
 SELECT *
 FROM tableavailability
@@ -16,11 +16,19 @@ WHERE DATE(ReservedTimestamp) = '2025-11-30';
 
 select * from productcategory p;
 
-select * from tablereservation s;
+select * from Menu s;
+
+select * from MenuItem s;
 
 select * from sessions m order by m.CreatedDate desc;
 
 select * from cart c order by c.CartId desc;
+
+INSERT INTO Users
+(UserId, Name, Surname, Mail, Username, Password, UserStateId, CreatedDate, LastUpdate)
+VALUES(5, 'Fabricio', 'Barrios', 'fbarrios@hotmail.com', 'fbarrios', '$2a$10$2QLXESSRkLo/RwWzVnFCpukxWF1uJXpuQVHYgU.9A1WunUWRMaeJG', 1, '2025-12-04 21:20:54.000', '2025-12-04 21:20:54.000');
+
+delete from Users where UserName = 'fbarrios@hotmail.com';
 
 ALTER TABLE MenuItem
 ADD COLUMN BasePrice DECIMAL(12,2) NOT NULL DEFAULT 0
@@ -41,40 +49,6 @@ WHERE MenuId = 1 AND Name = 'Flan casero';
 UPDATE MenuItem
 SET BasePrice = 120.00
 WHERE MenuId = 1 AND Name = 'Refresco 500ml';
-
-ALTER TABLE Cart DROP FOREIGN KEY fk_Cart_Session;
-ALTER TABLE Customer DROP FOREIGN KEY fk_Customer_Session;
-
-
-ALTER TABLE Sessions
-MODIFY SessionId VARCHAR(100)
-CHARACTER SET utf8mb4
-COLLATE utf8mb4_unicode_ci
-NOT NULL;
-
-ALTER TABLE Cart
-MODIFY SessionId VARCHAR(100)
-CHARACTER SET utf8mb4
-COLLATE utf8mb4_unicode_ci
-NOT NULL;
-
-ALTER TABLE Customer
-MODIFY SessionId VARCHAR(100)
-CHARACTER SET utf8mb4
-COLLATE utf8mb4_unicode_ci
-NULL;
-
-
-ALTER TABLE Cart
-ADD CONSTRAINT fk_Cart_Session
-FOREIGN KEY (SessionId)
-REFERENCES Sessions(SessionId);
-
-ALTER TABLE Customer
-ADD CONSTRAINT fk_Customer_Session
-FOREIGN KEY (SessionId)
-REFERENCES Sessions(SessionId);
-
 
 
 SELECT VERSION();

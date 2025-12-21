@@ -11,7 +11,7 @@ import org.hibernate.annotations.OnDeleteAction;
 @Getter
 @Setter
 @Entity
-@Table(name = "useringroup", schema = "proyectofinal")
+@Table(name = "UserInGroup", schema = "proyectofinal")
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Useringroup {
     @EmbeddedId

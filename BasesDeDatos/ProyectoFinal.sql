@@ -161,6 +161,18 @@ CREATE TABLE TableShift (
     FOREIGN KEY (StateId) REFERENCES TableState(StateId)
 ) ENGINE=InnoDB;
 
+CREATE TABLE CustomerDirection (
+  DirectionId   INT UNSIGNED NOT NULL,
+  CustomerId   INT UNSIGNED NOT NULL,
+  StreetName   VARCHAR(30) NOT NULL,
+  DoorNumber    VARCHAR(10) NOT NULL,
+  Phone     VARCHAR(15) NOT null,
+  Comments  VARCHAR(50) NOT NULL,
+  PRIMARY KEY (DirectionId),
+  CONSTRAINT fk_CustomerDirection_Customer
+    FOREIGN KEY (CustomerId) REFERENCES Customer(CustomerId) ON DELETE CASCADE,
+) ENGINE=InnoDB;
+
 CREATE TABLE TableReservation (
   ReservationId     INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
   TableId           INT UNSIGNED NOT NULL,

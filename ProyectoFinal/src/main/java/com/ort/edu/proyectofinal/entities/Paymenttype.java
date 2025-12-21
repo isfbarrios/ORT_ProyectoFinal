@@ -5,7 +5,7 @@ import jakarta.persistence.*;
 import jakarta.persistence.Table;
 
 @Entity
-@Table(name = "paymenttype", schema = "proyectofinal")
+@Table(name = "PaymentType", schema = "proyectofinal")
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Paymenttype {
     @Id

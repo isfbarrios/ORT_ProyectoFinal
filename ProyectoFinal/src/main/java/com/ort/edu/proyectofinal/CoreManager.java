@@ -1,5 +1,6 @@
 package com.ort.edu.proyectofinal;
 
+import com.ort.edu.proyectofinal.dto.UserDTO;
 import com.ort.edu.proyectofinal.entities.User;
 import com.ort.edu.proyectofinal.exception.AuthException;
 import com.ort.edu.proyectofinal.security.JwtUtil;
@@ -21,7 +22,7 @@ public final class CoreManager {
 
     public static final String genericErrorResponse = "Error al procesar la solicitud. Intente nuevamente";
 
-    private User user;
+    private UserDTO user;
 
     private CoreManager() {
     }
@@ -82,11 +83,11 @@ public final class CoreManager {
         return hexString.toString();
     }
 
-    public User getUser() {
+    public UserDTO getUser() {
         return user;
     }
 
-    public void setUser(User user) {
+    public void setUser(UserDTO user) {
         this.user = user;
     }
 }

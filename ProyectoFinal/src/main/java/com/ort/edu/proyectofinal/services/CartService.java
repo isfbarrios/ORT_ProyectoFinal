@@ -1,5 +1,6 @@
 package com.ort.edu.proyectofinal.services;
 
+import com.ort.edu.proyectofinal.CoreManager;
 import com.ort.edu.proyectofinal.dto.SessionCartDTO;
 import com.ort.edu.proyectofinal.dto.SessionCartItemDTO;
 import com.ort.edu.proyectofinal.dto.OrderDTO;
@@ -58,6 +59,8 @@ public class CartService {
     @Autowired
     private OrderService orderService;
 
+    private final CoreManager manager = CoreManager.getInstance();
+
     private Cart createNewCart(Session session) {
 
         Cartstate cartState = cartStateRepository.getReferenceById(1);
@@ -82,14 +85,8 @@ public class CartService {
         return cartRepository.save(cart);
     }
 
-    private Cart getOrCreateCartEntity(String authHeader) {
-        System.out.println(getClass().getSimpleName() + ".getOrCreateCartEntity.token: " + authHeader);
-
-        Session session = sessionService.resolveSession(authHeader);
-
-        if (session == null) {
-            session = sessionService.resolveSession(null);
-        }
+    private Cart getOrCreateCartEntity() {
+        Session session = sessionService.resolveSession(manager.getUser().getSessionId());
 
         Optional<Cart> cart = cartRepository.findBySession_SessionId(session.getSessionId());
 
@@ -113,8 +110,8 @@ public class CartService {
     }
 
     @Transactional
-    public SessionCartDTO getOrCreateCart(String authHeader) {
-        Cart cart = getOrCreateCartEntity(authHeader);
+    public SessionCartDTO getOrCreateCart() {
+        Cart cart = getOrCreateCartEntity();
         return buildSessionCartDTO(cart);
     }
 
@@ -125,7 +122,7 @@ public class CartService {
              throw new CartException("Cantidad insuficiente para el item " + menuItemId);
         }
 
-        Cart cart = getOrCreateCartEntity(authHeader);
+        Cart cart = getOrCreateCartEntity();
 
         Menuitem menuitem = menuItemRepository.findById(menuItemId)
                 .orElseThrow(() -> new IllegalArgumentException("Menuitem no encontrado"));
@@ -285,7 +282,7 @@ public class CartService {
     // TODO: revisar
     @Transactional
     public void closeCart(String sessionIdHeader) {
-        Cart cart = getOrCreateCartEntity(sessionIdHeader);
+        Cart cart = getOrCreateCartEntity();
         cart.setLastUpdate(LocalDateTime.now());
         // Si tenés estado de cart, marcarlo CERRADO
         cartRepository.save(cart);

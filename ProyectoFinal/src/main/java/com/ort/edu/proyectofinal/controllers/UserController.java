@@ -26,6 +26,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @RestController
@@ -177,19 +178,15 @@ public class UserController {
                     .body(new ResponseDTO("Usuario o contraseña incorrectos"));
         }
 
-        manager.setUser(user);
         String token = manager.generateToken(jwtUtil, user);
-        Session session = sessionService.createSession(user);
 
-        // Verificar si ya existe para no duplicar (aunque save hace merge, mejor evitar)
-        if (!sessionRepository.findBySessionId(session.getSessionId()).isPresent()) {
-             sessionRepository.saveAndFlush(session);
-        }
+        String sessionKey = UUID.randomUUID().toString();
+        Session session = sessionService.resolveSession(sessionKey);
 
         UserDTO dto = new UserDTO(user);
+        dto.setSessionId(session.getSessionId());
 
-        dto.setSessionId(token);
-        dto.setJwtToken(token);
+        manager.setUser(dto);
 
         LoginResponseDTO resp = new LoginResponseDTO(token, dto);
 

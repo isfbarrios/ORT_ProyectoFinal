@@ -39,9 +39,7 @@ public class SessionCartController {
                     .body(new ResponseDTO(e.getMessage()));
         }
 
-        System.out.println(getClass().getSimpleName() + ".getCart.token: " + manager.getToken(authHeader));
-
-        SessionCartDTO cart = cartService.getOrCreateCart(manager.getToken(authHeader));
+        SessionCartDTO cart = cartService.getOrCreateCart();
 
         return ResponseEntity.ok(cart);
     }
@@ -78,7 +76,6 @@ public class SessionCartController {
 
         return null;
     }
-
 
     @PostMapping("/confirm")
     public ResponseEntity<?> confirm(

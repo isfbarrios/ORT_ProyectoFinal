@@ -15,7 +15,7 @@ import jakarta.persistence.Table;
 @Getter
 @Setter
 @Entity
-@Table(name = "menuitem", schema = "proyectofinal")
+@Table(name = "MenuItem", schema = "proyectofinal")
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Menuitem {
     @Id

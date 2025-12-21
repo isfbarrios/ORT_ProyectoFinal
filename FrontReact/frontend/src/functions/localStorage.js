@@ -1,5 +1,6 @@
 export const KEY = "auth";
-export const SESSION_KEY = "API_TOKEN";
+export const API_TOKEN = "API_TOKEN";
+export const SESSION_ID = "SESSION_ID";
 export const API_URL = "http://localhost:8080/api";
 
 // GUARDAR DATO 
