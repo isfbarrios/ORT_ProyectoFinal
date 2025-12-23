@@ -14,7 +14,7 @@ import java.math.BigDecimal;
 @Setter
 @Getter
 @Entity
-@Table(name = "cartitem", schema = "proyectofinal")
+@Table(name = "CartItem", schema = "proyectofinal")
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Cartitem {
     @EmbeddedId

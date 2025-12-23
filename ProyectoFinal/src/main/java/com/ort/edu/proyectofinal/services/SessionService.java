@@ -1,7 +1,10 @@
 package com.ort.edu.proyectofinal.services;
 
+import com.ort.edu.proyectofinal.CoreManager;
 import com.ort.edu.proyectofinal.entities.Session;
+import com.ort.edu.proyectofinal.entities.User;
 import com.ort.edu.proyectofinal.repositories.SessionRepository;
+import com.ort.edu.proyectofinal.security.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -13,19 +16,17 @@ import java.util.UUID;
 public class SessionService {
 
     @Autowired
+    private JwtUtil jwtUtil;
+
+    @Autowired
     private SessionRepository repo;
+
+    private final CoreManager manager = CoreManager.getInstance();
 
     public Session resolveSession(String sessionId) {
 
         if (sessionId == null || sessionId.isBlank()) {
-
-            Session s = new Session();
-            s.setSessionId(UUID.randomUUID().toString());
-            s.setCreatedDate(LocalDateTime.now());
-
-            repo.save(s);
-
-            return s;
+            return createSession();
         }
 
         //TODO: Revisar esto
@@ -34,7 +35,16 @@ public class SessionService {
         if (existing.isPresent()) {
             return existing.get();
         }
+        else {
+            return createSession();
+        }
+    }
 
-        return null;
+    public Session createSession() {
+        Session s = new Session(UUID.randomUUID().toString(), LocalDateTime.now());
+
+        repo.saveAndFlush(s);
+
+        return s;
     }
 }

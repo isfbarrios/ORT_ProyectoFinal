@@ -14,7 +14,7 @@ import java.math.BigDecimal;
 @Getter
 @Setter
 @Entity
-@Table(name = "menuitemhasvariant", schema = "proyectofinal")
+@Table(name = "MenuItemHasVariant", schema = "proyectofinal")
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Menuitemhasvariant {
     @EmbeddedId

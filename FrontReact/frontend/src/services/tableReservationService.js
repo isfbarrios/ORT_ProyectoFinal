@@ -1,4 +1,3 @@
-import tableAvailabilityMock from "../mocks/tableAvailabilityMock";
 import { API_URL, buildFetchHeader } from "../functions/localStorage";
 
 export async function getTableAvailability() {
@@ -14,12 +13,11 @@ export async function getTableAvailability() {
 }
 
 export async function reserveTable(payload) {
-  console.log("ReserveTable payload:", payload);
   // Cuando esté listo:
   const res = await fetch(`${API_URL}/table_reservation/reserve`, {
     method: "POST",
     headers: buildFetchHeader(),
-    body: JSON.stringify({ tableId: 2, shiftId: 2, date: '2025-12-13', customerName: 'Fabri' }),
+    body: JSON.stringify(payload),
   });
 
   if (!res.ok) {

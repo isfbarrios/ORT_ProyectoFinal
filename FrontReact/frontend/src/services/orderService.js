@@ -6,8 +6,7 @@ export async function fetchOrderServiceFromApi(cartId) {
 
   const res = await fetch(`${API_URL}/cart_items/cart/${cartId}`, {
     method: "GET",
-    headers: buildFetchHeader(false)
-
+    headers: buildFetchHeader(),
   });
 
   const data = await safeJson(res);
@@ -15,6 +14,8 @@ export async function fetchOrderServiceFromApi(cartId) {
   if (!res.ok) {
     throw new Error(data.message || "No se pudieron obtener los ítems de la orden");
   }
+
+  console.log("fetchOrderServiceFromApi - data:", data);
 
   return data;
 }
@@ -25,13 +26,11 @@ export async function updateOrderState(orderId, stateId) {
   const res = await fetch(`${API_URL}/orders/update_state`, {
 
     method: "POST",
-    headers: buildFetchHeader(false),
+    headers: buildFetchHeader(),
     body: JSON.stringify({
-      orderId,
+      orderId: orderId,
       orderStateId: stateId
-
     })
-
   });
 
   if (!res.ok) {
@@ -42,10 +41,10 @@ export async function updateOrderState(orderId, stateId) {
 }
 
 async function safeJson(res) {
-    try {
-        return await res.json();
-    } catch {
-        throw new Error("Respuesta inválida del servidor");
-    }
+  try {
+    return await res.json();
+  } catch {
+    throw new Error("Respuesta inválida del servidor");
+  }
 }
 

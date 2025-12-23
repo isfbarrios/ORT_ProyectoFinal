@@ -14,14 +14,21 @@ import java.time.LocalDateTime;
 @Setter
 @Getter
 @Entity
-@Table(name = "sessions", schema = "proyectofinal")
+@Table(name = "Sessions", schema = "proyectofinal")
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Session {
     @Id
-    @Column(name = "SessionId", nullable = false, length = 36)
+    @Column(name = "SessionId", nullable = false)
     private String sessionId;
 
     @ColumnDefault("current_timestamp()")
     @Column(name = "CreatedDate", nullable = false)
     private LocalDateTime createdDate;
+
+    public Session() {}
+
+    public Session(String sessionId, LocalDateTime createdDate) {
+        this.sessionId = sessionId;
+        this.createdDate = createdDate;
+    }
 }

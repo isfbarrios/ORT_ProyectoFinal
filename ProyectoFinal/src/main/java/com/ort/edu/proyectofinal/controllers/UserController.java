@@ -9,6 +9,8 @@ import com.ort.edu.proyectofinal.entities.Session;
 import com.ort.edu.proyectofinal.entities.User;
 import com.ort.edu.proyectofinal.entities.Userstate;
 import com.ort.edu.proyectofinal.exception.AuthException;
+import com.ort.edu.proyectofinal.repositories.SessionRepository;
+import com.ort.edu.proyectofinal.repositories.UserstateRepository;
 import org.springframework.security.access.prepost.PreAuthorize;
 import com.ort.edu.proyectofinal.repositories.UserRepository;
 import com.ort.edu.proyectofinal.services.SessionService;
@@ -20,8 +22,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @RestController
@@ -35,7 +40,7 @@ public class UserController {
     private SessionService sessionService;
 
     @Autowired
-    private com.ort.edu.proyectofinal.repositories.UserstateRepository userstateRepository;
+    private UserstateRepository userstateRepository;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -43,6 +48,10 @@ public class UserController {
     @Autowired
     private JwtUtil jwtUtil;
 
+    @Autowired
+    private SessionRepository sessionRepository;
+
+    private final CoreManager manager = CoreManager.getInstance();
 
     @GetMapping("/{id}")
     @PreAuthorize("isAuthenticated()")
@@ -125,6 +134,7 @@ public class UserController {
         existing.setSurname(updatedUser.getSurname());
         existing.setMail(updatedUser.getMail());
         existing.setUsername(updatedUser.getUsername());
+
         // Actualizar contraseña solo si viene y codificarla
         if (updatedUser.getPassword() != null && !updatedUser.getPassword().isBlank()) {
             existing.setPassword(passwordEncoder.encode(updatedUser.getPassword()));
@@ -168,16 +178,18 @@ public class UserController {
                     .body(new ResponseDTO("Usuario o contraseña incorrectos"));
         }
 
-        // Armar DTO para no devolver la entidad cruda
+        String token = manager.generateToken(jwtUtil, user);
+
+        String sessionKey = UUID.randomUUID().toString();
+        Session session = sessionService.resolveSession(sessionKey);
+
         UserDTO dto = new UserDTO(user);
+        dto.setSessionId(session.getSessionId());
 
-        Session session = sessionService.resolveSession("");
-        if (session != null) dto.setSessionId(session.getSessionId());
-
-        // Generar token JWT con el username como subject
-        String token = jwtUtil.generateToken(user.getUsername());
+        manager.setUser(dto);
 
         LoginResponseDTO resp = new LoginResponseDTO(token, dto);
+
         return ResponseEntity.ok(resp);
     }
 }

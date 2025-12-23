@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @Entity
-@Table(name = "menuitemstate", schema = "proyectofinal")
+@Table(name = "MenuItemState", schema = "proyectofinal")
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Menuitemstate {
     @Id

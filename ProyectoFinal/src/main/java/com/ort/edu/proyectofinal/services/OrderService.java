@@ -26,7 +26,7 @@ public class OrderService {
     private OrderCanalRepository canalRepo;
 
     //TODO: Para crear las ordenes, deberiamos hacerlo por aca. Ver bien que es lo que deberiamos recibir por params
-    public Order createOrder(List<Cartitem> items) {
+    public Order createOrder(Cart cart, List<Cartitem> items) {
 
         if (items == null || items.isEmpty()) {
             throw new IllegalArgumentException("La orden debe contener al menos un ítem");
@@ -35,6 +35,7 @@ public class OrderService {
         Order order = new Order();
         order.setDate(LocalDateTime.now());
         order.setLastUpdate(LocalDateTime.now());
+        order.setCart(cart);
 
         // Número de orden simple (podés cambiar la estrategia)
         order.setOrderNumber(generateOrderNumber());

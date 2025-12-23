@@ -72,20 +72,10 @@ public class TableReservationController {
     @PostMapping("/reserve")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> reserveTableShift(
-        @RequestBody int tableId, @RequestBody int shiftId, @RequestBody LocalDate date,
-        @RequestBody String customerName, @RequestHeader(value = "Authorization", required = false) String authHeader) {
-
-        // Validar token JWT
-        try {
-            manager.validateTokenJWT(jwtUtil, authHeader);
-        }
-        catch (AuthException e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(new ResponseDTO(e.getMessage()));
-        }
+        @RequestBody ReservationRequestDTO request) {
 
         try {
-            boolean isReserved = service.reserve(tableId, shiftId, date, customerName);
+            boolean isReserved = service.reserve(request.getTableId(), request.getShiftId(), request.getDate(), request.getCustomerName());
 
             return isReserved ? ResponseEntity.ok(new ResponseDTO("Reserva realizada"))
                     : ResponseEntity.ok(new ResponseDTO(CoreManager.genericErrorResponse));

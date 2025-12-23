@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @Entity
-@Table(name = "tablecustomer", schema = "proyectofinal")
+@Table(name = "TableCustomer", schema = "proyectofinal")
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Tablecustomer {
     @EmbeddedId

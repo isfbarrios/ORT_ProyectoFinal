@@ -1,25 +1,14 @@
 import {
   API_URL,
   buildFetchHeader,
+  safeJson,
 } from "../functions/localStorage";
 
 // ===============================================
-// Helper: parse JSON seguro
-// ===============================================
-async function safeJson(res) {
-  const text = await res.text();
-  try {
-    return JSON.parse(text);
-  } catch {
-    return { message: text || "Respuesta inválida del servidor" };
-  }
-}
-
-// ===============================================
-// GET /session-cart
+// GET /session_cart
 // ===============================================
 export async function apiGetCart() {
-  const res = await fetch(`${API_URL}/session-cart`, {
+  const res = await fetch(`${API_URL}/session_cart`, {
     method: "GET",
     headers: buildFetchHeader(),
   });
@@ -31,10 +20,10 @@ export async function apiGetCart() {
 }
 
 // ===============================================
-// POST /session-cart/items  (agregar item)
+// POST /session_cart/items  (agregar item)
 // ===============================================
 export async function apiAddItemToCart(menuItemId, quantity = 1) {
-  const res = await fetch(`${API_URL}/session-cart/items`, {
+  const res = await fetch(`${API_URL}/session_cart/items`, {
     method: "POST",
     headers: buildFetchHeader(),
     body: JSON.stringify({ menuItemId, quantity }),
@@ -47,10 +36,10 @@ export async function apiAddItemToCart(menuItemId, quantity = 1) {
 }
 
 // ===============================================
-// POST /session-cart/confirm  (confirmar carrito)
+// POST /session_cart/confirm  (confirmar carrito)
 // ===============================================
 export async function apiConfirmCart() {
-  const res = await fetch(`${API_URL}/session-cart/confirm`, {
+  const res = await fetch(`${API_URL}/session_cart/confirm`, {
     method: "POST",
     headers: buildFetchHeader()
   });
@@ -62,10 +51,10 @@ export async function apiConfirmCart() {
 }
 
 // ===============================================
-// POST /session-cart/close  (cerrar carrito)
+// POST /session_cart/close  (cerrar carrito)
 // ===============================================
 export async function apiCloseCart() {
-  const res = await fetch(`${API_URL}/session-cart/close`, {
+  const res = await fetch(`${API_URL}/session_cart/close`, {
     method: "POST",
     headers: buildFetchHeader()
   });

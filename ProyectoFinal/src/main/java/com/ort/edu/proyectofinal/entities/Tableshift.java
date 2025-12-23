@@ -11,7 +11,7 @@ import org.hibernate.annotations.OnDeleteAction;
 @Setter
 @Getter
 @Entity
-@Table(name = "tableshift", schema = "proyectofinal")
+@Table(name = "TableShift", schema = "proyectofinal")
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Tableshift {
     @EmbeddedId

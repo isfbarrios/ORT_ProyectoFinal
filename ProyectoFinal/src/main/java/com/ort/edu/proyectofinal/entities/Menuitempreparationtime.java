@@ -13,7 +13,7 @@ import java.time.Instant;
 @Getter
 @Setter
 @Entity
-@Table(name = "menuitempreparationtime", schema = "proyectofinal")
+@Table(name = "MenuItemPreparationTime", schema = "proyectofinal")
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Menuitempreparationtime {
     @Id

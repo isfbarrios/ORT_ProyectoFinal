@@ -5,9 +5,9 @@ import {
   apiConfirmCart,
   apiCloseCart,
 } from "../../services/cartService";
- 
+
 import {
-  SESSION_KEY,
+  SESSION_ID,
   getFromLocalStorage,
   clearLocalStorage
 } from "../../functions/localStorage"
@@ -74,7 +74,7 @@ export const fetchCartAsync = () => async (dispatch) => {
   dispatch(setCartError(null));
 
   try {
-    const data = await apiGetCart(getFromLocalStorage(SESSION_KEY));
+    const data = await apiGetCart();
     dispatch(setCart(data));
   }
   catch (error) {
@@ -118,7 +118,7 @@ export const confirmCartAsync = () => async (dispatch) => {
   dispatch(setCartError(null));
 
   try {
-    const sessionId = getFromLocalStorage(SESSION_KEY);
+    const sessionId = getFromLocalStorage(SESSION_ID);
     const data = await apiConfirmCart(sessionId);
 
     dispatch(clearCartState());
@@ -145,7 +145,7 @@ export const closeCartAsync = () => async (dispatch) => {
   dispatch(setCartError(null));
 
   try {
-    const sessionId = getFromLocalStorage(SESSION_KEY);
+    const sessionId = getFromLocalStorage(SESSION_ID);
     const data = await apiCloseCart(sessionId);
 
     console.log(data);

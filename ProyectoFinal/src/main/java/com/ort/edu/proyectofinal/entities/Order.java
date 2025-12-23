@@ -14,7 +14,7 @@ import java.util.List;
 @Getter
 @Setter
 @Entity
-@Table(name = "`order`", schema = "proyectofinal")
+@Table(name = "`Order`", schema = "proyectofinal")
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Order {
     @Id
@@ -24,6 +24,11 @@ public class Order {
 
     @Column(name = "OrderNumber", nullable = false, length = 30)
     private String orderNumber;
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "CartId", nullable = false)
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+    private Cart cart;
 
     @Column(name = "Amount", nullable = false, precision = 12, scale = 2)
     private BigDecimal amount;

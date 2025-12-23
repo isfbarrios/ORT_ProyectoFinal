@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @Entity
-@jakarta.persistence.Table(name = "`table`", schema = "proyectofinal")
+@jakarta.persistence.Table(name = "`Table`", schema = "proyectofinal")
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Tables {
     @Id

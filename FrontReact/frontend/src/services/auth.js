@@ -1,10 +1,11 @@
 import {
   KEY,
-  SESSION_KEY,
   API_URL,
   saveToLocalStorage,
   getFromLocalStorage,
-  removeFromLocalStorage
+  removeFromLocalStorage,
+  API_TOKEN,
+  SESSION_ID
 } from "../functions/localStorage"
 
 // guardo la session del usuario
@@ -14,6 +15,10 @@ export function saveAuth(data) {
     user: data.user ?? data,
   };
 
+  console.log('saveAuth ini');
+  console.log(data);
+  console.log('saveAuth end');
+
   saveToLocalStorage(KEY, session);
 
   // si el back me  devolvió sessionId, lo guardo para el carrito
@@ -21,7 +26,8 @@ export function saveAuth(data) {
   if (token) {
     console.log('saveAuth.sessionId: ' + token);
 
-    saveToLocalStorage(SESSION_KEY, String(token));
+    saveToLocalStorage(API_TOKEN, String(token));
+    saveToLocalStorage(SESSION_ID, String(data.user.sessionId));
     //TODO: Si no tenemos el token, deberiamos cerrar sesion
   }
 }
@@ -34,7 +40,8 @@ export function getAuth() {
 //borro la sesion guardada en storage
 export function clearAuth() {
   removeFromLocalStorage(KEY);
-  removeFromLocalStorage(SESSION_KEY);
+  removeFromLocalStorage(API_TOKEN);
+  removeFromLocalStorage(SESSION_ID);
 }
 
 // MOCK login (luego lo vamos a remplazar por fetch al backend)

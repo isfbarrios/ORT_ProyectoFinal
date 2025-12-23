@@ -34,12 +34,15 @@ export default function Dashboard() {
 
   // Cargar tablero desde backend
   useEffect(() => {
-    
+
     async function cargarTablero() {
       try {
         dispatch(setLoading(true));
 
         const data = await fetchBoardFromApi(); //  devuelve SOLO array de pedidos
+
+        console.log(data);
+
         dispatch(setBoard(data));              // le paso el array cdirecto
 
       } catch (err) {
@@ -53,25 +56,25 @@ export default function Dashboard() {
   }, [dispatch])
 
   return (
-  <div className="container-fluid py-4" style={{ minHeight: "100vh" }}>
-    <h2 className="mb-4">Panel de Pedidos</h2>
+    <div className="container-fluid py-4" style={{ minHeight: "100vh" }}>
+      <h2 className="mb-4">Panel de Pedidos</h2>
 
-    {isLoading && <p>Cargando tablero...</p>}
-    {error && <p className="text-danger">{error}</p>}
+      {isLoading && <p>Cargando tablero...</p>}
+      {error && <p className="text-danger">{error}</p>}
 
- 
-    <div
-      className="p-3"
-      style={{
-        background: "#ffffff",
-        borderRadius: "10px",
-        border: "1px solid #ddd",
-        minHeight: "75vh",
-        overflowX: "auto",
-      }}
-    >
-      <Board />
+
+      <div
+        className="p-3"
+        style={{
+          background: "#ffffff",
+          borderRadius: "10px",
+          border: "1px solid #ddd",
+          minHeight: "75vh",
+          overflowX: "auto",
+        }}
+      >
+        <Board />
+      </div>
     </div>
-  </div>
-);
+  );
 }

@@ -6,27 +6,34 @@ import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
-import jakarta.persistence.Table;
 
-@Getter
 @Setter
+@Getter
 @Entity
-@Table(name = "CustomerPreference", schema = "proyectofinal")
+@Table(name = "CustomerDirection", schema = "proyectofinal")
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
-public class Customerpreference {
-    @EmbeddedId
-    private CustomerpreferenceId id;
+public class Customerdirection {
 
-    @MapsId("customerId")
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "DirectionId", nullable = false)
+    private Integer id;
+
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "CustomerId", nullable = false)
     @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private Customer customer;
 
-    @MapsId("preferenceId")
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "PreferenceId", nullable = false)
-    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
-    private Preference preference;
+    @Column(name = "StreetName", nullable = false)
+    private String streetName;
+
+    @Column(name = "DoorNumber", nullable = false)
+    private String doorNumber;
+
+    @Column(name = "Phone", nullable = false)
+    private String phone;
+
+    @Column(name = "Comments", nullable = false)
+    private String comments;
 }

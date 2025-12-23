@@ -6,7 +6,7 @@ import { getMenuItemsByMenu } from "../services/menuService";
 import {
   addItemToCartAsync,
   fetchCartAsync,
-  
+
 } from "../redux/features/cartSlice";
 
 export default function Menu({ menuId = 1 }) {

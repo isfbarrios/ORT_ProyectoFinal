@@ -14,7 +14,7 @@ import jakarta.persistence.Table;
 @Getter
 @Setter
 @Entity
-@Table(name = "menuitemvariant", schema = "proyectofinal")
+@Table(name = "MenuItemVariant", schema = "proyectofinal")
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Menuitemvariant {
     @Id
