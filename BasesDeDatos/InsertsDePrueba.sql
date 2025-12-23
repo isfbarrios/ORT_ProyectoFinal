@@ -125,7 +125,7 @@ INSERT INTO Preference (Name, Description) VALUES
 INSERT INTO Menu (Name, Description)
 VALUES ('Menú principal', 'Carta general del restaurante');
 
-INSERT INTO MenuItem (MenuId, Name, Description, TypeId, StateId)
+INSERT INTO MenuItem (MenuId, Name, Description,BasePrice, TypeId, StateId)
 VALUES 
 (1, 'Milanesa con papas fritas', 'Plato clásico', 450.00, 2, 1),
 (1, 'Ensalada César', 'Lechuga, pollo, crutones y aderezo', 380.00, 1, 1),

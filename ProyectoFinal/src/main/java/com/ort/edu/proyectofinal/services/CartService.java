@@ -203,10 +203,10 @@ public class CartService {
         }
 
         cart.setCartState(confirmedState);
-        cartRepository.save(cart);
+        cartRepository.saveAndFlush(cart);
 
         // Crear orden
-        Order order = orderService.createOrder(items);
+        Order order = orderService.createOrder(cart, items);
 
         // Devolver DTO al frontend
         return new OrderDTO(order);

@@ -170,7 +170,7 @@ CREATE TABLE CustomerDirection (
   Comments  VARCHAR(50) NOT NULL,
   PRIMARY KEY (DirectionId),
   CONSTRAINT fk_CustomerDirection_Customer
-    FOREIGN KEY (CustomerId) REFERENCES Customer(CustomerId) ON DELETE CASCADE,
+    FOREIGN KEY (CustomerId) REFERENCES Customer(CustomerId) ON DELETE CASCADE
 ) ENGINE=InnoDB;
 
 CREATE TABLE TableReservation (

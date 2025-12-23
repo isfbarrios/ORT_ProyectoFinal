@@ -25,6 +25,11 @@ public class Order {
     @Column(name = "OrderNumber", nullable = false, length = 30)
     private String orderNumber;
 
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "CartId", nullable = false)
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+    private Cart cart;
+
     @Column(name = "Amount", nullable = false, precision = 12, scale = 2)
     private BigDecimal amount;
 

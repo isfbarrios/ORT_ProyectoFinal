@@ -21,6 +21,7 @@ const dashboardSlice = createSlice({
   reducers: {
     // Recibe directamente el array de pedidos que viene del backend
     setBoard: (state, action) => {
+      console.log('dashboardSlice - setBoard action.payload:', action.payload);
       const ordersArray = action.payload || [];
 
       //  Guardar pedidos en un objeto indexado por id
@@ -29,11 +30,11 @@ const dashboardSlice = createSlice({
         state.orders[o.id] = o;
       });
 
-      //  Construir columnas fijas + orderIds según cartState.id
+      //  Construir columnas fijas + orderIds según state.id (nuevo payload del backend)
       state.columns = BASE_COLUMNS.map((col) => ({
         ...col,
         orderIds: ordersArray
-          .filter((o) => o.cartState?.id === col.id)
+          .filter((o) => o.state?.id === col.id)
           .map((o) => o.id),
       }));
 
@@ -41,6 +42,7 @@ const dashboardSlice = createSlice({
 
     // Para refrescar solo pedidos, pero manteniendo la lógica de columnas fijas
     setOrders: (state, action) => {
+      console.log('dashboardSlice - setOrders action.payload:', action.payload);
       const ordersArray = action.payload || [];
 
       state.orders = {};
@@ -51,55 +53,57 @@ const dashboardSlice = createSlice({
       state.columns = BASE_COLUMNS.map((col) => ({
         ...col,
         orderIds: ordersArray
-          .filter((o) => o.cartState?.id === col.id)
+          .filter((o) => o.state?.id === col.id)
           .map((o) => o.id),
       }));
     },
 
     // mover pedido entre columnas (drag & drop) solo a nivel front
     moveOrder: (state, action) => {
-    let { orderId, sourceColId, targetColId } = action.payload;
+      let { orderId, sourceColId, targetColId } = action.payload;
 
-    // Fuerzo todo a número por las dudas
-    orderId = Number(orderId);
-    sourceColId = Number(sourceColId);
-    targetColId = Number(targetColId);
+      // Fuerzo todo a número por las dudas
+      orderId = Number(orderId);
+      sourceColId = Number(sourceColId);
+      targetColId = Number(targetColId);
 
-    const order = state.orders[orderId];
-    if (!order) return;
+      console.log("orderId", orderId);
 
-    const sourceCol = state.columns.find(
+      const order = state.orders[orderId];
+      if (!order) return;
+
+      const sourceCol = state.columns.find(
         (col) => Number(col.id) === sourceColId
-    );
-    const targetCol = state.columns.find(
+      );
+      const targetCol = state.columns.find(
         (col) => Number(col.id) === targetColId
-    );
+      );
 
-    if (!sourceCol || !targetCol) return;
+      if (!sourceCol || !targetCol) return;
 
-    // Quitar de origen
-    sourceCol.orderIds = (sourceCol.orderIds || []).filter(
+      // Quitar de origen
+      sourceCol.orderIds = (sourceCol.orderIds || []).filter(
         (id) => Number(id) !== orderId
-    );
+      );
 
-    // Agregar a destino
-    if (!targetCol.orderIds) {
+      // Agregar a destino
+      if (!targetCol.orderIds) {
         targetCol.orderIds = [];
-    }
-    if (!targetCol.orderIds.some((id) => Number(id) === orderId)) {
+      }
+      if (!targetCol.orderIds.some((id) => Number(id) === orderId)) {
         targetCol.orderIds.push(orderId);
-    }
+      }
 
-    // Actualizar el "estado" del pedido en memoria
-    if (order.cartState) {
-        order.cartState = {
-        ...order.cartState,
-        id: targetColId,
+      // Actualizar el "estado" del pedido en memoria (state en lugar de cartState)
+      if (order.state) {
+        order.state = {
+          ...order.state,
+          id: targetColId,
         };
-    } else {
-        order.cartState = { id: targetColId };
-    }
-},
+      } else {
+        order.state = { id: targetColId };
+      }
+    },
 
 
     updateOrder: (state, action) => {

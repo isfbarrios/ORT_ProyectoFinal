@@ -1,4 +1,3 @@
-import tableAvailabilityMock from "../mocks/tableAvailabilityMock";
 import { API_URL, buildFetchHeader } from "../functions/localStorage";
 
 export async function getTableAvailability() {

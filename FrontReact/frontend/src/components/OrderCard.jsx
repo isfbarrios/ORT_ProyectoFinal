@@ -20,10 +20,10 @@ export default function OrderCard({ order, columnId }) {
         title: "Cargando detalles...",
         didOpen: () => Swal.showLoading(),
         allowOutsideClick: false,
-        
+
       });
 
-      const items = await fetchOrderServiceFromApi(order.id);
+      const items = await fetchOrderServiceFromApi(order.cart.id);
 
       // Total del pedido (precio unitario * cantidad)
       const total = items.reduce(
@@ -59,16 +59,14 @@ export default function OrderCard({ order, columnId }) {
 
       const html = `
         <p><strong>Mesa:</strong> ${mesa}</p>
-        ${
-          estimatedMinutes > 0
-            ? `<p><strong>Tiempo estimado:</strong> ${estimatedMinutes} min</p>`
-            : `<p><strong>Tiempo estimado:</strong> No definido</p>`
+        ${estimatedMinutes > 0
+          ? `<p><strong>Tiempo estimado:</strong> ${estimatedMinutes} min</p>`
+          : `<p><strong>Tiempo estimado:</strong> No definido</p>`
         }
         <hr />
-        ${
-          items.length === 0
-            ? "<p class='text-muted'>Este pedido no tiene ítems.</p>"
-            : `
+        ${items.length === 0
+          ? "<p class='text-muted'>Este pedido no tiene ítems.</p>"
+          : `
           <div class="table-responsive">
             <table class="table table-sm align-middle text-start">
               <thead>
@@ -120,7 +118,7 @@ export default function OrderCard({ order, columnId }) {
       <h6 className="m-0">#{order.id}</h6>
 
       <p className="m-0 text-muted small">
-        Mesa: {mesa} 
+        Mesa: {mesa}
       </p>
 
       <button

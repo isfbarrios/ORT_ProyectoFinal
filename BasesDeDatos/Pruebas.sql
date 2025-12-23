@@ -6,19 +6,21 @@ select * from cartitem s order by s.CartId desc;
 
 select * from tableavailability t;
 
-drop table if exists tablereservation;
+select * from TableReservation;
 
-select * from Users t;
+select * from `Order` t;
+
+select * from Cart c;
 
 SELECT *
 FROM tableavailability
 WHERE DATE(ReservedTimestamp) = '2025-11-30';
 
-select * from productcategory p;
+select * from CustomerDirection p;
 
 select * from Menu s;
 
-select * from MenuItem s;
+select * from TableShift s;
 
 select * from sessions m order by m.CreatedDate desc;
 
