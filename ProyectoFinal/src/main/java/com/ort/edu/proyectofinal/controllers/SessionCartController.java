@@ -77,7 +77,7 @@ public class SessionCartController {
         return null;
     }
 
-    @PostMapping("/confirm_deli")
+    @PostMapping("/confirm")
     public ResponseEntity<?> confirm(
             @RequestHeader(value = "Authorization", required = false) String authHeader) throws OrderException {
 
