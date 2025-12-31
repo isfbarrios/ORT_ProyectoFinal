@@ -13,4 +13,12 @@ public class UserDirectionRequestDTO {
     private String comments;
 
     // getters y setters
+    /*
+    {
+        streetName: 'Pruebita 123',
+        doorNumber: '123',
+        phone: '099999999',
+        comments: 'Casa con ventanas'
+    }
+    */
 }

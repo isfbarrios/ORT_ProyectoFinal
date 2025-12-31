@@ -59,3 +59,25 @@ FLUSH PRIVILEGES;
 
 SELECT VERSION();
 
+
+ALTER TABLE OrderItem
+DROP FOREIGN KEY fk_OrderItem_MenuItem;
+
+ALTER TABLE OrderItem
+DROP COLUMN MenuItemId;
+
+
+
+select * from UserDirection oi;
+
+select * from Cart oi;
+
+select * from `Order` o;
+
+drop table if exists OrderItem;
+
+INSERT INTO OrderItem (OrderId,CartId,ItemId,Quantity,ExtraData) VALUES
+	 (2,1,1,1,NULL),
+	 (3,3,3,1,NULL);
+
+

@@ -12,7 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/user")
+@RequestMapping("/api/user_direction")
 public class UserDirectionController {
 
     @Autowired
@@ -22,7 +22,7 @@ public class UserDirectionController {
 
     private final CoreManager manager = CoreManager.getInstance();
 
-    @PostMapping("/direction")
+    @PostMapping("/new_direction")
     public ResponseEntity<?> saveDirection(
             @RequestBody UserDirectionRequestDTO body,
             @RequestHeader(value = "Authorization", required = false) String authHeader) {

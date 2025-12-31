@@ -31,13 +31,10 @@ public class UserDirectionService {
             throw new RuntimeException("Usuario no encontrado");
         }
 
-        UserDirection direction = repo.findByUser_Id(user.getId());
+        UserDirection direction = new UserDirection();
 
-        if (direction == null) {
-            direction = new UserDirection();
-            direction.setUser(user);
-            direction.setCreatedDate(LocalDateTime.now());
-        }
+        direction.setUser(user);
+        direction.setCreatedDate(LocalDateTime.now());
 
         direction.setStreetName(dto.getStreetName());
         direction.setDoorNumber(dto.getDoorNumber());
