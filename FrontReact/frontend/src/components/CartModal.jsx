@@ -46,9 +46,9 @@ export default function CartModal() {
 
             {items.length > 0 && (
               <ul className="list-group mb-3">
-                {items.map((item) => (
+                {items.map((item, index) => (
                   <li
-                    key={item.cartItemId}
+                    key={`${item.cartItemId}-${index}`}
                     className="list-group-item d-flex justify-content-between"
                   >
                     <div>

@@ -62,13 +62,20 @@ public class OrderService {
                 total = total.add(cartItem.getItemAmount());
             }
 
+            /*
+             OrderId    INT UNSIGNED NOT NULL,
+              CartId     INT UNSIGNED NOT NULL,
+              ItemId     INT UNSIGNED NOT NULL,
+              Quantity   INT UNSIGNED NOT NULL,
+              ExtraData  JSON NULL,
+             */
             Orderitem item = new Orderitem();
             OrderitemId itemId = new OrderitemId();
             // El orderId lo setea Hibernate cuando se persista la orden
-            itemId.setItemId(cartItem.getMenuItem().getId());
+            itemId.setItemId(cartItem.getId().getItemId());
 
             item.setId(itemId);
-            item.setMenuItem(cartItem.getMenuItem());
+            item.setCartItem(cartItem);
             item.setQuantity(cartItem.getQuantity());
             item.setExtraData(null);
 

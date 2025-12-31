@@ -122,7 +122,7 @@ export const confirmCartAsync = () => async (dispatch) => {
     const data = await apiConfirmCart(sessionId);
 
     dispatch(clearCartState());
-    clearLocalStorage();
+    //clearLocalStorage();
 
     return data; // OrderDTO
   }

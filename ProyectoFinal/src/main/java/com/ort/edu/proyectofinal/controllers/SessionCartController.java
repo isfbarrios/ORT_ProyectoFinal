@@ -77,7 +77,7 @@ public class SessionCartController {
         return null;
     }
 
-    @PostMapping("/confirm")
+    @PostMapping("/confirm_deli")
     public ResponseEntity<?> confirm(
             @RequestHeader(value = "Authorization", required = false) String authHeader) throws OrderException {
 
@@ -93,9 +93,12 @@ public class SessionCartController {
         OrderDTO order = null;
 
         try {
-            order = cartService.confirmCart(authHeader);
+            order = cartService.confirmCart(manager.getUser().getSessionId());
         }
         catch (CartException ce) {
+            System.out.println();
+            System.out.println(getClass().getSimpleName()+".confirm.exception:"+ce.getMessage());
+            System.out.println();
             throw new OrderException("No pudimos confirmar tu orden");
         }
         catch (Exception e) {

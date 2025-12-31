@@ -5,8 +5,6 @@ import com.ort.edu.proyectofinal.entities.User;
 import com.ort.edu.proyectofinal.exception.AuthException;
 import com.ort.edu.proyectofinal.security.JwtUtil;
 import lombok.Getter;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 
 @Getter
 public final class CoreManager {
@@ -59,32 +57,6 @@ public final class CoreManager {
 
     public String getToken(String authHeader) {
         return authHeader.substring(7);
-    }
-
-    public String hashString(String input) {
-        try {
-            java.security.MessageDigest digest = java.security.MessageDigest.getInstance("SHA-256");
-            byte[] encodedhash = digest.digest(input.getBytes(java.nio.charset.StandardCharsets.UTF_8));
-            return bytesToHex(encodedhash);
-        } catch (Exception e) {
-            throw new RuntimeException("Error hashing token", e);
-        }
-    }
-
-    public String bytesToHex(byte[] hash) {
-        StringBuilder hexString = new StringBuilder(2 * hash.length);
-        for (int i = 0; i < hash.length; i++) {
-            String hex = Integer.toHexString(0xff & hash[i]);
-            if(hex.length() == 1) {
-                hexString.append('0');
-            }
-            hexString.append(hex);
-        }
-        return hexString.toString();
-    }
-
-    public UserDTO getUser() {
-        return user;
     }
 
     public void setUser(UserDTO user) {

@@ -53,5 +53,9 @@ SET BasePrice = 120.00
 WHERE MenuId = 1 AND Name = 'Refresco 500ml';
 
 
+CREATE USER 'backend'@'%' IDENTIFIED BY 'ortedu2025';
+GRANT ALL PRIVILEGES ON proyectofinal.* TO 'backend'@'%';
+FLUSH PRIVILEGES;
+
 SELECT VERSION();
 

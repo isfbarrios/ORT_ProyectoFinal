@@ -25,9 +25,12 @@ public class Orderitem {
     private Order order;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "MenuItemId", nullable = false)
+    @JoinColumns({
+            @JoinColumn(name = "CartId", referencedColumnName = "CartId", insertable = false, updatable = false),
+            @JoinColumn(name = "ItemId", referencedColumnName = "ItemId", insertable = false, updatable = false)
+    })
     @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
-    private Menuitem menuItem;
+    private Cartitem cartItem;
 
     @Column(name = "Quantity", nullable = false)
     private Integer quantity;

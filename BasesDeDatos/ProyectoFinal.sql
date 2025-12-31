@@ -390,16 +390,22 @@ CREATE TABLE `Order` (
 ) ENGINE=InnoDB;
 
 CREATE TABLE OrderItem (
-  OrderId         INT UNSIGNED NOT NULL,
-  ItemId          INT UNSIGNED NOT NULL,
-  MenuItemId      INT UNSIGNED NOT NULL,
-  Quantity        INT UNSIGNED NOT NULL,
-  ExtraData       JSON NULL,
+  OrderId    INT UNSIGNED NOT NULL,
+  CartId     INT UNSIGNED NOT NULL,
+  ItemId     INT UNSIGNED NOT NULL,
+  Quantity   INT UNSIGNED NOT NULL,
+  ExtraData  JSON NULL,
   PRIMARY KEY (OrderId, ItemId),
+
   CONSTRAINT fk_OrderItem_Order
-    FOREIGN KEY (OrderId) REFERENCES `Order`(OrderId) ON DELETE CASCADE,
-  CONSTRAINT fk_OrderItem_MenuItem
-    FOREIGN KEY (MenuItemId) REFERENCES MenuItem(MenuItemId),
+    FOREIGN KEY (OrderId)
+    REFERENCES `Order`(OrderId)
+    ON DELETE CASCADE,
+
+  CONSTRAINT fk_OrderItem_CartItem
+    FOREIGN KEY (CartId, ItemId)
+    REFERENCES CartItem (CartId, ItemId),
+
   CHECK (Quantity > 0)
 ) ENGINE=InnoDB;
 
