@@ -1,5 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { saveUserDirection } from "../../../services/userDirectionService";
+import { saveUserDirection } from "../../services/userDirectionService";
 
 const initialState = {
   direction: null,
@@ -43,14 +43,13 @@ export const {
 export default userDirectionSlice.reducer;
 
 export const saveUserDirectionAsync = (direction) => async (dispatch) => {
-    dispatch(saveDirectionStart());
-  
-    try {
-      const data = await saveUserDirection(direction);
-      dispatch(saveDirectionSuccess(data));
+  dispatch(saveDirectionStart());
 
-    } catch (error) {
-      dispatch(saveDirectionError(error.message));
-    }
-  };
-  
+  try {
+    const data = await saveUserDirection(direction);
+    dispatch(saveDirectionSuccess(data));
+
+  } catch (error) {
+    dispatch(saveDirectionError(error.message));
+  }
+};

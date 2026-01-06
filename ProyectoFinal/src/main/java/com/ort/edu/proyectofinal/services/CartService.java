@@ -86,6 +86,13 @@ public class CartService {
     }
 
     private Cart getOrCreateCartEntity() {
+
+        try {
+            //TODO: Estamos llamando dos veces
+            System.out.println(manager.getUser());
+        }
+        catch(Exception e) {}
+
         Session session = sessionService.resolveSession(manager.getUser().getSessionId());
 
         Optional<Cart> cart = cartRepository.findBySession_SessionId(session.getSessionId());

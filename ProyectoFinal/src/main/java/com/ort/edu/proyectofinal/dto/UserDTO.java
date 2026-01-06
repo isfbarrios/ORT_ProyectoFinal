@@ -1,5 +1,6 @@
 package com.ort.edu.proyectofinal.dto;
 
+import com.ort.edu.proyectofinal.CoreManager;
 import com.ort.edu.proyectofinal.entities.User;
 import lombok.Getter;
 import lombok.Setter;
@@ -16,6 +17,7 @@ public class UserDTO {
     private String mail;
     private String username;
     private String sessionId;
+    private CoreManager.UserType type;
 
     public UserDTO() {}
 
@@ -25,6 +27,8 @@ public class UserDTO {
         this.mail = user.getMail();
         this.surname = user.getSurname();
         this.username = user.getUsername();
+        //Por defecto se asigna como local
+        this.type = CoreManager.UserType.LOCAL;
     }
 
     @Override

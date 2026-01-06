@@ -11,6 +11,11 @@ public final class CoreManager {
 
     private static CoreManager instance;
 
+    public enum UserType {
+        LOCAL,
+        DELIVERY,
+    }
+
     // Estados de mesa / turno
     public static final int _AVAILABLE_STATE_ID = 1;
     public static final int _BUSY_STATE_ID = 2;

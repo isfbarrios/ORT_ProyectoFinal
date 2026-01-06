@@ -1,15 +1,23 @@
 import { Outlet } from "react-router-dom"; // muestro el cotenido de la ruta hija ej: log,home
-import NavBar from "./components/NavBar"; 
-import CartModal from "./components/CartModal"; 
+import NavBar from "./components/NavBar";
+import CartModal from "./components/CartModal";
 import { useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { fetchCartAsync } from "./redux/features/cartSlice";
+import { sessionRenew } from "./services/auth";
+import {
+  getFromLocalStorage,
+  API_TOKEN,
+} from "./functions/localStorage";
 
 export default function App() {
 
   const dispatch = useDispatch();
 
   useEffect(() => {
+    if (getFromLocalStorage(API_TOKEN)) {
+      sessionRenew();
+    }
     dispatch(fetchCartAsync());
   }, [dispatch]);
 

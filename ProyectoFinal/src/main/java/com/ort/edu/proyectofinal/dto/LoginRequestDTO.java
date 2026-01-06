@@ -9,6 +9,7 @@ public class LoginRequestDTO {
 
     private String mail;
     private String password;
+    private String userType;
 
     public LoginRequestDTO() {}
 }

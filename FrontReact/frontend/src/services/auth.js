@@ -3,9 +3,11 @@ import {
   API_URL,
   saveToLocalStorage,
   getFromLocalStorage,
+  clearLocalStorage,
   removeFromLocalStorage,
   API_TOKEN,
-  SESSION_ID
+  SESSION_ID,
+  buildFetchHeader
 } from "../functions/localStorage"
 
 // guardo la session del usuario
@@ -45,13 +47,14 @@ export function clearAuth() {
 }
 
 // MOCK login (luego lo vamos a remplazar por fetch al backend)
-export async function loginApi({ email, password }) {
+export async function loginApi({ email, password, userType }) {
   const res = await fetch(API_URL + "/users/login", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
       mail: email,
-      password: password
+      password: password,
+      userType: userType
     })
   });
 
@@ -65,6 +68,33 @@ export async function loginApi({ email, password }) {
   }
 
   if (!res.ok) {
+    throw new Error(data.message || "Credenciales inválidas");
+  }
+
+  return data;
+}
+
+export async function sessionRenew() {
+  const res = await fetch(API_URL + "/users/session_renew", {
+    method: "POST",
+    headers: buildFetchHeader(),
+    body: JSON.stringify({
+      sessionId: getFromLocalStorage(SESSION_ID)
+    })
+  });
+
+  let data;
+
+  try {
+    data = await res.json();
+  }
+  catch {
+    throw new Error("Respuesta inválida del servidor");
+  }
+
+  if (!res.ok) {
+    clearLocalStorage();
+    //TODO: Ver si puedo redireccionar al login
     throw new Error(data.message || "Credenciales inválidas");
   }
 

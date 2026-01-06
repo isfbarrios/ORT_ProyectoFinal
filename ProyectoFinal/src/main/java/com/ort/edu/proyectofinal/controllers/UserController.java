@@ -1,11 +1,9 @@
 package com.ort.edu.proyectofinal.controllers;
 
 import com.ort.edu.proyectofinal.CoreManager;
-import com.ort.edu.proyectofinal.dto.ResponseDTO;
-import com.ort.edu.proyectofinal.dto.LoginRequestDTO;
-import com.ort.edu.proyectofinal.dto.UserDTO;
-import com.ort.edu.proyectofinal.dto.LoginResponseDTO;
+import com.ort.edu.proyectofinal.dto.*;
 import com.ort.edu.proyectofinal.entities.Session;
+import com.ort.edu.proyectofinal.entities.Tables;
 import com.ort.edu.proyectofinal.entities.User;
 import com.ort.edu.proyectofinal.entities.Userstate;
 import com.ort.edu.proyectofinal.exception.AuthException;
@@ -186,10 +184,43 @@ public class UserController {
         UserDTO dto = new UserDTO(user);
         dto.setSessionId(session.getSessionId());
 
+        dto.setType(
+                request.getUserType().equalsIgnoreCase("LOCAL")
+                ? CoreManager.UserType.LOCAL
+                : CoreManager.UserType.DELIVERY
+        );
+
         manager.setUser(dto);
 
         LoginResponseDTO resp = new LoginResponseDTO(token, dto);
 
         return ResponseEntity.ok(resp);
+    }
+
+    @PostMapping("/session_renew")
+    public ResponseEntity<?> sessionRenew(@RequestBody SessionRenewRequest req,
+        @RequestHeader(value = "Authorization", required = false) String authHeader) {
+
+        // Validar token JWT
+        try {
+            manager.validateTokenJWT(jwtUtil, authHeader);
+        }
+        catch (AuthException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new ResponseDTO(e.getMessage()));
+        }
+
+        System.out.println();
+        System.out.println(getClass().getSimpleName()+".sessionRenew.sessionId: " + req.getSessionId());
+        System.out.println();
+
+        Session session = sessionRepository.findBySessionId(req.getSessionId())
+                .orElseThrow(() -> new IllegalArgumentException("La sesión no existe"));
+
+        if (req.getSessionId().equalsIgnoreCase(manager.getUser().getSessionId())) {
+            return ResponseEntity.ok(manager.getUser());
+        }
+
+        return null;
     }
 }

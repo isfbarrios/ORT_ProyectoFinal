@@ -1,4 +1,7 @@
-import { getAuthHeader } from "./auth";
+import {
+  buildFetchHeader
+} from "../functions/localStorage"
+
 
 /*
   Crear o actualizar la dirección del usuario logueado
@@ -8,10 +11,7 @@ export async function saveUserDirection(direction) {
   try {
     const response = await fetch("/api/user/direction", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        ...getAuthHeader(),
-      },
+      headers: buildFetchHeader(),
       body: JSON.stringify(direction),
     });
 

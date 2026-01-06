@@ -3,8 +3,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 
 import { clearAuth, getAuth } from "../services/auth";
-import UserDirectionForm from "../components/user/UserDirectionForm";
-import { saveUserDirectionAsync } from "../redux/features/userDirection/userDirectionSlice";
+import UserDirectionForm from "../components/UserDirectionForm";
+import { saveUserDirectionAsync } from "../redux/features/userDirectionSlice";
 
 export default function UserDirectionPage() {
   const navigate = useNavigate();

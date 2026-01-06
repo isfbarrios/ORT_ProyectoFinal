@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 
 import { loginApi, saveAuth } from "../services/auth";
 import { setUser, setLoading } from "../redux/features/appSlice";
@@ -8,6 +8,7 @@ import { setUser, setLoading } from "../redux/features/appSlice";
 export default function Login() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
 
   const isLoading = useSelector((state) => state.app.isLoading);
 
@@ -22,21 +23,22 @@ export default function Login() {
 
     try {
       // 1) Llamo al backend
-      const data = await loginApi({ email, password });
+      // Leemos si viene userType en la URL (ej: ?userType=DELIVERY)
+      // Si no viene, asumimos LOCAL
+      const userType = searchParams.get("userType") || "LOCAL";
 
-      // 2) Guardo en localStorage (persistencia)
+      const data = await loginApi({ email, password, userType });
+
       saveAuth(data);
-
-      // 3) Guardo en Redux (sesión en memoria)
       dispatch(setUser(data.user ?? data));
 
-      // 4) Redirigir al dashboard
       navigate("/dashboard");
-
-    } catch (error) {
+    }
+    catch (error) {
       console.error("Error de login:", error);
       setErrorMsg(error.message || "Credenciales inválidas");
-    } finally {
+    }
+    finally {
       dispatch(setLoading(false));
     }
   };

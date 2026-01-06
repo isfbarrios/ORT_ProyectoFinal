@@ -41,6 +41,12 @@ export default function NavBar() {
         <NavLink to="/login" style={linkStyle}>
           Login
         </NavLink>
+        <NavLink to="/directions" style={linkStyle}>
+          Direcciones
+        </NavLink>
+        <NavLink to="/qr" style={linkStyle}>
+          QR
+        </NavLink>
         <NavLink to="/register" style={linkStyle}>
           Registro
         </NavLink>
