@@ -13,6 +13,7 @@ export async function saveUserDirection(direction) {
       method: "POST",
       headers: buildFetchHeader(),
       body: JSON.stringify(direction),
+      credentials:"include"
     });
 
     if (!response.ok) {

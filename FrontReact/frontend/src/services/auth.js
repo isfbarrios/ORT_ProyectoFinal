@@ -55,7 +55,8 @@ export async function loginApi({ email, password, userType }) {
       mail: email,
       password: password,
       userType: userType
-    })
+    }),
+    credentials: "include"
   });
 
   let data;
@@ -80,7 +81,8 @@ export async function sessionRenew() {
     headers: buildFetchHeader(),
     body: JSON.stringify({
       sessionId: getFromLocalStorage(SESSION_ID)
-    })
+    }),
+    credentials: "include"
   });
 
   let data;

@@ -7,6 +7,7 @@ export async function fetchOrderServiceFromApi(cartId) {
   const res = await fetch(`${API_URL}/cart_items/cart/${cartId}`, {
     method: "GET",
     headers: buildFetchHeader(),
+    credentials:"include"
   });
 
   const data = await safeJson(res);
@@ -30,7 +31,8 @@ export async function updateOrderState(orderId, stateId) {
     body: JSON.stringify({
       orderId: orderId,
       orderStateId: stateId
-    })
+    }),
+    credentials:"include"
   });
 
   if (!res.ok) {
