@@ -1,6 +1,7 @@
 package com.ort.edu.proyectofinal.services;
 
 import com.ort.edu.proyectofinal.CoreManager;
+import com.ort.edu.proyectofinal.dto.UserDTO;
 import com.ort.edu.proyectofinal.dto.SessionCartDTO;
 import com.ort.edu.proyectofinal.dto.SessionCartItemDTO;
 import com.ort.edu.proyectofinal.dto.OrderDTO;
@@ -10,7 +11,12 @@ import com.ort.edu.proyectofinal.entities.Session;
 import com.ort.edu.proyectofinal.entities.*;
 import com.ort.edu.proyectofinal.exception.CartException;
 import com.ort.edu.proyectofinal.repositories.*;
+import jakarta.servlet.http.HttpSession;
 import jakarta.transaction.Transactional;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -57,7 +63,13 @@ public class CartService {
     private TablesRepository tablesRepository;
 
     @Autowired
+    private HttpSession httpSession;
+
+    @Autowired
     private OrderService orderService;
+
+    @Autowired
+    private UserRepository userRepository;
 
     private final CoreManager manager = CoreManager.getInstance();
 
@@ -88,12 +100,47 @@ public class CartService {
     private Cart getOrCreateCartEntity() {
 
         try {
-            //TODO: Estamos llamando dos veces
-            System.out.println(manager.getUser());
-        }
-        catch(Exception e) {}
+            System.out.println("DEBUG: CartService.httpSession.getId(): " + httpSession.getId());
+            System.out.println("DEBUG: httpSession.getAttribute('user'): " + httpSession.getAttribute("user"));
+        } catch(Exception e) {}
 
-        Session session = sessionService.resolveSession(manager.getUser().getSessionId());
+        UserDTO user = (UserDTO) httpSession.getAttribute("user");
+
+        if (user == null) {
+            System.out.println("DEBUG: User not found in session, attempting JWT fallback...");
+            // Fallback: Intentar recuperar del contexto de seguridad (JWT)
+            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+
+            if (auth != null && auth.isAuthenticated() && !auth.getPrincipal().equals("anonymousUser")) {
+                
+                String username = null;
+                if (auth.getPrincipal() instanceof UserDetails) {
+                    username = ((UserDetails) auth.getPrincipal()).getUsername();
+                } else if (auth.getPrincipal() instanceof String) {
+                    username = (String) auth.getPrincipal();
+                }
+
+                if (username != null) {
+                    User dbUser = userRepository.findByUsername(username);
+                    if (dbUser != null) {
+                        user = new UserDTO(dbUser);
+                        // Como no tenemos la cookie, generamos una sesión temporal
+                        // TODO: Esto crea un carrito NUEVO cada vez si no se arregla el cliente
+                        String tempSessionId = UUID.randomUUID().toString();
+                        user.setSessionId(tempSessionId);
+                        
+                        // Guardar en sesión para la próxima (si el cliente soporta cookies ahora)
+                        httpSession.setAttribute("user", user);
+                    }
+                }
+            }
+        }
+
+        if (user == null) {
+            throw new RuntimeException("Usuario no logueado en sesión");
+        }
+
+        Session session = sessionService.resolveSession(user.getSessionId());
 
         Optional<Cart> cart = cartRepository.findBySession_SessionId(session.getSessionId());
 

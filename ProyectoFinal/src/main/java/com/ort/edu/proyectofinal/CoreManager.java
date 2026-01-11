@@ -25,10 +25,7 @@ public final class CoreManager {
 
     public static final String genericErrorResponse = "Error al procesar la solicitud. Intente nuevamente";
 
-    private UserDTO user;
-
-    private CoreManager() {
-    }
+    private CoreManager() {}
 
     public static CoreManager getInstance() {
         if (instance == null) {
@@ -62,9 +59,5 @@ public final class CoreManager {
 
     public String getToken(String authHeader) {
         return authHeader.substring(7);
-    }
-
-    public void setUser(UserDTO user) {
-        this.user = user;
     }
 }

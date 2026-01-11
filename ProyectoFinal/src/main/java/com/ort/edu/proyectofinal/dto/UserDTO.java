@@ -39,6 +39,7 @@ public class UserDTO {
                 ", surname='" + surname + '\'' +
                 ", mail='" + mail + '\'' +
                 ", username='" + username + '\'' +
+                ", sessionid='" + sessionId + '\'' +
                 '}';
     }
 

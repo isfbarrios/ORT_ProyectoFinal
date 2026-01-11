@@ -3,7 +3,6 @@ package com.ort.edu.proyectofinal.controllers;
 import com.ort.edu.proyectofinal.CoreManager;
 import com.ort.edu.proyectofinal.dto.*;
 import com.ort.edu.proyectofinal.entities.Session;
-import com.ort.edu.proyectofinal.entities.Tables;
 import com.ort.edu.proyectofinal.entities.User;
 import com.ort.edu.proyectofinal.entities.Userstate;
 import com.ort.edu.proyectofinal.exception.AuthException;
@@ -12,19 +11,21 @@ import com.ort.edu.proyectofinal.repositories.UserstateRepository;
 import org.springframework.security.access.prepost.PreAuthorize;
 import com.ort.edu.proyectofinal.repositories.UserRepository;
 import com.ort.edu.proyectofinal.services.SessionService;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import com.ort.edu.proyectofinal.security.JwtUtil;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 @RestController
@@ -48,6 +49,9 @@ public class UserController {
 
     @Autowired
     private SessionRepository sessionRepository;
+
+    @Autowired
+    private HttpSession httpSession;
 
     private final CoreManager manager = CoreManager.getInstance();
 
@@ -158,7 +162,7 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody LoginRequestDTO request) {
+    public ResponseEntity<?> login(@RequestBody LoginRequestDTO request, HttpServletRequest httpReq) {
         // Buscar usuario por mail
         User user = repo.findByMail(request.getMail());
 
@@ -178,11 +182,11 @@ public class UserController {
 
         String token = manager.generateToken(jwtUtil, user);
 
-        String sessionKey = UUID.randomUUID().toString();
-        Session session = sessionService.resolveSession(sessionKey);
+        String sessionKey = httpSession.getId();
+        Session dbSession = sessionService.resolveSession(sessionKey);
 
         UserDTO dto = new UserDTO(user);
-        dto.setSessionId(session.getSessionId());
+        dto.setSessionId(dbSession.getSessionId());
 
         dto.setType(
                 request.getUserType().equalsIgnoreCase("LOCAL")
@@ -190,7 +194,14 @@ public class UserController {
                 : CoreManager.UserType.DELIVERY
         );
 
-        manager.setUser(dto);
+        // Forzar creación de sesión HTTP para generar cookie JSESSIONID
+        HttpSession session = httpReq.getSession(true);
+        session.setAttribute("user", dto);
+
+        try {
+            System.out.println("Session created: " + session.getId());
+            System.out.println("User in session: " + session.getAttribute("user"));
+        } catch(Exception e) {}
 
         LoginResponseDTO resp = new LoginResponseDTO(token, dto);
 
@@ -198,7 +209,8 @@ public class UserController {
     }
 
     @PostMapping("/session_renew")
-    public ResponseEntity<?> sessionRenew(@RequestBody SessionRenewRequest req,
+    public ResponseEntity<?> sessionRenew(
+        @RequestBody(required = false) SessionRenewRequest req,
         @RequestHeader(value = "Authorization", required = false) String authHeader) {
 
         // Validar token JWT
@@ -210,17 +222,49 @@ public class UserController {
                     .body(new ResponseDTO(e.getMessage()));
         }
 
-        System.out.println();
-        System.out.println(getClass().getSimpleName()+".sessionRenew.sessionId: " + req.getSessionId());
-        System.out.println();
+        UserDTO user = (UserDTO) httpSession.getAttribute("user");
 
-        Session session = sessionRepository.findBySessionId(req.getSessionId())
-                .orElseThrow(() -> new IllegalArgumentException("La sesión no existe"));
+        if (user == null) {
+            // Fallback JWT
+            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+            if (auth != null && auth.isAuthenticated() && !auth.getPrincipal().equals("anonymousUser")) {
+                String username = null;
+                if (auth.getPrincipal() instanceof UserDetails) {
+                    username = ((UserDetails) auth.getPrincipal()).getUsername();
+                } else if (auth.getPrincipal() instanceof String) {
+                    username = (String) auth.getPrincipal();
+                }
 
-        if (req.getSessionId().equalsIgnoreCase(manager.getUser().getSessionId())) {
-            return ResponseEntity.ok(manager.getUser());
+                if (username != null) {
+                    User dbUser = repo.findByUsername(username);
+                    if (dbUser != null) {
+                        user = new UserDTO(dbUser);
+                        // Generamos sessionId temporal si no hay cookie
+                        String tempSessionId = httpSession.getId();
+                        user.setSessionId(tempSessionId);
+                        // Lo guardamos en sesión por si acaso
+                        httpSession.setAttribute("user", user);
+                    }
+                }
+            }
         }
 
-        return null;
+        if (user != null) {
+            // Validamos que si mandaron un sessionId (frontend viejo?), coincida? 
+            // No, mejor confiamos en la cookie/JWT que es más seguro.
+            // Retornamos el usuario actual validado.
+            return ResponseEntity.ok(user);
+        }
+
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ResponseDTO("Sesión expirada"));
+    }
+    @PostMapping("/logout")
+    public ResponseEntity<?> logout() {
+        try {
+            httpSession.invalidate();
+        } catch (Exception e) {
+            // Si ya era inválida, no pasa nada
+        }
+        return ResponseEntity.ok(new ResponseDTO("Sesión cerrada correctamente"));
     }
 }

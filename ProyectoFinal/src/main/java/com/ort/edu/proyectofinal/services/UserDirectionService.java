@@ -10,6 +10,7 @@ import com.ort.edu.proyectofinal.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import jakarta.servlet.http.HttpSession;
 import java.time.LocalDateTime;
 @Service
 public class UserDirectionService {
@@ -19,11 +20,17 @@ public class UserDirectionService {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private HttpSession session;
+
     private final CoreManager manager = CoreManager.getInstance();
 
     public void saveOrUpdate(UserDirectionRequestDTO dto) {
 
-        UserDTO userDTO = manager.getUser();
+        UserDTO userDTO = (UserDTO) session.getAttribute("user");
+        if (userDTO == null) {
+            throw new RuntimeException("Usuario no logueado");
+        }
 
         User user = userRepository.findByUsername(userDTO.getUsername());
 

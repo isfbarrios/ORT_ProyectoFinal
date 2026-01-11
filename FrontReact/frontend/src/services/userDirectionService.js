@@ -2,7 +2,6 @@ import {
   buildFetchHeader
 } from "../functions/localStorage"
 
-
 /*
   Crear o actualizar la dirección del usuario logueado
 */
@@ -13,6 +12,7 @@ export async function saveUserDirection(direction) {
       method: "POST",
       headers: buildFetchHeader(),
       body: JSON.stringify(direction),
+      credentials: 'include'
     });
 
     if (!response.ok) {
@@ -21,7 +21,8 @@ export async function saveUserDirection(direction) {
     }
 
     return await response.json();
-  } catch (error) {
+  }
+  catch (error) {
     console.error("saveUserDirection error:", error);
     throw error;
   }

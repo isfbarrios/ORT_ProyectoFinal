@@ -5,12 +5,12 @@ import com.ort.edu.proyectofinal.entities.Session;
 import com.ort.edu.proyectofinal.entities.User;
 import com.ort.edu.proyectofinal.repositories.SessionRepository;
 import com.ort.edu.proyectofinal.security.JwtUtil;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
-import java.util.UUID;
 
 @Service
 public class SessionService {
@@ -20,6 +20,9 @@ public class SessionService {
 
     @Autowired
     private SessionRepository repo;
+
+    @Autowired
+    private HttpSession httpSession;
 
     private final CoreManager manager = CoreManager.getInstance();
 
@@ -41,7 +44,7 @@ public class SessionService {
     }
 
     public Session createSession() {
-        Session s = new Session(UUID.randomUUID().toString(), LocalDateTime.now());
+        Session s = new Session(httpSession.getId(), LocalDateTime.now());
 
         repo.saveAndFlush(s);
 
