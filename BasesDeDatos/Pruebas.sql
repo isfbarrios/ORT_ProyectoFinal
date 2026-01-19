@@ -70,7 +70,7 @@ DROP COLUMN MenuItemId;
 
 select * from UserDirection oi;
 
-select * from Cart oi;
+select count(*) from Cart oi;
 
 select * from `Order` o;
 

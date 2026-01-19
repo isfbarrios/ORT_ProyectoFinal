@@ -1,7 +1,19 @@
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams, Link } from "react-router-dom";
+import {
+  Button,
+  Input,
+  FormControl,
+  FormLabel,
+  VStack,
+  Alert,
+  AlertIcon,
+  Heading,
+  Text,
+} from "@chakra-ui/react";
 
+import PublicLayout from "../components/layout/PublicLayout";
 import { loginApi, saveAuth } from "../services/auth";
 import { setUser, setLoading } from "../redux/features/appSlice";
 
@@ -22,9 +34,6 @@ export default function Login() {
     dispatch(setLoading(true));
 
     try {
-      // 1) Llamo al backend
-      // Leemos si viene userType en la URL (ej: ?userType=DELIVERY)
-      // Si no viene, asumimos LOCAL
       const userType = searchParams.get("userType") || "LOCAL";
 
       const data = await loginApi({ email, password, userType });
@@ -32,63 +41,99 @@ export default function Login() {
       saveAuth(data);
       dispatch(setUser(data.user ?? data));
 
-      navigate("/dashboard");
-    }
-    catch (error) {
+      const resolvedType =
+        (data?.user?.type || data?.user?.userType || data?.type || "")
+          .toString()
+          .toUpperCase();
+      const nextPath = resolvedType === "COCINA" ? "/dashboard" : "/menu";
+      navigate(nextPath);
+    } catch (error) {
       console.error("Error de login:", error);
       setErrorMsg(error.message || "Credenciales inválidas");
-    }
-    finally {
+    } finally {
       dispatch(setLoading(false));
     }
   };
 
   return (
-    <div className="d-flex justify-content-center align-items-center mt-5">
-      <div className="card shadow p-4" style={{ width: "350px" }}>
-        <h3 className="text-center mb-4">Iniciar Sesión</h3>
-        <span>fbarrios@hotmail.com</span>
-        <span>pass1234</span>
-        <form onSubmit={handleLogin}>
-          <div className="mb-3">
-            <label className="form-label">Correo</label>
-            <input
+    <PublicLayout>
+      <Heading size="lg" textAlign="center" mb={6}>
+        Iniciar sesión
+      </Heading>
+
+      <Text fontSize="sm" color="gray.500" textAlign="center" mb={4}>
+        Accedé a tu cuenta para continuar
+      </Text>
+
+      <form onSubmit={handleLogin}>
+        <VStack spacing={4}>
+          <FormControl>
+            <FormLabel>Correo</FormLabel>
+            <Input
               type="email"
-              className="form-control"
               placeholder="ej: usuario@mail.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               disabled={isLoading}
               required
             />
-          </div>
+          </FormControl>
 
-          <div className="mb-3">
-            <label className="form-label">Contraseña</label>
-            <input
+          <FormControl>
+            <FormLabel>Contraseña</FormLabel>
+            <Input
               type="password"
-              className="form-control"
               placeholder="●●●●●●●●"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               disabled={isLoading}
               required
             />
-          </div>
+          </FormControl>
 
           {errorMsg && (
-            <div className="alert alert-danger py-2">{errorMsg}</div>
+            <Alert status="error" borderRadius="md">
+              <AlertIcon />
+              {errorMsg}
+            </Alert>
           )}
 
-          <button
+          <Button
             type="submit"
-            className="btn btn-primary w-100"
-            disabled={isLoading}
+            colorScheme="orange"
+            size="lg"
+            width="100%"
+            isLoading={isLoading}
+            loadingText="Ingresando..."
           >
-            {isLoading ? "Ingresando..." : "Ingresar"}
-          </button>
-        </form>
-      </div>
-    </div>
+            Ingresar
+          </Button>
+
+          <Text fontSize="sm" textAlign="center" color="gray.500" mt={4}>
+            ¿No tenés cuenta?{" "}
+            <Text
+              as={Link}
+              to="/register"
+              color="orange.400"
+              fontWeight="semibold"
+              display="inline"
+            >
+              Registrate
+            </Text>
+          </Text>
+
+          <Text fontSize="sm" textAlign="center" mt={2}>
+            <Text
+              as={Link}
+              to="/"
+              color="gray.400"
+              display="inline"
+            >
+              Volver al inicio
+            </Text>
+          </Text>
+        </VStack>
+      </form>
+    </PublicLayout>
   );
 }

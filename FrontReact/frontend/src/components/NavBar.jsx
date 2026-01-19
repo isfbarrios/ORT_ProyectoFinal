@@ -1,22 +1,60 @@
 import { NavLink } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import {
-  openCartModal,
-  fetchCartAsync,
-} from "../redux/features/cartSlice";
+  Badge,
+  Box,
+  Flex,
+  HStack,
+  Link as ChakraLink,
+  Text,
+  Button,
+} from "@chakra-ui/react";
+import { openCartModal, fetchCartAsync } from "../redux/features/cartSlice";
 
-const linkStyle = ({ isActive }) => ({
-  textDecoration: "none",
-  padding: "8px 12px",
-  borderRadius: "8px",
-  fontWeight: "600",
-  backgroundColor: isActive ? "#dce8ff" : "transparent",
-});
+function NavItem({ to, children }) {
+  return (
+    <ChakraLink
+      as={NavLink}
+      to={to}
+      px={3}
+      py={2}
+      rounded="md"
+      fontWeight="semibold"
+      _hover={{ textDecoration: "none", bg: "orange.50" }}
+      _activeLink={{ bg: "orange.100", color: "orange.700" }}
+    >
+      {children}
+    </ChakraLink>
+  );
+}
+
+function NavAction({ onClick, children }) {
+  return (
+    <Button
+      onClick={onClick}
+      px={3}
+      py={2}
+      rounded="md"
+      fontWeight="semibold"
+      variant="outline"
+      colorScheme="orange"
+      _hover={{ bg: "orange.50" }}
+      _active={{ bg: "orange.100", color: "orange.700" }}
+    >
+      {children}
+    </Button>
+  );
+}
 
 export default function NavBar() {
   const dispatch = useDispatch();
   const itemsCount = useSelector((state) => state.cart.items.length);
   const totalAmount = useSelector((state) => state.cart.totalAmount);
+  const user = useSelector((state) => state.app.user);
+  const userType = (user?.userType || user?.type || user?.role || "").toString();
+  const normalizedType = userType.toUpperCase();
+  const isLocal = normalizedType === "LOCAL";
+  const isKitchen = normalizedType === "COCINA";
 
   const handleOpenCart = () => {
     dispatch(fetchCartAsync());
@@ -24,59 +62,52 @@ export default function NavBar() {
   };
 
   return (
-    <nav
-      style={{
-        display: "flex",
-        justifyContent: "space-between",
-        alignItems: "center",
-        gap: 12,
-        marginBottom: 16,
-      }}
+    <Box
+      as="nav"
+      bg="white"
+      borderWidth="1px"
+      borderColor="orange.100"
+      rounded="lg"
+      px={4}
+      py={3}
+      mb={6}
+      boxShadow="sm"
     >
-      {/* Links a páginas */}
-      <div style={{ display: "flex", gap: 12 }}>
-        <NavLink to="/" style={linkStyle}>
-          Inicio
-        </NavLink>
-        <NavLink to="/login" style={linkStyle}>
-          Login
-        </NavLink>
-        <NavLink to="/directions" style={linkStyle}>
-          Direcciones
-        </NavLink>
-        <NavLink to="/qr" style={linkStyle}>
-          QR
-        </NavLink>
-        <NavLink to="/register" style={linkStyle}>
-          Registro
-        </NavLink>
-        <NavLink to="/dashboard" style={linkStyle}>
-          Dashboard
-        </NavLink>
-        <NavLink to="/menu" style={linkStyle}>
-          Menu
-        </NavLink>
-        <NavLink to="/reserva" style={linkStyle}>
-          Reservas
-        </NavLink>
-      </div>
+      <Flex align="center" justify="space-between" gap={4} wrap="wrap">
+        <HStack spacing={2}>
+          {isLocal && (
+            <>
+              <NavItem to="/menu">Menu</NavItem>
+              <NavAction onClick={() => {}}>Llamar mozo</NavAction>
+            </>
+          )}
+          {!isLocal && (
+            <>
+              {isKitchen && <NavItem to="/dashboard">Dashboard</NavItem>}
+              <NavItem to="/menu">Menu</NavItem>
+              <NavItem to="/directions">Direcciones</NavItem>
+              <NavItem to="/reserva">Reservas</NavItem>
+            </>
+          )}
+        </HStack>
 
-      {/* Botón de carrito, alineado a la derecha */}
-      <button
-        type="button"
-        onClick={handleOpenCart}
-        style={{
-          padding: "8px 12px",
-          borderRadius: "8px",
-          border: "1px solid #1f2933",
-          backgroundColor: "#1f2933",
-          color: "#fff",
-          fontWeight: 600,
-          cursor: "pointer",
-        }}
-      >
-        Carrito ({itemsCount}){totalAmount > 0 ? ` - $${totalAmount}` : ""}
-      </button>
-    </nav>
+        <Button
+          onClick={handleOpenCart}
+          colorScheme="orange"
+          variant="solid"
+          size="sm"
+        >
+          <HStack spacing={2}>
+            <Text>Carrito</Text>
+            <Badge colorScheme="whiteAlpha" bg="whiteAlpha.900" color="orange.700">
+              {itemsCount}
+            </Badge>
+            {totalAmount > 0 && (
+              <Text fontWeight="semibold">- ${totalAmount}</Text>
+            )}
+          </HStack>
+        </Button>
+      </Flex>
+    </Box>
   );
 }

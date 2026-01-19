@@ -2,10 +2,14 @@ package com.ort.edu.proyectofinal.services;
 
 import com.ort.edu.proyectofinal.dto.OrderDTO;
 import com.ort.edu.proyectofinal.dto.OrderUpdateDTO;
+import com.ort.edu.proyectofinal.dto.UserDTO;
 import com.ort.edu.proyectofinal.entities.*;
+import com.ort.edu.proyectofinal.exception.CartException;
+import com.ort.edu.proyectofinal.exception.OrderException;
 import com.ort.edu.proyectofinal.repositories.OrderRepository;
 import com.ort.edu.proyectofinal.repositories.OrderStateRepository;
 import com.ort.edu.proyectofinal.repositories.OrderCanalRepository;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -25,11 +29,19 @@ public class OrderService {
     @Autowired
     private OrderCanalRepository canalRepo;
 
-    //TODO: Para crear las ordenes, deberiamos hacerlo por aca. Ver bien que es lo que deberiamos recibir por params
-    public Order createOrder(Cart cart, List<Cartitem> items) {
+    @Autowired
+    private HttpSession httpSession;
+
+    public Order createOrder(Cart cart, List<Cartitem> items) throws OrderException {
+
+        UserDTO user = (UserDTO) httpSession.getAttribute("user");
+
+        if (user == null) {
+            throw new OrderException("No se recibió el identificador de sesión");
+        }
 
         if (items == null || items.isEmpty()) {
-            throw new IllegalArgumentException("La orden debe contener al menos un ítem");
+            throw new OrderException("La orden debe contener al menos un ítem");
         }
 
         Order order = new Order();

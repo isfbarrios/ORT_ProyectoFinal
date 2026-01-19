@@ -39,6 +39,9 @@ public class User {
     @Column(name = "Password", nullable = false)
     private String password;
 
+    @Column(name = "SessionId")
+    private String sessionId;
+
     @ColumnDefault("current_timestamp()")
     @Column(name = "CreatedDate", nullable = false)
     private LocalDateTime createdDate;

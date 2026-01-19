@@ -1,11 +1,26 @@
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import {
+    Button,
+    FormControl,
+    FormLabel,
+    Input,
+    Modal,
+    ModalBody,
+    ModalCloseButton,
+    ModalContent,
+    ModalFooter,
+    ModalHeader,
+    ModalOverlay,
+    Text,
+    VStack,
+} from "@chakra-ui/react";
 import { submitReservation } from "../redux/features/tableReservationSlice";
 
 const ModalReserva = ({ mesa, turno, onClose }) => {
 
     const dispatch = useDispatch();
-    const { selectedDate } = useSelector((state) => state.tableReservation);
+    const { selectedDate, loading } = useSelector((state) => state.tableReservation);
 
     const [nombre, setNombre] = useState("");
 
@@ -22,33 +37,41 @@ const ModalReserva = ({ mesa, turno, onClose }) => {
     };
 
     return (
-        <div className="modal-backdrop" style={{
-            position: "fixed", top: 0, left: 0, right: 0, bottom: 0,
-            backgroundColor: "rgba(0,0,0,0.5)", display: "flex",
-            justifyContent: "center", alignItems: "center"
-        }}>
-            <div className="bg-white p-4 rounded shadow" style={{ width: "300px" }}>
-
-                <h4>Reservar {mesa.name}</h4>
-                <p>Turno: {turno}</p>
-
-                <label>Nombre:</label>
-                <input
-                    type="text"
-                    className="form-control"
-                    onChange={(e) => setNombre(e.target.value)}
-                />
-
-                <button className="btn btn-success mt-3 w-100" onClick={handleReservar}>
-                    Confirmar
-                </button>
-
-                <button className="btn btn-secondary mt-2 w-100" onClick={onClose}>
-                    Cancelar
-                </button>
-
-            </div>
-        </div>
+        <Modal isOpen onClose={onClose} isCentered size="sm">
+            <ModalOverlay />
+            <ModalContent>
+                <ModalHeader>Reservar {mesa.name}</ModalHeader>
+                <ModalCloseButton />
+                <ModalBody>
+                    <VStack spacing={3} align="stretch">
+                        <Text color="gray.500">Turno seleccionado: {turno}</Text>
+                        <FormControl>
+                            <FormLabel>Nombre</FormLabel>
+                            <Input
+                                type="text"
+                                value={nombre}
+                                onChange={(e) => setNombre(e.target.value)}
+                                placeholder="Tu nombre"
+                            />
+                        </FormControl>
+                    </VStack>
+                </ModalBody>
+                <ModalFooter gap={2}>
+                    <Button variant="ghost" onClick={onClose}>
+                        Cancelar
+                    </Button>
+                    <Button
+                        colorScheme="orange"
+                        onClick={handleReservar}
+                        isLoading={loading}
+                        loadingText="Confirmando..."
+                        isDisabled={!nombre}
+                    >
+                        Confirmar
+                    </Button>
+                </ModalFooter>
+            </ModalContent>
+        </Modal>
     );
 };
 

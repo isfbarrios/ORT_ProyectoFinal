@@ -5,7 +5,6 @@ import com.ort.edu.proyectofinal.dto.*;
 import com.ort.edu.proyectofinal.entities.Session;
 import com.ort.edu.proyectofinal.entities.User;
 import com.ort.edu.proyectofinal.entities.Userstate;
-import com.ort.edu.proyectofinal.exception.AuthException;
 import com.ort.edu.proyectofinal.repositories.SessionRepository;
 import com.ort.edu.proyectofinal.repositories.UserstateRepository;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -16,14 +15,12 @@ import jakarta.servlet.http.HttpSession;
 import com.ort.edu.proyectofinal.security.JwtUtil;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -183,10 +180,17 @@ public class UserController {
         String token = manager.generateToken(jwtUtil, user);
 
         String sessionKey = httpSession.getId();
-        Session dbSession = sessionService.resolveSession(sessionKey);
+        Session dbSession = new Session(sessionKey, LocalDateTime.now());
+
+        sessionRepository.save(dbSession);
 
         UserDTO dto = new UserDTO(user);
-        dto.setSessionId(dbSession.getSessionId());
+
+        // Actualizar sessionId en la BD también, para persistencia ante pérdida de cookie
+        user.setSessionId(sessionKey);
+        repo.save(user);
+
+        dto.setSessionId(sessionKey);
 
         dto.setType(
                 request.getUserType().equalsIgnoreCase("LOCAL")
@@ -196,68 +200,52 @@ public class UserController {
 
         // Forzar creación de sesión HTTP para generar cookie JSESSIONID
         HttpSession session = httpReq.getSession(true);
+
         session.setAttribute("user", dto);
+        session.setAttribute("sessionid", sessionKey);
 
         try {
             System.out.println("Session created: " + session.getId());
+            System.out.println("Session created: " + sessionKey);
             System.out.println("User in session: " + session.getAttribute("user"));
         } catch(Exception e) {}
 
+        // El carrito se cargará en sesión automáticamente cuando sea solicitado por el CartService
+        
         LoginResponseDTO resp = new LoginResponseDTO(token, dto);
 
         return ResponseEntity.ok(resp);
     }
 
-    @PostMapping("/session_renew")
-    public ResponseEntity<?> sessionRenew(
-        @RequestBody(required = false) SessionRenewRequest req,
-        @RequestHeader(value = "Authorization", required = false) String authHeader) {
+    @GetMapping("/session_renew")
+    public ResponseEntity<?> sessionRenew(HttpServletRequest request) {
 
-        // Validar token JWT
-        try {
-            manager.validateTokenJWT(jwtUtil, authHeader);
-        }
-        catch (AuthException e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(new ResponseDTO(e.getMessage()));
-        }
+        HttpSession session = request.getSession(false);
 
-        UserDTO user = (UserDTO) httpSession.getAttribute("user");
-
-        if (user == null) {
-            // Fallback JWT
-            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-            if (auth != null && auth.isAuthenticated() && !auth.getPrincipal().equals("anonymousUser")) {
-                String username = null;
-                if (auth.getPrincipal() instanceof UserDetails) {
-                    username = ((UserDetails) auth.getPrincipal()).getUsername();
-                } else if (auth.getPrincipal() instanceof String) {
-                    username = (String) auth.getPrincipal();
-                }
-
-                if (username != null) {
-                    User dbUser = repo.findByUsername(username);
-                    if (dbUser != null) {
-                        user = new UserDTO(dbUser);
-                        // Generamos sessionId temporal si no hay cookie
-                        String tempSessionId = httpSession.getId();
-                        user.setSessionId(tempSessionId);
-                        // Lo guardamos en sesión por si acaso
-                        httpSession.setAttribute("user", user);
-                    }
-                }
+        if (session == null) {
+            try {
+                httpSession.invalidate();
             }
+            catch (Exception e) {
+                // Si ya era inválida, no pasa nada
+            }
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
-        if (user != null) {
-            // Validamos que si mandaron un sessionId (frontend viejo?), coincida? 
-            // No, mejor confiamos en la cookie/JWT que es más seguro.
-            // Retornamos el usuario actual validado.
-            return ResponseEntity.ok(user);
+        if (session.getAttribute("user") == null) {
+            try {
+                httpSession.invalidate();
+            }
+            catch (Exception e) {
+                // Si ya era inválida, no pasa nada
+            }
+
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ResponseDTO("Sesión expirada"));
+        return ResponseEntity.ok().build();
     }
+
     @PostMapping("/logout")
     public ResponseEntity<?> logout() {
         try {
@@ -266,5 +254,10 @@ public class UserController {
             // Si ya era inválida, no pasa nada
         }
         return ResponseEntity.ok(new ResponseDTO("Sesión cerrada correctamente"));
+    }
+
+    @GetMapping("/debug-session")
+    public String debug(HttpSession session) {
+        return session.getId();
     }
 }

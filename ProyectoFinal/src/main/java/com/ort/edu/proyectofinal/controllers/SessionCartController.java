@@ -70,11 +70,7 @@ public class SessionCartController {
         }
 
         try {
-            SessionCartDTO cart = cartService.addItemToCart(
-                    authHeader,
-                    body.getMenuItemId(),
-                    body.getQuantity()
-            );
+            SessionCartDTO cart = cartService.addItemToCart(body.getMenuItemId(), body.getQuantity());
 
             return ResponseEntity.ok(cart);
         }
@@ -102,18 +98,32 @@ public class SessionCartController {
                     .body(new ResponseDTO(e.getMessage()));
         }
 
+        System.out.println();
+        System.out.println(getClass().getSimpleName()+".confirm.INI");
+        System.out.println();
+        System.out.println("authHeader: " + authHeader);
+        System.out.println("session.id: " + session.getId());
+        System.out.println("session.user: " + session.getAttribute("user"));
+        System.out.println();
+        System.out.println(getClass().getSimpleName()+".confirm.END");
+        System.out.println();
+
         OrderDTO order = null;
 
         try {
             UserDTO user = (UserDTO) session.getAttribute("user");
+
             if (user == null) {
-                // Fallback JWT
                 Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+
                 if (auth != null && auth.isAuthenticated() && !auth.getPrincipal().equals("anonymousUser")) {
+
                     String username = null;
+
                     if (auth.getPrincipal() instanceof UserDetails) {
                         username = ((UserDetails) auth.getPrincipal()).getUsername();
-                    } else if (auth.getPrincipal() instanceof String) {
+                    }
+                    else if (auth.getPrincipal() instanceof String) {
                         username = (String) auth.getPrincipal();
                     }
 
@@ -121,19 +131,9 @@ public class SessionCartController {
                         com.ort.edu.proyectofinal.entities.User dbUser = userRepository.findByUsername(username);
                         if (dbUser != null) {
                             user = new UserDTO(dbUser);
-                            // IMPORTANTE: Si es fallback, no tenemos sessionId viejo.
-                            // Esto fallará si el carrito estaba asociado a otra sesión.
-                            // Pero al menos no da NPE.
-                            // Podríamos intentar buscar "último carrito abierto" de este usuario?
-                            // El Cart tiene Session, pero Session no tiene User.
-                            // Asumimos nueva sesión.
-                            // Pero espera, confirmCart busca por sessionID.
-                            // Si invento uno, no va a encontrar el carrito para confirmar.
-                            // ERROR: Confirm cart NECESITA el sessionId original.
                             
-                            // Si llegamos acá es porque perdimos la cookie.
-                            // No podemos confirmar un carrito que no encontramos.
-                            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseDTO("Sesión expirada o cookie perdida. No se puede confirmar carrito."));
+                            // Recuperado por JWT. Confiamos en el ID de sesión de la base.
+                            session.setAttribute("user", user);
                         }
                     }
                 }
@@ -142,7 +142,7 @@ public class SessionCartController {
             if (user == null) {
                  return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ResponseDTO("Usuario no logueado"));
             }
-            order = cartService.confirmCart(user.getSessionId());
+            order = cartService.confirmCart();
         }
         catch (CartException ce) {
             System.out.println();

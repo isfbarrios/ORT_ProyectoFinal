@@ -1,4 +1,11 @@
-import { NavLink } from "react-router-dom";
+import {
+  Button,
+  FormControl,
+  FormLabel,
+  Input,
+  Textarea,
+  VStack,
+} from "@chakra-ui/react";
 
 export default function UserDirectionForm({
   formData,
@@ -7,69 +14,52 @@ export default function UserDirectionForm({
   loading,
 }) {
   return (
-    <form onSubmit={onSubmit} className="user-direction-form">
-      <h4>Dirección de entrega</h4>
+    <form onSubmit={onSubmit}>
+      <VStack spacing={4} align="stretch">
+        <FormControl isRequired>
+          <FormLabel>Calle</FormLabel>
+          <Input
+            type="text"
+            name="streetName"
+            value={formData.streetName}
+            onChange={onChange}
+          />
+        </FormControl>
 
-      <div>
-        <label>Calle</label>
-        <input
-          type="text"
-          name="streetName"
-          value={formData.streetName}
-          onChange={onChange}
-          required
-        />
-      </div>
+        <FormControl isRequired>
+          <FormLabel>Número</FormLabel>
+          <Input
+            type="text"
+            name="doorNumber"
+            value={formData.doorNumber}
+            onChange={onChange}
+          />
+        </FormControl>
 
-      <div>
-        <label>Número</label>
-        <input
-          type="text"
-          name="doorNumber"
-          value={formData.doorNumber}
-          onChange={onChange}
-          required
-        />
-      </div>
+        <FormControl isRequired>
+          <FormLabel>Teléfono</FormLabel>
+          <Input
+            type="text"
+            name="phone"
+            value={formData.phone}
+            onChange={onChange}
+          />
+        </FormControl>
 
-      <div>
-        <label>Teléfono</label>
-        <input
-          type="text"
-          name="phone"
-          value={formData.phone}
-          onChange={onChange}
-          required
-        />
-      </div>
+        <FormControl>
+          <FormLabel>Comentarios</FormLabel>
+          <Textarea
+            name="comments"
+            value={formData.comments}
+            onChange={onChange}
+            placeholder="Aclaraciones para la entrega"
+          />
+        </FormControl>
 
-      <div>
-        <label>Comentarios</label>
-        <input
-          type="text"
-          name="comments"
-          value={formData.comments}
-          onChange={onChange}
-        />
-      </div>
-
-      {/*A FUTURO: método de pago */}
-      <div>
-        <label>Método de pago</label>
-        <select
-          name="paymentMethod"
-          value={formData.paymentMethod}
-          onChange={onChange}
-        >
-          <option value="">Seleccionar</option>
-          <option value="CASH">Efectivo</option>
-          <option value="MERCADO_PAGO">Mercado Pago</option>
-        </select>
-      </div>
-
-      <button type="submit" disabled={loading}>
-        {loading ? "Guardando..." : "Guardar dirección"}
-      </button>
+        <Button type="submit" colorScheme="orange" isLoading={loading}>
+          Guardar dirección
+        </Button>
+      </VStack>
     </form>
   );
 }

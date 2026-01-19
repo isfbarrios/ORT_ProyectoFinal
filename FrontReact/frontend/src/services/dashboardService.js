@@ -4,7 +4,7 @@ export async function fetchBoardFromApi() {
   const res = await fetch(`${API_URL}/orders`, {
     method: "GET",
     headers: buildFetchHeader(),
-    credentials: 'include'
+    credentials:"include"
   });
 
   if (!res.ok) {

@@ -5,7 +5,7 @@ export async function getTableAvailability() {
   const res = await fetch(`${API_URL}/table_reservation`, {
     method: "GET",
     headers: buildFetchHeader(),
-    credentials: 'include'
+    credentials:"include"
   });
 
   if (!res.ok) throw new Error("Error al obtener disponibilidad");
@@ -19,7 +19,7 @@ export async function reserveTable(payload) {
     method: "POST",
     headers: buildFetchHeader(),
     body: JSON.stringify(payload),
-    credentials: 'include'
+    credentials:"include"
   });
 
   if (!res.ok) {

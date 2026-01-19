@@ -1,5 +1,26 @@
+import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { setDate, setShift, fetchAvailability } from "../redux/features/tableReservationSlice";
+import {
+  Box,
+  Button,
+  FormControl,
+  FormLabel,
+  Heading,
+  HStack,
+  Input,
+  Select,
+  Stack,
+  Text,
+  Alert,
+  AlertIcon,
+  Badge,
+} from "@chakra-ui/react";
+import {
+  setDate,
+  setShift,
+  fetchAvailability,
+  clearSuccess,
+} from "../redux/features/tableReservationSlice";
 import MesasGrid from "../components/MesaGrid";
 
 const shifts = [
@@ -16,51 +37,117 @@ const ReservaPage = () => {
     const tableReservationState = useSelector((state) => state.tableReservation);
 
     // Validación de seguridad
-    const { tables = [], selectedDate = "", selectedShiftId = null, loading = false } = tableReservationState || {};
+    const {
+        tables = [],
+        selectedDate = "",
+        selectedShiftId = null,
+        loading = false,
+        error,
+        reservationSuccess,
+    } = tableReservationState || {};
 
     const handleBuscar = () => {
         if (!selectedDate || !selectedShiftId) return;
         dispatch(fetchAvailability(selectedDate, selectedShiftId));
     };
 
+    useEffect(() => {
+        if (!reservationSuccess) return;
+        const timer = setTimeout(() => {
+            dispatch(clearSuccess());
+        }, 10000);
+        return () => clearTimeout(timer);
+    }, [dispatch, reservationSuccess]);
+
     return (
-        <div className="container mt-4">
-
-            <h2>Reservas</h2>
-
-            {/* Selector de fecha */}
-            <label className="form-label">Fecha:</label>
-            <input
-                type="date"
-                className="form-control"
-                onChange={(e) => dispatch(setDate(e.target.value))}
-            />
-
-            {/* Selector de turno */}
-            <label className="form-label mt-3">Turno:</label>
-            <select
-                className="form-select"
-                onChange={(e) => dispatch(setShift(Number(e.target.value)))}
+        <Stack spacing={6}>
+            <Box
+                bg="white"
+                borderWidth="1px"
+                borderColor="orange.100"
+                rounded="xl"
+                p={{ base: 4, md: 6 }}
+                boxShadow="sm"
             >
-                <option value="">Seleccione un turno</option>
-                {shifts.map((s) => (
-                    <option key={s.id} value={s.id}>{s.label}</option>
-                ))}
-            </select>
+                <Stack spacing={2}>
+                    <Heading size="lg">Reservas</Heading>
+                    <Text color="gray.500">
+                        Elegí fecha y turno, luego seleccioná tu mesa.
+                    </Text>
+                    <HStack spacing={3} wrap="wrap">
+                        <Badge colorScheme="green">Disponible</Badge>
+                        <Badge colorScheme="red">Ocupada</Badge>
+                    </HStack>
+                </Stack>
+            </Box>
 
-            <button className="btn btn-primary mt-3" onClick={handleBuscar}>
-                Buscar mesas
-            </button>
+            <Box borderWidth="1px" borderColor="orange.100" rounded="xl" p={{ base: 4, md: 6 }}>
+                <Stack spacing={4}>
+                    <Stack direction={{ base: "column", md: "row" }} spacing={4}>
+                        <FormControl>
+                            <FormLabel>Fecha</FormLabel>
+                            <Input
+                                type="date"
+                                value={selectedDate || ""}
+                                onChange={(e) => dispatch(setDate(e.target.value))}
+                            />
+                        </FormControl>
 
-            <hr />
+                        <FormControl>
+                            <FormLabel>Turno</FormLabel>
+                            <Select
+                                placeholder="Seleccione un turno"
+                                value={selectedShiftId || ""}
+                                onChange={(e) => dispatch(setShift(Number(e.target.value)))}
+                            >
+                                {shifts.map((s) => (
+                                    <option key={s.id} value={s.id}>
+                                        {s.label}
+                                    </option>
+                                ))}
+                            </Select>
+                        </FormControl>
+                    </Stack>
 
-            {loading && <p>Cargando disponibilidad...</p>}
+                    <Button
+                        colorScheme="orange"
+                        alignSelf="flex-start"
+                        onClick={handleBuscar}
+                        isDisabled={!selectedDate || !selectedShiftId}
+                        isLoading={loading}
+                        loadingText="Buscando..."
+                    >
+                        Buscar mesas
+                    </Button>
 
-            {!loading && tables.length > 0 && (
-                <MesasGrid mesas={tables} turnoSeleccionado={selectedShiftId} />
-            )}
+                    {error && (
+                        <Alert status="error" borderRadius="md">
+                            <AlertIcon />
+                            {error}
+                        </Alert>
+                    )}
 
-        </div>
+                    {reservationSuccess && (
+                        <Alert status="success" borderRadius="md">
+                            <AlertIcon />
+                            Reserva confirmada.
+                        </Alert>
+                    )}
+                </Stack>
+            </Box>
+
+            <Box>
+                {loading && <Text color="gray.500">Cargando disponibilidad...</Text>}
+
+                {!loading && tables.length > 0 && (
+                    <MesasGrid mesas={tables} turnoSeleccionado={selectedShiftId} />
+                )}
+
+                {!loading && tables.length === 0 && selectedDate && selectedShiftId && (
+                    <Text color="gray.500">No hay mesas disponibles para ese turno.</Text>
+                )}
+            </Box>
+        </Stack>
     );
 };
 

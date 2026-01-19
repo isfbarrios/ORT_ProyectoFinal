@@ -1,13 +1,23 @@
 import React, { useEffect, useState } from "react";
-import { motion } from "framer-motion";
 import { useDispatch, useSelector } from "react-redux";
+import {
+  Box,
+  Button,
+  Heading,
+  SimpleGrid,
+  Spinner,
+  Text,
+  VStack,
+  Alert,
+  AlertIcon,
+  Card,
+  CardBody,
+  CardFooter,
+  Stack,
+} from "@chakra-ui/react";
 
 import { getMenuItemsByMenu } from "../services/menuService";
-import {
-  addItemToCartAsync,
-  fetchCartAsync,
-
-} from "../redux/features/cartSlice";
+import { addItemToCartAsync, fetchCartAsync } from "../redux/features/cartSlice";
 
 export default function Menu({ menuId = 1 }) {
   const dispatch = useDispatch();
@@ -46,118 +56,67 @@ export default function Menu({ menuId = 1 }) {
     dispatch(addItemToCartAsync(menuItemId, 1));
   };
 
-  if (loadingMenu || cart.loading) {
-    return (
-      <div className="container mt-4 text-center">
-        <div className="spinner-border" role="status"></div>
-      </div>
-    );
-  }
-
-  if (errorMenu) {
-    return (
-      <div className="container mt-4">
-        <div className="alert alert-danger text-center">{errorMenu}</div>
-      </div>
-    );
-  }
-
   return (
-    <div className="container mt-4">
-      <h2 className="mb-4 text-center">Menú del Restaurante</h2>
+    <Box>
+      <VStack spacing={2} textAlign="center" mb={6}>
+        <Heading size="lg">Menú del Restaurante</Heading>
+        <Text color="gray.500">
+          Elegí tus platos y confirmá el pedido cuando estés listo.
+        </Text>
+      </VStack>
 
-      {/* Cards (vista “linda”) */}
-      <div className="row g-3">
-        {items.map((item) => (
-          <div className="col-12 col-md-6 col-lg-4" key={item.id}>
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.3 }}
-            >
-              <div className="card shadow-sm h-100">
-                <div className="card-body d-flex flex-column">
-                  <h5 className="card-title">{item.name}</h5>
+      {loadingMenu && (
+        <VStack spacing={3} py={10}>
+          <Spinner size="lg" color="orange.400" />
+          <Text color="gray.500">Cargando menú...</Text>
+        </VStack>
+      )}
 
+      {errorMenu && (
+        <Alert status="error" borderRadius="md" mb={6}>
+          <AlertIcon />
+          {errorMenu}
+        </Alert>
+      )}
+
+      {!loadingMenu && !errorMenu && (
+        <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} spacing={6}>
+          {items.map((item) => (
+            <Card key={item.id} borderWidth="1px" borderColor="orange.100">
+              <CardBody>
+                <Stack spacing={3}>
+                  <Heading size="md">{item.name}</Heading>
                   {item.description && (
-                    <p className="card-text text-muted">
-                      {item.description}
-                    </p>
+                    <Text color="gray.500">{item.description}</Text>
                   )}
+                  <Text fontSize="xl" fontWeight="bold" color="orange.600">
+                    {item.basePrice !== undefined && item.basePrice !== null
+                      ? `$${item.basePrice.toFixed(2)}`
+                      : "—"}
+                  </Text>
+                </Stack>
+              </CardBody>
+              <CardFooter>
+                <Button
+                  colorScheme="orange"
+                  width="100%"
+                  onClick={() => handleAddToCart(item.id)}
+                  isLoading={cart.loading}
+                  loadingText="Agregando..."
+                >
+                  Añadir al pedido
+                </Button>
+              </CardFooter>
+            </Card>
+          ))}
+        </SimpleGrid>
+      )}
 
-                  <div className="mt-auto">
-                    <p className="fw-bold fs-5">
-                      {item.basePrice !== undefined && item.basePrice !== null
-                        ? `$${item.basePrice.toFixed(2)}`
-                        : "—"}
-                    </p>
-
-                    <button
-                      className="btn btn-primary w-100"
-                      onClick={() => handleAddToCart(item.id)}
-                    >
-                      Añadir al pedido
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </motion.div>
-          </div>
-        ))}
-
-        {items.length === 0 && (
-          <div className="col-12">
-            <p className="text-center">
-              No hay ítems cargados para este menú.
-            </p>
-          </div>
-        )}
-      </div>
-
-      {/* Tabla (vista más “admin”) */}
-      <div className="table-responsive mt-4">
-        <table className="table table-striped table-bordered align-middle">
-          <thead className="table-dark">
-            <tr>
-              <th style={{ width: "50px" }}>ID</th>
-              <th>Nombre</th>
-              <th>Descripción</th>
-              <th style={{ width: "120px" }}>Precio</th>
-              <th style={{ width: "150px" }}></th>
-            </tr>
-          </thead>
-          <tbody>
-            {items.map((item) => (
-              <tr key={item.id}>
-                <td>{item.id}</td>
-                <td className="fw-semibold">{item.name}</td>
-                <td>{item.description || "—"}</td>
-                <td className="fw-bold">
-                  {item.basePrice !== undefined && item.basePrice !== null
-                    ? `$${item.basePrice.toFixed(2)}`
-                    : "—"}
-                </td>
-                <td>
-                  <button
-                    className="btn btn-primary w-100"
-                    onClick={() => handleAddToCart(item.id)}
-                  >
-                    Añadir al pedido
-                  </button>
-                </td>
-              </tr>
-            ))}
-
-            {items.length === 0 && (
-              <tr>
-                <td colSpan="5" className="text-center p-4">
-                  No hay items cargados para este menú.
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
-      </div>
-    </div>
+      {!loadingMenu && !errorMenu && items.length === 0 && (
+        <Text textAlign="center" color="gray.500" mt={6}>
+          No hay ítems cargados para este menú.
+        </Text>
+      )}
+    </Box>
   );
 }

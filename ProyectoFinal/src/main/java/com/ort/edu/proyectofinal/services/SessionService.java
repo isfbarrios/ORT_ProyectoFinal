@@ -2,7 +2,6 @@ package com.ort.edu.proyectofinal.services;
 
 import com.ort.edu.proyectofinal.CoreManager;
 import com.ort.edu.proyectofinal.entities.Session;
-import com.ort.edu.proyectofinal.entities.User;
 import com.ort.edu.proyectofinal.repositories.SessionRepository;
 import com.ort.edu.proyectofinal.security.JwtUtil;
 import jakarta.servlet.http.HttpSession;

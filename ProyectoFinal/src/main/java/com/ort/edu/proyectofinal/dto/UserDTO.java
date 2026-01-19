@@ -27,6 +27,7 @@ public class UserDTO {
         this.mail = user.getMail();
         this.surname = user.getSurname();
         this.username = user.getUsername();
+        this.sessionId = user.getSessionId();
         //Por defecto se asigna como local
         this.type = CoreManager.UserType.LOCAL;
     }

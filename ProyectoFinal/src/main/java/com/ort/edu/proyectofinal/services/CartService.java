@@ -10,6 +10,7 @@ import com.ort.edu.proyectofinal.entities.Cartitem;
 import com.ort.edu.proyectofinal.entities.Session;
 import com.ort.edu.proyectofinal.entities.*;
 import com.ort.edu.proyectofinal.exception.CartException;
+import com.ort.edu.proyectofinal.exception.OrderException;
 import com.ort.edu.proyectofinal.repositories.*;
 import jakarta.servlet.http.HttpSession;
 import jakarta.transaction.Transactional;
@@ -94,60 +95,54 @@ public class CartService {
         cart.setAmount(amount);
         cart.setDelayTime(120);
 
-        return cartRepository.save(cart);
+        cart = cartRepository.save(cart);
+        
+        // Guardar tambien en sesion
+        httpSession.setAttribute("cart", cart);
+        
+        return cart;
     }
 
     private Cart getOrCreateCartEntity() {
+
+        UserDTO user = (UserDTO) httpSession.getAttribute("user");
+
+        if (user == null) {
+            throw new RuntimeException("Usuario no logueado en sesión");
+        }
+
+        // Intento recuperar el carrito de la sesion
+        Cart sessionCart = (Cart) httpSession.getAttribute("cart");
+
+        if (sessionCart != null) {
+            System.out.println("DEBUG: Cart found in HttpSession cache. CartId=" + sessionCart.getId());
+            return sessionCart;
+        }
 
         try {
             System.out.println("DEBUG: CartService.httpSession.getId(): " + httpSession.getId());
             System.out.println("DEBUG: httpSession.getAttribute('user'): " + httpSession.getAttribute("user"));
         } catch(Exception e) {}
 
-        UserDTO user = (UserDTO) httpSession.getAttribute("user");
-
-        if (user == null) {
-            System.out.println("DEBUG: User not found in session, attempting JWT fallback...");
-            // Fallback: Intentar recuperar del contexto de seguridad (JWT)
-            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-
-            if (auth != null && auth.isAuthenticated() && !auth.getPrincipal().equals("anonymousUser")) {
-                
-                String username = null;
-                if (auth.getPrincipal() instanceof UserDetails) {
-                    username = ((UserDetails) auth.getPrincipal()).getUsername();
-                } else if (auth.getPrincipal() instanceof String) {
-                    username = (String) auth.getPrincipal();
-                }
-
-                if (username != null) {
-                    User dbUser = userRepository.findByUsername(username);
-                    if (dbUser != null) {
-                        user = new UserDTO(dbUser);
-                        // Como no tenemos la cookie, generamos una sesión temporal
-                        // TODO: Esto crea un carrito NUEVO cada vez si no se arregla el cliente
-                        String tempSessionId = UUID.randomUUID().toString();
-                        user.setSessionId(tempSessionId);
-                        
-                        // Guardar en sesión para la próxima (si el cliente soporta cookies ahora)
-                        httpSession.setAttribute("user", user);
-                    }
-                }
-            }
-        }
-
-        if (user == null) {
-            throw new RuntimeException("Usuario no logueado en sesión");
-        }
+        // Si no encuentro el carrito en la sesion, lo busco por db
+        Optional<Cart> cartOptional = cartRepository.findBySession_SessionId(user.getSessionId());
 
         Session session = sessionService.resolveSession(user.getSessionId());
 
-        Optional<Cart> cart = cartRepository.findBySession_SessionId(session.getSessionId());
+        if (cartOptional.isPresent()) {
+            sessionCart = cartOptional.get();
+        }
+        else {
+            sessionCart = createNewCart(session);
+        }
 
-        return cart.isPresent() ? cart.get() : createNewCart(session);
+        httpSession.setAttribute("cart", sessionCart);
+
+        return sessionCart;
     }
 
     private SessionCartDTO buildSessionCartDTO(Cart cart) {
+
         List<Cartitem> items = cartItemRepository.findByCartId(cart.getId());
 
         List<SessionCartItemDTO> dtoItems = items.stream()
@@ -170,13 +165,40 @@ public class CartService {
     }
 
     @Transactional
-    public SessionCartDTO addItemToCart(String authHeader, int menuItemId, int quantity) throws CartException {
+    public SessionCartDTO addItemToCart(int menuItemId, int quantity) throws CartException {
 
         if (quantity <= 0) {
              throw new CartException("Cantidad insuficiente para el item " + menuItemId);
         }
 
-        Cart cart = getOrCreateCartEntity();
+        Cart cart = null;
+
+        // Primero busco el cart en la sesion, sino, lo busco por la db
+        cart = (Cart) httpSession.getAttribute("cart");
+
+        if (cart != null) {
+            System.out.println("DEBUG: Cart found in HttpSession cache. CartId=" + cart.getId());
+        }
+
+        if (cart == null) {
+            UserDTO user = (UserDTO) httpSession.getAttribute("user");
+
+            if (user == null) {
+                throw new RuntimeException("Usuario no logueado en sesión");
+            }
+
+            // Si no encuentro el carrito en la sesion, lo busco por db
+            Optional<Cart> cartOptional = cartRepository.findBySession_SessionId(user.getSessionId());
+
+            Session session = sessionService.resolveSession(user.getSessionId());
+
+            if (cartOptional.isPresent()) {
+                cart = cartOptional.get();
+            }
+            else {
+                cart = createNewCart(session);
+            }
+        }
 
         Menuitem menuitem = menuItemRepository.findById(menuItemId)
                 .orElseThrow(() -> new IllegalArgumentException("Menuitem no encontrado"));
@@ -208,7 +230,6 @@ public class CartService {
         }
         else {
             //TODO: Validar si tiene variantes, xq pueden ser el mismo menuId pero con variantes
-
             existing.setQuantity(existing.getQuantity() + quantity);
             // Si usás itemAmount, recalculalo acá
             cartItemRepository.save(existing);
@@ -217,23 +238,33 @@ public class CartService {
         cart.setLastUpdate(LocalDateTime.now());
         cartRepository.save(cart);
 
+        //Actualizo el carrito en la sesion
+        httpSession.removeAttribute("cart");
+        httpSession.setAttribute("cart", cart);
+
         return buildSessionCartDTO(cart);
     }
 
     // ============================
     // Confirmar carrito → crear Order
     // ============================
-    public OrderDTO confirmCart(String sessionId) throws CartException {
+    public OrderDTO confirmCart() throws CartException {
 
-        if (sessionId == null || sessionId.isBlank()) {
+        UserDTO user = (UserDTO) httpSession.getAttribute("user");
+
+        if (user == null) {
             throw new CartException("No se recibió el identificador de sesión");
         }
 
-        Session session = sessionRepository.findBySessionId(sessionId)
-                .orElseThrow(() -> new CartException("Sesión no encontrada"));
+        Cart cart = null;
 
-        Cart cart = cartRepository.findBySession_SessionId(sessionId)
-                .orElseThrow(() -> new CartException("No existe un carrito abierto para la sesión"));
+        // Primero busco el cart en la sesion, sino, lo busco por la db
+        cart = (Cart) httpSession.getAttribute("cart");
+
+        if (cart == null) {
+            cart = cartRepository.findBySession_SessionId(user.getSessionId())
+                    .orElseThrow(() -> new CartException("No existe un carrito abierto para la sesión"));
+        }
 
         List<Cartitem> items = cartItemRepository.findByCartId(cart.getId());
 
@@ -260,10 +291,14 @@ public class CartService {
         cartRepository.saveAndFlush(cart);
 
         // Crear orden
-        Order order = orderService.createOrder(cart, items);
-
-        // Devolver DTO al frontend
-        return new OrderDTO(order);
+        Order order = null;
+        try {
+            order = orderService.createOrder(cart, items);
+            return new OrderDTO(order);
+        }
+        catch (OrderException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     /*

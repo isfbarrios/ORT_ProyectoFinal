@@ -3,8 +3,14 @@ package com.ort.edu.proyectofinal;
 import com.ort.edu.proyectofinal.dto.UserDTO;
 import com.ort.edu.proyectofinal.entities.User;
 import com.ort.edu.proyectofinal.exception.AuthException;
+import com.ort.edu.proyectofinal.repositories.UserRepository;
 import com.ort.edu.proyectofinal.security.JwtUtil;
+import jakarta.servlet.http.HttpSession;
 import lombok.Getter;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 
 @Getter
 public final class CoreManager {
@@ -32,6 +38,41 @@ public final class CoreManager {
             instance = new CoreManager();
         }
         return instance;
+    }
+
+    public UserDTO getSessionUser(HttpSession httpSession, UserRepository repo) {
+        UserDTO user = (UserDTO) httpSession.getAttribute("user");
+
+        if (user == null) {
+            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+
+            if (auth != null && auth.isAuthenticated() && !auth.getPrincipal().equals("anonymousUser")) {
+
+                String username = null;
+
+                if (auth.getPrincipal() instanceof UserDetails) {
+                    username = ((UserDetails) auth.getPrincipal()).getUsername();
+                }
+                else if (auth.getPrincipal() instanceof String) {
+                    username = (String) auth.getPrincipal();
+                }
+
+                if (username != null) {
+                    User dbUser = repo.findByUsername(username);
+
+                    if (dbUser != null) {
+                        user = new UserDTO(dbUser);
+                        // Generamos sessionId temporal si no hay cookie
+                        String tempSessionId = httpSession.getId();
+                        user.setSessionId(tempSessionId);
+                        // Lo guardamos en sesión por si acaso
+                        httpSession.setAttribute("user", user);
+                    }
+                }
+            }
+        }
+
+        return user;
     }
 
     // Validar token JWT

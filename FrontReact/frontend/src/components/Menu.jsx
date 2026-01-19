@@ -158,12 +158,7 @@ export default function Menu({ menuId = 1 }) {
         </table>
       </div>
 
-      {/* (Opcional) Podés mostrar un resumen rápido del carrito acá abajo */}
-      {/* 
-      <hr className="my-4" />
-      <h3>Carrito</h3>
-      <p>Total: <strong>${cart.totalAmount.toFixed(2)}</strong></p>
-      */}
+     
     </div>
   );
 }

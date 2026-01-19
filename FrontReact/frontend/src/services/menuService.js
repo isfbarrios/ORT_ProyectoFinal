@@ -7,7 +7,7 @@ export async function getMenuItemsByMenu(menuId) {
   const res = await fetch(`${API_URL}/menu_item/menu/${menuId}`, {
     method: "GET",
     headers: buildFetchHeader(),
-    credentials: 'include'
+    credentials:"include"
   });
 
   if (!res.ok) {
@@ -26,7 +26,6 @@ export async function uploadMenuExcelService(file) {
   const res = await fetch(`${API_URL}/menu/import`, {
     method: "POST",
     body: formData,
-    credentials: 'include'
   });
 
   const text = await res.text().catch(() => "");
