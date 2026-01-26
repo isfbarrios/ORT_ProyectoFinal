@@ -9,6 +9,7 @@ import {
   getFromLocalStorage,
   API_TOKEN,
 } from "./functions/localStorage";
+import KitchenLayout from "./components/layout/KitchenLayout";
 
 export default function App() {
   const dispatch = useDispatch();
@@ -18,6 +19,7 @@ export default function App() {
     location.pathname === "/" ||
     location.pathname === "/login" ||
     location.pathname === "/register";
+  const isKitchenRoute = location.pathname.startsWith("/kitchen");
 
   useEffect(() => {
     if (getFromLocalStorage(API_TOKEN)) {
@@ -25,14 +27,18 @@ export default function App() {
     }
 
     // Solo cargamos carrito si NO estamos en rutas públicas
-    if (!isPublicRoute) {
+    if (!isPublicRoute && !isKitchenRoute) {
       dispatch(fetchCartAsync());
     }
-  }, [dispatch, isPublicRoute]);
+  }, [dispatch, isPublicRoute, isKitchenRoute]);
 
   // RUTAS PÚBLICAS (sin layout global)
   if (isPublicRoute) {
     return <Outlet />;
+  }
+
+  if (isKitchenRoute) {
+    return <KitchenLayout />;
   }
 
   // RUTAS PRIVADAS (layout completo)

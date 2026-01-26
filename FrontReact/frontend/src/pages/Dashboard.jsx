@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { clearAuth, getAuth } from "../services/auth";
 import { useNavigate } from "react-router-dom";
+import { Box, Stack, Typography } from "@mui/material";
 
 import Board from "../components/Board";
 
@@ -56,25 +57,33 @@ export default function Dashboard() {
   }, [dispatch])
 
   return (
-    <div className="container-fluid py-4" style={{ minHeight: "100vh" }}>
-      <h2 className="mb-4">Panel de Pedidos</h2>
+    <Box sx={{ minHeight: "100%", display: "flex", flexDirection: "column", gap: 2 }}>
+      <Stack direction="row" alignItems="center" justifyContent="space-between">
+        <Typography variant="h5" fontWeight="bold">
+          Panel de Pedidos
+        </Typography>
+      </Stack>
 
-      {isLoading && <p>Cargando tablero...</p>}
-      {error && <p className="text-danger">{error}</p>}
+      {isLoading && <Typography>Cargando tablero...</Typography>}
+      {error && (
+        <Typography color="error.main">
+          {error}
+        </Typography>
+      )}
 
-
-      <div
-        className="p-3"
-        style={{
-          background: "#ffffff",
-          borderRadius: "10px",
-          border: "1px solid #ddd",
+      <Box
+        sx={{
+          p: 2,
+          bgcolor: "common.white",
+          borderRadius: 2,
+          border: "1px solid",
+          borderColor: "divider",
           minHeight: "75vh",
           overflowX: "auto",
         }}
       >
         <Board />
-      </div>
-    </div>
+      </Box>
+    </Box>
   );
 }

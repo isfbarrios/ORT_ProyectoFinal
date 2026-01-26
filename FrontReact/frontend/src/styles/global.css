@@ -14,3 +14,37 @@ body {
   color: var(--ink-900);
   background: #fffaf5;
 }
+
+.swal-brand-popup {
+  background: var(--brand-100);
+}
+
+.swal-brand-button {
+  background: var(--brand-500);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 0.5rem 1rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.swal-brand-button:focus {
+  outline: 2px solid var(--brand-300);
+  outline-offset: 2px;
+}
+
+.swal-brand-table {
+  background: #fffaf2;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.swal-brand-table th {
+  background: #ffe6cc;
+  color: var(--ink-900);
+}
+
+.swal-brand-table td {
+  background: #fffaf2;
+}

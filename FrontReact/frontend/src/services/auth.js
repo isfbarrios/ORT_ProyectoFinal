@@ -7,6 +7,7 @@ import {
   removeFromLocalStorage,
   API_TOKEN,
   SESSION_ID,
+  buildFetchHeader
 } from "../functions/localStorage"
 
 // guardo la session del usuario
@@ -76,7 +77,11 @@ export async function loginApi({ email, password, userType }) {
 
 export async function sessionRenew() {
   const res = await fetch(API_URL + "/users/session_renew", {
-    method: "GET",
+    method: "POST",
+    headers: buildFetchHeader(),
+    body: JSON.stringify({
+      sessionId: getFromLocalStorage(SESSION_ID)
+    }),
     credentials: "include"
   });
 
@@ -87,15 +92,6 @@ export async function sessionRenew() {
   }
   catch {
     throw new Error("Respuesta inválida del servidor");
-  }
-
-  if (res.status === 200) {
-    console.log("Sesión activa");
-  }
-  else {
-    clearLocalStorage();
-    //TODO: Ver si puedo redireccionar al login
-    throw new Error(data.message || "Credenciales inválidas");
   }
 
   if (!res.ok) {

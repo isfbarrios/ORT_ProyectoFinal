@@ -83,7 +83,7 @@ export default function NavBar() {
           )}
           {!isLocal && (
             <>
-              {isKitchen && <NavItem to="/dashboard">Dashboard</NavItem>}
+              {isKitchen && <NavItem to="/kitchen">Cocina</NavItem>}
               <NavItem to="/menu">Menu</NavItem>
               <NavItem to="/directions">Direcciones</NavItem>
               <NavItem to="/reserva">Reservas</NavItem>

@@ -45,7 +45,7 @@ export default function Login() {
         (data?.user?.type || data?.user?.userType || data?.type || "")
           .toString()
           .toUpperCase();
-      const nextPath = resolvedType === "COCINA" ? "/dashboard" : "/menu";
+      const nextPath = resolvedType === "COCINA" ? "/kitchen" : "/menu";
       navigate(nextPath);
     } catch (error) {
       console.error("Error de login:", error);

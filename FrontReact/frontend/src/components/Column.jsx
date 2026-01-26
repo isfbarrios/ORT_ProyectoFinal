@@ -1,85 +1,77 @@
-import { useDispatch, useSelector } from "react-redux";
-import { moveOrder } from "../redux/features/dashboardSlice";
+import { useSelector } from "react-redux";
+import { useDroppable } from "@dnd-kit/core";
+import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
+import { Chip, Paper, Stack, Typography } from "@mui/material";
 import OrderCard from "./OrderCard";
-import Swal from "sweetalert2";
-import { updateOrderState } from "../services/orderService"; // POST del backend
+
+const STATUS_STYLES = {
+  1: { label: "Pendiente", color: "#DC2626", chipBg: "#FEE2E2" },
+  2: { label: "Preparacion", color: "#FB923C", chipBg: "#FFF7ED" },
+  3: { label: "Listo", color: "#22C55E", chipBg: "#ECFDF3" },
+  4: { label: "Entregado", color: "#9CA3AF", chipBg: "#F3F4F6" },
+};
 
 export default function Column({ column }) {
-  const dispatch = useDispatch();
   const ordersById = useSelector((state) => state.dashboard.orders);
-
-  const handleDrop = async (e) => {
-    e.preventDefault();
-
-    const orderIdStr = e.dataTransfer.getData("orderId");
-    const sourceColIdStr = e.dataTransfer.getData("sourceColId");
-
-    if (!orderIdStr || !sourceColIdStr) return;
-
-    const orderId = Number(orderIdStr);
-    const sourceColId = Number(sourceColIdStr);
-    const targetColId = Number(column.id);
-
-    // 1) Mover en el front inmediatamente (UX instantáneo)
-    dispatch(
-      moveOrder({
-        orderId,
-        sourceColId,
-        targetColId,
-      })
-    );
-
-    try {
-      // 2) Actualizar en backend con POST (tu elección)
-      await updateOrderState(orderId, targetColId);
-
-      console.log(`Estado del pedido #${orderId} actualizado a columna ${targetColId}`);
-      
-    } catch (error) {
-      console.error("Error backend:", error);
-
-      // 3) Revertir cambio en el front si el backend falla
-      dispatch(
-        moveOrder({
-          orderId,
-          sourceColId: targetColId, // revertimos
-          targetColId: sourceColId,
-        })
-      );
-
-      Swal.fire({
-        icon: "error",
-        title: "Error",
-        text: "No se pudo actualizar el estado del pedido",
-      });
-    }
-  };
+  const { setNodeRef, isOver } = useDroppable({
+    id: `column-${column.id}`,
+    data: { columnId: column.id },
+  });
 
   const orderIds = column.orderIds || [];
+  const statusStyle = STATUS_STYLES[column.id] || STATUS_STYLES[1];
 
   return (
-    <div
-      className="bg-light p-2 rounded shadow-sm"
-      style={{ width: "280px", minHeight: "70vh" }}
-      onDragOver={(e) => e.preventDefault()}
-      onDrop={handleDrop}
+    <Paper
+      ref={setNodeRef}
+      elevation={2}
+      sx={{
+        width: 300,
+        minHeight: "70vh",
+        p: 2,
+        bgcolor: "common.white",
+        border: "1px solid",
+        borderColor: statusStyle.color,
+        boxShadow: "0 12px 30px rgba(245, 124, 0, 0.08)",
+      }}
     >
-      <h5 className="mb-3 text-center">{column.title}</h5>
+      <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
+        <Typography variant="h6" fontWeight="bold" sx={{ color: statusStyle.color }}>
+          {column.title}
+        </Typography>
+        <Chip
+          size="small"
+          label={orderIds.length}
+          sx={{ bgcolor: statusStyle.chipBg, color: statusStyle.color, fontWeight: 600 }}
+        />
+      </Stack>
 
-      <div className="d-flex flex-column gap-2">
-        {orderIds.map((id) => {
-          const order = ordersById[id];
-          if (!order) return null;
+      <SortableContext items={orderIds} strategy={verticalListSortingStrategy}>
+        <Stack
+          spacing={2}
+          sx={{
+            minHeight: 40,
+            borderRadius: 1,
+            border: "1px dashed",
+            borderColor: isOver ? "orange.400" : "transparent",
+            p: 0.75,
+            transition: "border-color 0.2s ease",
+          }}
+        >
+          {orderIds.map((id) => {
+            const order = ordersById[id];
+            if (!order) return null;
 
-          return (
-            <OrderCard
-              key={id}
-              order={order}
-              columnId={column.id}
-            />
-          );
-        })}
-      </div>
-    </div>
+            return (
+              <OrderCard
+                key={id}
+                order={order}
+                columnId={column.id}
+              />
+            );
+          })}
+        </Stack>
+      </SortableContext>
+    </Paper>
   );
 }

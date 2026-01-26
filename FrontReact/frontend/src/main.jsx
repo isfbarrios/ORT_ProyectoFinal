@@ -1,6 +1,6 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { ChakraProvider } from "@chakra-ui/react";
 import { Provider } from "react-redux";
 import { store } from "./redux/store";
@@ -18,6 +18,7 @@ import Dashboard from "./pages/Dashboard.jsx";
 import Menu from "./pages/Menu.jsx";
 import ReservaPage from "./pages/ReservaPage.jsx";
 import RequireAuth from "./routes/RequireAuth.jsx";
+import RequireRole from "./routes/RequireRole.jsx";
 import UserDirectionPage from "./pages/UserDirectionPage.jsx";
 import Checkout from "./pages/Checkout.jsx";
 
@@ -37,7 +38,10 @@ ReactDOM.createRoot(document.getElementById("root")).render(
 
               {/* Rutas protegidas */}
               <Route element={<RequireAuth />}>
-                <Route path="dashboard" element={<Dashboard />} />
+                <Route element={<RequireRole allowed={["COCINA"]} />}>
+                  <Route path="kitchen" element={<Dashboard />} />
+                  <Route path="dashboard" element={<Navigate to="/kitchen" replace />} />
+                </Route>
                 <Route path="menu" element={<Menu />} />
                 <Route path="reserva" element={<ReservaPage />} />
                 <Route path="checkout" element={<Checkout />} />

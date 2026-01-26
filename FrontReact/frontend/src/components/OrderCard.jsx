@@ -2,15 +2,40 @@
 import Swal from "sweetalert2";
 import "sweetalert2/dist/sweetalert2.min.css";
 import { fetchOrderServiceFromApi } from "../services/orderService";
+import { useSortable } from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
+import { Button, Card, CardContent, Chip, Stack, Typography } from "@mui/material";
 
 export default function OrderCard({ order, columnId }) {
+  const isLocked = Number(columnId) === 4;
+  const statusStyle =
+    {
+      1: { label: "Pendiente", color: "#DC2626", chipBg: "#FEE2E2" },
+      2: { label: "Preparacion", color: "#FB923C", chipBg: "#FFF7ED" },
+      3: { label: "Listo", color: "#22C55E", chipBg: "#ECFDF3" },
+      4: { label: "Entregado", color: "#9CA3AF", chipBg: "#F3F4F6" },
+    }[Number(columnId)] || { label: "Pendiente", color: "#DC2626", chipBg: "#FEE2E2" };
 
-  const onDragStart = (e) => {
-    e.dataTransfer.setData("orderId", String(order.id));
-    e.dataTransfer.setData("sourceColId", String(columnId));
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({
+    id: order.id,
+    data: { orderId: order.id, columnId },
+    disabled: isLocked,
+  });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
   };
 
   const mesa = order.table?.name ?? "—";
+  const estimatedMinutes = Number(order.delayTime) || 0;
 
 
   const handleDetails = async () => {
@@ -68,7 +93,7 @@ export default function OrderCard({ order, columnId }) {
           ? "<p class='text-muted'>Este pedido no tiene ítems.</p>"
           : `
           <div class="table-responsive">
-            <table class="table table-sm align-middle text-start">
+            <table class="table table-sm align-middle text-start swal-brand-table">
               <thead>
                 <tr>
                   <th>Producto</th>
@@ -96,6 +121,11 @@ export default function OrderCard({ order, columnId }) {
         title: `Pedido #${order.id}`,
         html,
         width: 700,
+        customClass: {
+          popup: "swal-brand-popup",
+          confirmButton: "swal-brand-button",
+        },
+        buttonsStyling: false,
         confirmButtonText: "Cerrar",
       });
     } catch (err) {
@@ -109,24 +139,55 @@ export default function OrderCard({ order, columnId }) {
   };
 
   return (
-    <div
-      className="card p-2 shadow-sm"
-      draggable
-      onDragStart={onDragStart}
-      style={{ cursor: "grab", minHeight: "70px" }}
+    <Card
+      ref={setNodeRef}
+      variant="outlined"
+      sx={{
+        cursor: isLocked ? "not-allowed" : "grab",
+        minHeight: 80,
+        opacity: isLocked ? 0.6 : isDragging ? 0.6 : 1,
+        boxShadow: isDragging ? 3 : 1,
+        borderColor: "transparent",
+        bgcolor: isLocked ? "grey.100" : statusStyle.chipBg,
+        ...style,
+      }}
+      {...(!isLocked ? listeners : {})}
+      {...(!isLocked ? attributes : {})}
     >
-      <h6 className="m-0">#{order.id}</h6>
-
-      <p className="m-0 text-muted small">
-        Mesa: {mesa}
-      </p>
-
-      <button
-        className="btn btn-sm btn-outline-primary mt-1"
-        onClick={handleDetails}
-      >
-        Ver detalles
-      </button>
-    </div>
+      <CardContent sx={{ pb: 2 }}>
+        <Stack spacing={0.5}>
+          <Stack direction="row" alignItems="center" justifyContent="space-between">
+            <Typography variant="subtitle1" fontWeight="bold">
+              #{order.id}
+            </Typography>
+            <Stack direction="row" spacing={0.5} alignItems="center">
+              {estimatedMinutes > 0 && (
+                <Chip
+                  size="small"
+                  label={`${estimatedMinutes} min`}
+                  sx={{ bgcolor: "#FFF7ED", color: "#9A3412", fontWeight: 600 }}
+                />
+              )}
+              <Chip
+                size="small"
+                label={statusStyle.label}
+                sx={{ bgcolor: statusStyle.chipBg, color: statusStyle.color, fontWeight: 600 }}
+              />
+            </Stack>
+          </Stack>
+          <Typography variant="body2" color="text.secondary">
+            Mesa: {mesa}
+          </Typography>
+          <Button
+            size="small"
+            variant="outlined"
+            onClick={handleDetails}
+            onPointerDown={(e) => e.stopPropagation()}
+          >
+            Ver detalles
+          </Button>
+        </Stack>
+      </CardContent>
+    </Card>
   );
 }

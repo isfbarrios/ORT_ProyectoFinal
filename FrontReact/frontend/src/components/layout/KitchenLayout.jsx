@@ -1,0 +1,26 @@
+import { Outlet } from "react-router-dom";
+import { AppBar, Box, CssBaseline, Toolbar, Typography } from "@mui/material";
+import { ThemeProvider, createTheme } from "@mui/material/styles";
+
+export default function KitchenLayout() {
+  return (
+    <ThemeProvider theme={createTheme()}>
+      <CssBaseline />
+      <Box sx={{ minHeight: "100vh", bgcolor: "grey.100" }}>
+        <AppBar position="sticky" color="default" elevation={1}>
+          <Toolbar sx={{ display: "flex", justifyContent: "space-between" }}>
+            <Typography variant="h6" fontWeight="bold">
+              Cocina
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              Panel operativo
+            </Typography>
+          </Toolbar>
+        </AppBar>
+        <Box sx={{ p: 2, minHeight: "calc(100vh - 64px)" }}>
+          <Outlet />
+        </Box>
+      </Box>
+    </ThemeProvider>
+  );
+}
