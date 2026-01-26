@@ -32,9 +32,12 @@ VALUES(5, 'Fabricio', 'Barrios', 'fbarrios@hotmail.com', 'fbarrios', '$2a$10$2QL
 
 delete from Users where UserName = 'fbarrios@hotmail.com';
 
-ALTER TABLE MenuItem
-ADD COLUMN BasePrice DECIMAL(12,2) NOT NULL DEFAULT 0
-AFTER Description;
+ALTER TABLE Users
+ADD COLUMN SessionId VARCHAR(50)
+AFTER Mail;
+
+ALTER TABLE Users
+DROP COLUMN SessionId;
 
 UPDATE MenuItem
 SET BasePrice = 450.00
@@ -53,26 +56,24 @@ SET BasePrice = 120.00
 WHERE MenuId = 1 AND Name = 'Refresco 500ml';
 
 
-CREATE USER 'backend'@'%' IDENTIFIED BY 'ortedu2025';
-GRANT ALL PRIVILEGES ON proyectofinal.* TO 'backend'@'%';
-FLUSH PRIVILEGES;
 
-SELECT VERSION();
-
-
-ALTER TABLE OrderItem
-DROP FOREIGN KEY fk_OrderItem_MenuItem;
-
-ALTER TABLE OrderItem
-DROP COLUMN MenuItemId;
-
-
+select * from Users u;
 
 select * from UserDirection oi;
 
 select count(*) from Cart oi;
 
+select * from Cart c order by c.CartId desc;
+
+select * from CartState c;
+
 select * from `Order` o;
+
+select * from Sessions s;
+
+delete from Sessions where UserId = 0;
+
+select * from UserDirection u;
 
 drop table if exists OrderItem;
 

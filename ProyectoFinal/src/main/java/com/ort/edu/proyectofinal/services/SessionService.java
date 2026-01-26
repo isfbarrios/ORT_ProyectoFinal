@@ -1,9 +1,7 @@
 package com.ort.edu.proyectofinal.services;
 
-import com.ort.edu.proyectofinal.CoreManager;
 import com.ort.edu.proyectofinal.entities.Session;
 import com.ort.edu.proyectofinal.repositories.SessionRepository;
-import com.ort.edu.proyectofinal.security.JwtUtil;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -15,15 +13,10 @@ import java.util.Optional;
 public class SessionService {
 
     @Autowired
-    private JwtUtil jwtUtil;
-
-    @Autowired
     private SessionRepository repo;
 
     @Autowired
     private HttpSession httpSession;
-
-    private final CoreManager manager = CoreManager.getInstance();
 
     public Session resolveSession(String sessionId) {
 

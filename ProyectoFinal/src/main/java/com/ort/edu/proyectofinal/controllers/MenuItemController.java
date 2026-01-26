@@ -1,12 +1,9 @@
 package com.ort.edu.proyectofinal.controllers;
 
-import com.ort.edu.proyectofinal.CoreManager;
 import com.ort.edu.proyectofinal.dto.MenuItemDTO;
 import com.ort.edu.proyectofinal.dto.ResponseDTO;
 import com.ort.edu.proyectofinal.entities.Menuitem;
-import com.ort.edu.proyectofinal.exception.AuthException;
 import com.ort.edu.proyectofinal.repositories.MenuItemRepository;
-import com.ort.edu.proyectofinal.security.JwtUtil;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -24,24 +21,9 @@ public class MenuItemController {
     @Autowired
     private MenuItemRepository repo;
 
-    private CoreManager manager = CoreManager.getInstance();
-
-    @Autowired
-    private JwtUtil jwtUtil;
-
     @GetMapping("/{id}")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<?> get(
-            @PathVariable int id, @RequestHeader(value = "Authorization", required = false) String authHeader) {
-
-        // Validar token JWT
-        try {
-            manager.validateTokenJWT(jwtUtil, authHeader);
-        }
-        catch (AuthException e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(new ResponseDTO(e.getMessage()));
-        }
+    public ResponseEntity<?> get(@PathVariable int id) {
 
         Optional<Menuitem> optional = repo.findById(id);
 
@@ -54,16 +36,7 @@ public class MenuItemController {
 
     @GetMapping
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<?> getAll(@RequestHeader(value = "Authorization", required = false) String authHeader) {
-
-        // Validar token JWT
-        try {
-            manager.validateTokenJWT(jwtUtil, authHeader);
-        }
-        catch (AuthException e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(new ResponseDTO(e.getMessage()));
-        }
+    public ResponseEntity<?> getAll() {
 
         List<MenuItemDTO> items = repo.findAll()
                 .stream()
@@ -75,17 +48,7 @@ public class MenuItemController {
 
     @GetMapping("/menu/{menuId}")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<?> getAllByCart(
-            @PathVariable int menuId, @RequestHeader(value = "Authorization", required = false) String authHeader) {
-
-        // Validar token JWT
-        try {
-            manager.validateTokenJWT(jwtUtil, authHeader);
-        }
-        catch (AuthException e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(new ResponseDTO(e.getMessage()));
-        }
+    public ResponseEntity<?> getAllByCart(@PathVariable int menuId) {
 
         List<MenuItemDTO> items = repo.findByMenuId(menuId)
                 .stream()

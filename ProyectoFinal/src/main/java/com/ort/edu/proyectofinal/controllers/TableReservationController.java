@@ -2,12 +2,10 @@ package com.ort.edu.proyectofinal.controllers;
 
 import com.ort.edu.proyectofinal.CoreManager;
 import com.ort.edu.proyectofinal.dto.*;
-import com.ort.edu.proyectofinal.exception.AuthException;
 import com.ort.edu.proyectofinal.exception.TableException;
 import com.ort.edu.proyectofinal.repositories.TableReservationRepository;
 import com.ort.edu.proyectofinal.repositories.TableShiftRepository;
 import com.ort.edu.proyectofinal.repositories.TablesRepository;
-import com.ort.edu.proyectofinal.security.JwtUtil;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import com.ort.edu.proyectofinal.services.TableReservationService;
@@ -35,22 +33,9 @@ public class TableReservationController {
     @Autowired
     private TableReservationService service;
 
-    private final CoreManager manager = CoreManager.getInstance();
-
-    @Autowired
-    private JwtUtil jwtUtil;
-
     @GetMapping
-    public ResponseEntity<?> getAll(@RequestHeader(value = "Authorization", required = false) String authHeader) {
-
-        // Validar token JWT
-        try {
-            manager.validateTokenJWT(jwtUtil, authHeader);
-        }
-        catch (AuthException e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(new ResponseDTO(e.getMessage()));
-        }
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<?> getAll() {
 
         List<TablesDTO> items = repo.findAll()
                 .stream()

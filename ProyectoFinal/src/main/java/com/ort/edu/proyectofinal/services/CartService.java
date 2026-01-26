@@ -301,69 +301,6 @@ public class CartService {
         }
     }
 
-    /*
-    @Transactional
-    public OrderDTO confirmCart(String sessionIdHeader) {
-        Cart cart = getOrCreateCartEntity(sessionIdHeader);
-        List<Cartitem> items = cartItemRepository.findByCartId(cart.getId());
-
-        if (items.isEmpty()) {
-            throw new IllegalStateException("El carrito está vacío");
-        }
-
-        BigDecimal total = items.stream()
-                .map(ci -> ci.getMenuItem().getBasePrice()
-                        .multiply(BigDecimal.valueOf(ci.getQuantity())))
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
-
-        // Estado inicial "Pendiente" (ajustá el id según tu tabla)
-        Orderstate pending = orderStateRepository.findById(1)
-                .orElseThrow(() -> new RuntimeException("Estado Pendiente no encontrado"));
-
-        // Canal por defecto (ej: PWA)
-        Ordercanal canal = orderCanalRepository.findById(1)
-                .orElseThrow(() -> new RuntimeException("Canal por defecto no encontrado"));
-
-        Order order = new Order();
-        //TODO: Hay que usar la sesion del usuario
-        //TODO: Number y Id vienen de la db, no los gestionamos
-        order.setOrderNumber(UUID.randomUUID().toString());
-        order.setDate(Instant.now());
-        order.setAmount(total);
-        order.setState(pending);
-        order.setCanal(canal);
-        order.setLastUpdate(Instant.now());
-        // Si tu Order tiene relación con User o Session, setear aquí
-
-        order = orderRepository.save(order);
-
-        // Crear Orderitems a partir de los Cartitems
-        int line = 1;
-        for (Cartitem ci : items) {
-            OrderitemId id = new OrderitemId();
-            id.setOrderId(order.getId());
-            id.setItemId(line++);
-
-            Orderitem oi = new Orderitem();
-            oi.setId(id);
-            oi.setOrder(order);
-            oi.setMenuItem(ci.getMenuItem());
-            oi.setQuantity(ci.getQuantity());
-            //oi.setExtraData(ci.getExtraData()); // si no usás extraData, podés omitir
-
-            orderItemRepository.save(oi);
-        }
-
-        // Limpiar / cerrar carrito
-        cartItemRepository.deleteAll(items);
-        cart.setLastUpdate(Instant.now());
-        // Si tenés estado de cart, marcarlo como CERRADO
-        cartRepository.save(cart);
-
-        // Mapear a tu OrderDTO actual (usado por el Kanban)
-        return orderMapper.toDto(order);
-    }
-    */
     // ============================
     // Cerrar carrito sin confirmar
     // ============================

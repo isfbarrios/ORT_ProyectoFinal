@@ -1,12 +1,9 @@
 package com.ort.edu.proyectofinal.controllers;
 
-import com.ort.edu.proyectofinal.CoreManager;
 import com.ort.edu.proyectofinal.dto.CartDTO;
 import com.ort.edu.proyectofinal.dto.ResponseDTO;
 import com.ort.edu.proyectofinal.entities.Cart;
-import com.ort.edu.proyectofinal.exception.AuthException;
 import com.ort.edu.proyectofinal.repositories.CartRepository;
-import com.ort.edu.proyectofinal.security.JwtUtil;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -25,23 +22,9 @@ public class CartController {
     @Autowired
     private CartRepository repo;
 
-    private final CoreManager manager = CoreManager.getInstance();
-
-    @Autowired
-    private JwtUtil jwtUtil;
-
     @GetMapping("/{id}")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<?> get(@PathVariable int id, @RequestHeader(value = "Authorization", required = false) String authHeader) {
-
-        // Validar token JWT
-        try {
-            manager.validateTokenJWT(jwtUtil, authHeader);
-        }
-        catch (AuthException e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(new ResponseDTO(e.getMessage()));
-        }
+    public ResponseEntity<?> get(@PathVariable int id) {
 
         Optional<Cart> optionalCart = repo.findById(id);
 
@@ -54,16 +37,7 @@ public class CartController {
 
     @GetMapping
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<?> getAll(@RequestHeader(value = "Authorization", required = false) String authHeader) {
-
-        // Validar token JWT
-        try {
-            manager.validateTokenJWT(jwtUtil, authHeader);
-        }
-        catch (AuthException e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(new ResponseDTO(e.getMessage()));
-        }
+    public ResponseEntity<?> getAll() {
 
         List<CartDTO> carts = repo.findAll()
                 .stream()

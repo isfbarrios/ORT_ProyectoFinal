@@ -4,7 +4,7 @@ import com.ort.edu.proyectofinal.dto.UserDTO;
 import com.ort.edu.proyectofinal.entities.User;
 import com.ort.edu.proyectofinal.exception.AuthException;
 import com.ort.edu.proyectofinal.repositories.UserRepository;
-import com.ort.edu.proyectofinal.security.JwtUtil;
+
 import jakarta.servlet.http.HttpSession;
 import lombok.Getter;
 import org.springframework.http.ResponseEntity;
@@ -59,6 +59,10 @@ public final class CoreManager {
 
                 if (username != null) {
                     User dbUser = repo.findByUsername(username);
+                    
+                    if (dbUser == null) {
+                        dbUser = repo.findByMail(username);
+                    }
 
                     if (dbUser != null) {
                         user = new UserDTO(dbUser);
@@ -73,32 +77,5 @@ public final class CoreManager {
         }
 
         return user;
-    }
-
-    // Validar token JWT
-    public void validateTokenJWT(JwtUtil jwtUtil, String authHeader) throws AuthException {
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            throw new AuthException("Token no proporcionado o formato inválido");
-        }
-
-        // Extrae el token sin "Bearer "
-        String token = getToken(authHeader);
-
-        try {
-            String username = jwtUtil.extractUsername(token);
-            if (!jwtUtil.isTokenValid(token, username)) {
-                throw new AuthException("Token inválido o expirado");
-            }
-        } catch (Exception ex) {
-            throw new AuthException("Token inválido o error al validar");
-        }
-    }
-
-    public String generateToken(JwtUtil jwtUtil, User user) {
-        return jwtUtil.generateToken(user.getUsername());
-    }
-
-    public String getToken(String authHeader) {
-        return authHeader.substring(7);
     }
 }

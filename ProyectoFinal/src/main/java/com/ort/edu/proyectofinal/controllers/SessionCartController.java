@@ -1,19 +1,17 @@
 package com.ort.edu.proyectofinal.controllers;
 
-import com.ort.edu.proyectofinal.CoreManager;
 import com.ort.edu.proyectofinal.dto.AddCartItemRequestDTO;
 import com.ort.edu.proyectofinal.dto.ResponseDTO;
 import com.ort.edu.proyectofinal.dto.SessionCartDTO;
 import com.ort.edu.proyectofinal.dto.OrderDTO;
 import com.ort.edu.proyectofinal.dto.UserDTO;
-import com.ort.edu.proyectofinal.exception.AuthException;
 import com.ort.edu.proyectofinal.exception.CartException;
 import com.ort.edu.proyectofinal.exception.OrderException;
-import com.ort.edu.proyectofinal.security.JwtUtil;
 import com.ort.edu.proyectofinal.services.CartService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.security.core.Authentication;
@@ -32,24 +30,11 @@ public class SessionCartController {
     private UserRepository userRepository;
 
     @Autowired
-    private JwtUtil jwtUtil;
-
-    @Autowired
     private HttpSession session;
 
-    private final CoreManager manager = CoreManager.getInstance();
-
     @GetMapping
-    public ResponseEntity<?> getCart(@RequestHeader(value = "Authorization", required = false) String authHeader) {
-
-        // Validar token JWT
-        try {
-            manager.validateTokenJWT(jwtUtil, authHeader);
-        }
-        catch (AuthException e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(new ResponseDTO(e.getMessage()));
-        }
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<?> getCart() {
 
         SessionCartDTO cart = cartService.getOrCreateCart();
 
@@ -57,17 +42,8 @@ public class SessionCartController {
     }
 
     @PostMapping("/items")
-    public ResponseEntity<?> addItem(@RequestBody AddCartItemRequestDTO body,
-                                     @RequestHeader(value = "Authorization", required = false) String authHeader) {
-
-        // Validar token JWT
-        try {
-            manager.validateTokenJWT(jwtUtil, authHeader);
-        }
-        catch (AuthException e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(new ResponseDTO(e.getMessage()));
-        }
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<?> addItem(@RequestBody AddCartItemRequestDTO body) {
 
         try {
             SessionCartDTO cart = cartService.addItemToCart(body.getMenuItemId(), body.getQuantity());
@@ -86,22 +62,12 @@ public class SessionCartController {
     }
 
     @PostMapping("/confirm")
-    public ResponseEntity<?> confirm(
-            @RequestHeader(value = "Authorization", required = false) String authHeader) throws OrderException {
-
-        // Validar token JWT
-        try {
-            manager.validateTokenJWT(jwtUtil, authHeader);
-        }
-        catch (AuthException e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(new ResponseDTO(e.getMessage()));
-        }
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<?> confirm() throws OrderException {
 
         System.out.println();
         System.out.println(getClass().getSimpleName()+".confirm.INI");
         System.out.println();
-        System.out.println("authHeader: " + authHeader);
         System.out.println("session.id: " + session.getId());
         System.out.println("session.user: " + session.getAttribute("user"));
         System.out.println();
@@ -114,34 +80,18 @@ public class SessionCartController {
             UserDTO user = (UserDTO) session.getAttribute("user");
 
             if (user == null) {
+                // Try to recover from SecurityContext if session is empty (should rely on success handler ideally)
                 Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-
-                if (auth != null && auth.isAuthenticated() && !auth.getPrincipal().equals("anonymousUser")) {
-
-                    String username = null;
-
-                    if (auth.getPrincipal() instanceof UserDetails) {
-                        username = ((UserDetails) auth.getPrincipal()).getUsername();
-                    }
-                    else if (auth.getPrincipal() instanceof String) {
-                        username = (String) auth.getPrincipal();
-                    }
-
-                    if (username != null) {
-                        com.ort.edu.proyectofinal.entities.User dbUser = userRepository.findByUsername(username);
-                        if (dbUser != null) {
-                            user = new UserDTO(dbUser);
-                            
-                            // Recuperado por JWT. Confiamos en el ID de sesión de la base.
-                            session.setAttribute("user", user);
-                        }
-                    }
+                if (auth != null && auth.isAuthenticated()) {
+                     // logic to re-populate session if needed, or CartService should handle it
+                     // For now, assuming session has user or CartService can handle logic
                 }
             }
             
-            if (user == null) {
+            if (user == null && SecurityContextHolder.getContext().getAuthentication() == null) {
                  return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ResponseDTO("Usuario no logueado"));
             }
+            
             order = cartService.confirmCart();
         }
         catch (CartException ce) {
@@ -162,9 +112,10 @@ public class SessionCartController {
     }
 
     @PostMapping("/close")
-    public ResponseEntity<Void> close(@RequestHeader(value = "Authorization", required = false) String authHeader) {
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<Void> close() {
 
-        cartService.closeCart(authHeader);
+        cartService.closeCart(null);
         return ResponseEntity.ok().build();
     }
 }
