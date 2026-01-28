@@ -27,7 +27,6 @@ public class UserDirectionController {
     private HttpSession session;
 
     @GetMapping
-    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> getAll() {
 
         UserDTO user = (UserDTO) session.getAttribute("user");
@@ -45,7 +44,6 @@ public class UserDirectionController {
     }
 
     @PostMapping("/new_direction")
-    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> saveDirection(
             @RequestBody UserDirectionRequestDTO body) {
 

@@ -27,7 +27,6 @@ public class MenuController {
     private MenuImportService menuImportService;
 
     @GetMapping("/{id}")
-    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> get(@PathVariable int id) {
 
         Optional<Menu> optional = repo.findById(id);
@@ -40,7 +39,6 @@ public class MenuController {
     }
 
     @GetMapping
-    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> getAll() {
 
         List<MenuDTO> items = repo.findAll()

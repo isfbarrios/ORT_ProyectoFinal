@@ -22,7 +22,6 @@ public class MenuItemController {
     private MenuItemRepository repo;
 
     @GetMapping("/{id}")
-    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> get(@PathVariable int id) {
 
         Optional<Menuitem> optional = repo.findById(id);
@@ -35,7 +34,6 @@ public class MenuItemController {
     }
 
     @GetMapping
-    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> getAll() {
 
         List<MenuItemDTO> items = repo.findAll()
@@ -47,7 +45,6 @@ public class MenuItemController {
     }
 
     @GetMapping("/menu/{menuId}")
-    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> getAllByCart(@PathVariable int menuId) {
 
         List<MenuItemDTO> items = repo.findByMenuId(menuId)

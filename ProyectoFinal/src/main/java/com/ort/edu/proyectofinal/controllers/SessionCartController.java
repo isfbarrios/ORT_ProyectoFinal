@@ -33,7 +33,6 @@ public class SessionCartController {
     private HttpSession session;
 
     @GetMapping
-    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> getCart() {
 
         SessionCartDTO cart = cartService.getOrCreateCart();
@@ -42,7 +41,6 @@ public class SessionCartController {
     }
 
     @PostMapping("/items")
-    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> addItem(@RequestBody AddCartItemRequestDTO body) {
 
         try {
@@ -62,7 +60,6 @@ public class SessionCartController {
     }
 
     @PostMapping("/confirm")
-    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> confirm() throws OrderException {
 
         System.out.println();
@@ -112,7 +109,6 @@ public class SessionCartController {
     }
 
     @PostMapping("/close")
-    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<Void> close() {
 
         cartService.closeCart(null);

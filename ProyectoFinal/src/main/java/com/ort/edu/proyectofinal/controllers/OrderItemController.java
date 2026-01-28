@@ -22,7 +22,6 @@ public class OrderItemController {
 
 
     @GetMapping("/order/{orderId}")
-    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> getAllByOrderId(
             @PathVariable int cartId) {
 

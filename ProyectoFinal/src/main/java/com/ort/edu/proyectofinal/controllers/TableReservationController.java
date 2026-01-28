@@ -34,7 +34,6 @@ public class TableReservationController {
     private TableReservationService service;
 
     @GetMapping
-    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> getAll() {
 
         List<TablesDTO> items = repo.findAll()
@@ -55,7 +54,6 @@ public class TableReservationController {
     }
 
     @PostMapping("/reserve")
-    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> reserveTableShift(
         @RequestBody ReservationRequestDTO request) {
 

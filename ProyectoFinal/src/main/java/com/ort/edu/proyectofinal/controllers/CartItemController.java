@@ -30,7 +30,6 @@ public class CartItemController {
             description = "Obtener item del carrito (menu_item) por su id"
     )
     @GetMapping("/{cartId}/{menuItemId}")
-    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> get(@PathVariable int cartId,
         @PathVariable int menuItemId) {
 
@@ -48,7 +47,6 @@ public class CartItemController {
     }
 
     @GetMapping
-    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> getAll() {
 
         List<CartItemDTO> items = repo.findAll()
@@ -60,7 +58,6 @@ public class CartItemController {
     }
 
     @GetMapping("/cart/{cartId}")
-    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> getAllByCart(@PathVariable int cartId) {
 
         List<CartItemDTO> items = repo.findByCartId(cartId)

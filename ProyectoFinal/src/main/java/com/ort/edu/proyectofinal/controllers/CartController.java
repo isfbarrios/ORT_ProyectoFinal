@@ -23,7 +23,6 @@ public class CartController {
     private CartRepository repo;
 
     @GetMapping("/{id}")
-    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> get(@PathVariable int id) {
 
         Optional<Cart> optionalCart = repo.findById(id);
@@ -36,7 +35,6 @@ public class CartController {
     }
 
     @GetMapping
-    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> getAll() {
 
         List<CartDTO> carts = repo.findAll()

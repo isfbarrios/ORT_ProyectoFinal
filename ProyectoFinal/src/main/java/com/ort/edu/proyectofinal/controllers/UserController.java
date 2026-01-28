@@ -28,7 +28,6 @@ public class UserController {
     private UserstateRepository userstateRepository;
 
     @GetMapping("/me")
-    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<UserDTO> getCurrentUser(Authentication authentication) {
         if (authentication == null) {
             return ResponseEntity.status(401).build();
@@ -48,7 +47,6 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> getUser(@PathVariable int id) {
 
         Optional<User> optionalUser = repo.findById(id);
@@ -61,7 +59,6 @@ public class UserController {
     }
 
     @GetMapping
-    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> getAllUsers() {
 
         List<UserDTO> users = repo.findAll()
@@ -110,9 +107,7 @@ public class UserController {
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<?> updateUser(@PathVariable int id,
-        @RequestBody User updatedUser) {
+    public ResponseEntity<?> updateUser(@PathVariable int id, @RequestBody User updatedUser) {
 
         Optional<User> optional = repo.findById(id);
 
@@ -135,7 +130,6 @@ public class UserController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> deleteUser(@PathVariable int id) {
 
         Optional<User> optional = repo.findById(id);

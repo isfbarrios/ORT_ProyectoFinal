@@ -28,7 +28,6 @@ public class OrderController {
     private OrderService orderService;
 
     @PostMapping("/update_state")
-    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> updateState(@RequestBody OrderUpdateDTO dto) {
 
         Order updated = orderService.updateOrderState(dto);
@@ -36,7 +35,6 @@ public class OrderController {
     }
 
     @GetMapping
-    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> getAll() {
 
         List<OrderDTO> orders = repo.findAll()

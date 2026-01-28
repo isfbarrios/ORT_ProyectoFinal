@@ -20,7 +20,6 @@ public class CartStateController {
     private CartStateRepository repo;
 
     @GetMapping("/{id}")
-    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> get(@PathVariable int id) {
 
         Optional<Cartstate> optional = repo.findById(id);

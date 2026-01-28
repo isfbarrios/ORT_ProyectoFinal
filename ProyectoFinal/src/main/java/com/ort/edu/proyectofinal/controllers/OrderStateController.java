@@ -24,7 +24,6 @@ public class OrderStateController {
     private OrderStateRepository repo;
 
     @GetMapping("/{id}")
-    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> get(@PathVariable int id) {
 
         Optional<Orderstate> optionalOrderState = repo.findById(id);
@@ -37,7 +36,6 @@ public class OrderStateController {
     }
 
     @GetMapping
-    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> getAll() {
 
         List<OrderStateDTO> states = repo.findAll()
