@@ -47,32 +47,30 @@ export function clearAuth() {
 }
 
 // MOCK login (luego lo vamos a remplazar por fetch al backend)
-export async function loginApi({ email, password, userType }) {
+export async function loginApi({ username, password, userType }) {
   const res = await fetch(API_URL + "/auth/login", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
-      mail: email,
-      password: password,
-      userType: userType
+      nombreUsuario: username,
+      contrasenia: password,
+      type: userType
     }),
     credentials: "include"
   });
 
-  let data;
-
+  if (!res.ok) {
+    const errorText = await res.text();
+    throw new Error(errorText || "Credenciales inválidas");
+  }
+  // El backend devuelve JSON solo en caso de éxito (AuthResponseDTO)
   try {
-    data = await res.json();
+    const data = await res.json();
+    return data;
   }
   catch {
     throw new Error("Respuesta inválida del servidor");
   }
-
-  if (!res.ok) {
-    throw new Error(data.message || "Credenciales inválidas");
-  }
-
-  return data;
 }
 
 export async function sessionRenew() {

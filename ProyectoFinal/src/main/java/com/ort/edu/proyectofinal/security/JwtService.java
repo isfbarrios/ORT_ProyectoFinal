@@ -16,7 +16,7 @@ import java.util.function.Function;
 public class JwtService {
 
     //TODO: Levantar de algun archivo de configuracion
-    private static final String SECRET_KEY = "clave_secreta_para_jwt";
+    private static final String SECRET_KEY = "clave_secreta_para_jwt_super_segura_y_lo_suficientemente_larga_para_hs256";
 
     private Key getSigningKey() {
         return Keys.hmacShaKeyFor(SECRET_KEY.getBytes());
@@ -40,9 +40,14 @@ public class JwtService {
     }
 
     public String generateToken(UserDetails userDetails) {
+        String role = "USER";
+        if (!userDetails.getAuthorities().isEmpty()) {
+            role = userDetails.getAuthorities().toArray()[0].toString();
+        }
+
         return Jwts.builder()
                 .setSubject(userDetails.getUsername())
-                .claim("role", userDetails.getAuthorities().toArray()[0].toString()) // Guarda el rol
+                .claim("role", role) // Guarda el rol
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + 3600000)) // 1 hora de validez
                 .signWith(getSigningKey(), SignatureAlgorithm.HS256)

@@ -36,6 +36,8 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody AuthRequestDTO request) {
         try {
+            System.out.println(request.toString());
+
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(request.getNombreUsuario(), request.getContrasenia()));
 

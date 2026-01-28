@@ -24,7 +24,7 @@ export default function Login() {
 
   const isLoading = useSelector((state) => state.app.isLoading);
 
-  const [email, setEmail] = useState("");
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
 
@@ -36,7 +36,7 @@ export default function Login() {
     try {
       const userType = searchParams.get("userType") || "LOCAL";
 
-      const data = await loginApi({ email, password, userType });
+      const data = await loginApi({ username, password, userType });
 
       saveAuth(data);
       dispatch(setUser(data.user ?? data));
@@ -70,10 +70,10 @@ export default function Login() {
           <FormControl>
             <FormLabel>Correo</FormLabel>
             <Input
-              type="email"
-              placeholder="ej: usuario@mail.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              type="text"
+              placeholder="jperez"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
               disabled={isLoading}
               required
             />
