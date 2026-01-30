@@ -111,9 +111,9 @@ public class SessionCartController {
     }
 
     @PostMapping("/close")
-    public ResponseEntity<Void> close() {
+    public ResponseEntity<Void> close(Principal principal) {
 
-        cartService.closeCart(null);
+        cartService.closeCart(principal);
         return ResponseEntity.ok().build();
     }
 }
