@@ -17,6 +17,8 @@ import jakarta.transaction.Transactional;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+
+import java.security.Principal;
 import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -74,16 +76,21 @@ public class CartService {
 
     private final CoreManager manager = CoreManager.getInstance();
 
-    private Cart createNewCart(Session session) {
+    private Cart createNewCart(Principal principal) {
+
+        String userName = principal.getName();
+
+        User user = userRepository.findByUsername(userName);
 
         Cartstate cartState = cartStateRepository.getReferenceById(1);
+
         //TODO: Ajustar para pedir por fecha
         Tables table = tablesRepository.getReferenceById(1);
 
         //Traigo mesas disponibles
 
         Cart cart = new Cart();
-        cart.setSession(session);
+        cart.setUserName(userName);
         cart.setDate(LocalDateTime.now());
         cart.setLastUpdate(LocalDateTime.now());
         cart.setCartState(cartState);
@@ -103,42 +110,17 @@ public class CartService {
         return cart;
     }
 
-    private Cart getOrCreateCartEntity() {
+    private Cart getOrCreateCartEntity(Principal principal) {
 
-        UserDTO user = (UserDTO) httpSession.getAttribute("user");
+        String userName = principal.getName();
 
-        if (user == null) {
-            throw new RuntimeException("Usuario no logueado en sesión");
-        }
+        User user = userRepository.findByUsername(userName);
 
-        // Intento recuperar el carrito de la sesion
-        Cart sessionCart = (Cart) httpSession.getAttribute("cart");
+        Cart cart = cartRepository.findByUserName(userName);
 
-        if (sessionCart != null) {
-            System.out.println("DEBUG: Cart found in HttpSession cache. CartId=" + sessionCart.getId());
-            return sessionCart;
-        }
+        if (cart == null) cart = createNewCart(principal);
 
-        try {
-            System.out.println("DEBUG: CartService.httpSession.getId(): " + httpSession.getId());
-            System.out.println("DEBUG: httpSession.getAttribute('user'): " + httpSession.getAttribute("user"));
-        } catch(Exception e) {}
-
-        // Si no encuentro el carrito en la sesion, lo busco por db
-        Optional<Cart> cartOptional = cartRepository.findBySession_SessionId(user.getSessionId());
-
-        Session session = sessionService.resolveSession(user.getSessionId());
-
-        if (cartOptional.isPresent()) {
-            sessionCart = cartOptional.get();
-        }
-        else {
-            sessionCart = createNewCart(session);
-        }
-
-        httpSession.setAttribute("cart", sessionCart);
-
-        return sessionCart;
+        return cart;
     }
 
     private SessionCartDTO buildSessionCartDTO(Cart cart) {
@@ -159,46 +141,23 @@ public class CartService {
     }
 
     @Transactional
-    public SessionCartDTO getOrCreateCart() {
-        Cart cart = getOrCreateCartEntity();
+    public SessionCartDTO getOrCreateCart(Principal principal) {
+        Cart cart = getOrCreateCartEntity(principal);
         return buildSessionCartDTO(cart);
     }
 
     @Transactional
-    public SessionCartDTO addItemToCart(int menuItemId, int quantity) throws CartException {
+    public SessionCartDTO addItemToCart(Principal principal, int menuItemId, int quantity) throws CartException {
 
         if (quantity <= 0) {
              throw new CartException("Cantidad insuficiente para el item " + menuItemId);
         }
 
-        Cart cart = null;
+        String userName = principal.getName();
 
-        // Primero busco el cart en la sesion, sino, lo busco por la db
-        cart = (Cart) httpSession.getAttribute("cart");
+        User user = userRepository.findByUsername(userName);
 
-        if (cart != null) {
-            System.out.println("DEBUG: Cart found in HttpSession cache. CartId=" + cart.getId());
-        }
-
-        if (cart == null) {
-            UserDTO user = (UserDTO) httpSession.getAttribute("user");
-
-            if (user == null) {
-                throw new RuntimeException("Usuario no logueado en sesión");
-            }
-
-            // Si no encuentro el carrito en la sesion, lo busco por db
-            Optional<Cart> cartOptional = cartRepository.findBySession_SessionId(user.getSessionId());
-
-            Session session = sessionService.resolveSession(user.getSessionId());
-
-            if (cartOptional.isPresent()) {
-                cart = cartOptional.get();
-            }
-            else {
-                cart = createNewCart(session);
-            }
-        }
+        Cart cart = cartRepository.findByUserName(userName);
 
         Menuitem menuitem = menuItemRepository.findById(menuItemId)
                 .orElseThrow(() -> new IllegalArgumentException("Menuitem no encontrado"));
@@ -248,23 +207,13 @@ public class CartService {
     // ============================
     // Confirmar carrito → crear Order
     // ============================
-    public OrderDTO confirmCart() throws CartException {
+    public OrderDTO confirmCart(Principal principal) throws CartException {
 
-        UserDTO user = (UserDTO) httpSession.getAttribute("user");
+        String userName = principal.getName();
 
-        if (user == null) {
-            throw new CartException("No se recibió el identificador de sesión");
-        }
+        User user = userRepository.findByUsername(userName);
 
-        Cart cart = null;
-
-        // Primero busco el cart en la sesion, sino, lo busco por la db
-        cart = (Cart) httpSession.getAttribute("cart");
-
-        if (cart == null) {
-            cart = cartRepository.findBySession_SessionId(user.getSessionId())
-                    .orElseThrow(() -> new CartException("No existe un carrito abierto para la sesión"));
-        }
+        Cart cart = cartRepository.findByUserName(userName);
 
         List<Cartitem> items = cartItemRepository.findByCartId(cart.getId());
 
@@ -307,10 +256,34 @@ public class CartService {
 
     // TODO: revisar
     @Transactional
-    public void closeCart(String sessionIdHeader) {
-        Cart cart = getOrCreateCartEntity();
+    public void closeCart(Principal principal) {
+        Cart cart = getOrCreateCartEntity(principal);
         cart.setLastUpdate(LocalDateTime.now());
         // Si tenés estado de cart, marcarlo CERRADO
         cartRepository.save(cart);
     }
+
+    /*
+    private UserDTO getAuthenticatedUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication == null || !authentication.isAuthenticated() ||
+            "anonymousUser".equals(authentication.getPrincipal())) {
+            return null;
+        }
+
+        String principalName = authentication.getName();
+        User user = userRepository.findByUsername(principalName);
+
+        if (user == null) {
+            user = userRepository.findByMail(principalName);
+        }
+
+        if (user == null) {
+            return null;
+        }
+
+        return new UserDTO(user);
+    }
+     */
 }

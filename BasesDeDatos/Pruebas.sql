@@ -65,6 +65,27 @@ select count(*) from Cart oi;
 
 select * from Cart c order by c.CartId desc;
 
+
+ALTER TABLE Cart
+DROP FOREIGN KEY fk_Cart_Session;
+
+ALTER TABLE Cart
+DROP COLUMN SessionId;
+
+
+ALTER TABLE Cart
+ADD COLUMN UserName VARCHAR(50) NOT NULL AFTER TableId;
+
+
+ALTER TABLE Cart
+ADD INDEX ix_Cart_UserName (UserName);
+
+
+select m.Name, c.*
+from CartItem c 
+join MenuItem m on (m.MenuItemId = c.MenuItemId)
+where c.CartId = 152;
+
 select * from CartState c;
 
 select * from `Order` o;

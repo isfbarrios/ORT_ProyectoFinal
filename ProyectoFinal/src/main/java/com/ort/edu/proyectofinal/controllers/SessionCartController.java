@@ -19,6 +19,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import com.ort.edu.proyectofinal.repositories.UserRepository;
 
+import java.security.Principal;
+
 @RestController
 @RequestMapping("/api/session_cart")
 public class SessionCartController {
@@ -33,18 +35,18 @@ public class SessionCartController {
     private HttpSession session;
 
     @GetMapping
-    public ResponseEntity<?> getCart() {
+    public ResponseEntity<?> getCart(Principal principal) {
 
-        SessionCartDTO cart = cartService.getOrCreateCart();
+        SessionCartDTO cart = cartService.getOrCreateCart(principal);
 
         return ResponseEntity.ok(cart);
     }
 
     @PostMapping("/items")
-    public ResponseEntity<?> addItem(@RequestBody AddCartItemRequestDTO body) {
+    public ResponseEntity<?> addItem(@RequestBody AddCartItemRequestDTO body, Principal principal) {
 
         try {
-            SessionCartDTO cart = cartService.addItemToCart(body.getMenuItemId(), body.getQuantity());
+            SessionCartDTO cart = cartService.addItemToCart(principal, body.getMenuItemId(), body.getQuantity());
 
             return ResponseEntity.ok(cart);
         }
@@ -60,7 +62,7 @@ public class SessionCartController {
     }
 
     @PostMapping("/confirm")
-    public ResponseEntity<?> confirm() throws OrderException {
+    public ResponseEntity<?> confirm(Principal principal) throws OrderException {
 
         System.out.println();
         System.out.println(getClass().getSimpleName()+".confirm.INI");
@@ -89,7 +91,7 @@ public class SessionCartController {
                  return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ResponseDTO("Usuario no logueado"));
             }
             
-            order = cartService.confirmCart();
+            order = cartService.confirmCart(principal);
         }
         catch (CartException ce) {
             System.out.println();

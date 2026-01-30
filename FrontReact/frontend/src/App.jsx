@@ -4,11 +4,6 @@ import CartModal from "./components/CartModal";
 import { useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { fetchCartAsync } from "./redux/features/cartSlice";
-import { sessionRenew } from "./services/auth";
-import {
-  getFromLocalStorage,
-  API_TOKEN,
-} from "./functions/localStorage";
 import KitchenLayout from "./components/layout/KitchenLayout";
 
 export default function App() {
@@ -22,10 +17,6 @@ export default function App() {
   const isKitchenRoute = location.pathname.startsWith("/kitchen");
 
   useEffect(() => {
-    if (getFromLocalStorage(API_TOKEN)) {
-      sessionRenew();
-    }
-
     // Solo cargamos carrito si NO estamos en rutas públicas
     if (!isPublicRoute && !isKitchenRoute) {
       dispatch(fetchCartAsync());

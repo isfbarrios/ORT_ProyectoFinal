@@ -3,11 +3,9 @@ import {
   API_URL,
   saveToLocalStorage,
   getFromLocalStorage,
-  clearLocalStorage,
   removeFromLocalStorage,
   API_TOKEN,
   SESSION_ID,
-  buildFetchHeader
 } from "../functions/localStorage"
 
 // guardo la session del usuario
@@ -24,13 +22,13 @@ export function saveAuth(data) {
   saveToLocalStorage(KEY, session);
 
   // si el back me  devolvió sessionId, lo guardo para el carrito
-  const token = data?.token;
-  if (token) {
-    console.log('saveAuth.sessionId: ' + token);
+  const accessToken = data?.accessToken;
+  if (accessToken) {
+    console.log('saveAuth.sessionId: ' + accessToken);
 
-    saveToLocalStorage(API_TOKEN, String(token));
-    saveToLocalStorage(SESSION_ID, String(data.user.sessionId));
-    //TODO: Si no tenemos el token, deberiamos cerrar sesion
+    saveToLocalStorage(API_TOKEN, String(accessToken));
+    //saveToLocalStorage(SESSION_ID, String(data.user.sessionId));
+    //TODO: Si no tenemos el accessToken, deberiamos cerrar sesion
   }
 }
 
@@ -71,32 +69,4 @@ export async function loginApi({ username, password, userType }) {
   catch {
     throw new Error("Respuesta inválida del servidor");
   }
-}
-
-export async function sessionRenew() {
-  const res = await fetch(API_URL + "/users/session_renew", {
-    method: "POST",
-    headers: buildFetchHeader(),
-    body: JSON.stringify({
-      sessionId: getFromLocalStorage(SESSION_ID)
-    }),
-    credentials: "include"
-  });
-
-  let data;
-
-  try {
-    data = await res.json();
-  }
-  catch {
-    throw new Error("Respuesta inválida del servidor");
-  }
-
-  if (!res.ok) {
-    clearLocalStorage();
-    //TODO: Ver si puedo redireccionar al login
-    throw new Error(data.message || "Credenciales inválidas");
-  }
-
-  return data;
 }
