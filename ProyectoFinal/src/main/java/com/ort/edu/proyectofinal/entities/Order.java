@@ -42,10 +42,9 @@ public class Order {
     @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private Orderstate state;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "CanalId", nullable = false)
-    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
-    private Ordercanal canal;
+    @Lob
+    @Column(name = "Rol")
+    private String rol;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "PaymentTypeId")

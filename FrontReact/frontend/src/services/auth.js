@@ -66,7 +66,8 @@ export async function loginApi({ username, password, userType }) {
     const data = await res.json();
     return data;
   }
-  catch {
+  catch (error) {
+    console.error("Error al parsear JSON:", error);
     throw new Error("Respuesta inválida del servidor");
   }
 }

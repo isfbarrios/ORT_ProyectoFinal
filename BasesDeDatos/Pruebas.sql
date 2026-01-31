@@ -55,7 +55,7 @@ UPDATE MenuItem
 SET BasePrice = 120.00
 WHERE MenuId = 1 AND Name = 'Refresco 500ml';
 
-
+select * from `Order` u;
 
 select * from Users u;
 
@@ -79,6 +79,21 @@ ADD COLUMN UserName VARCHAR(50) NOT NULL AFTER TableId;
 
 ALTER TABLE Cart
 ADD INDEX ix_Cart_UserName (UserName);
+
+
+ALTER TABLE `Order`
+DROP FOREIGN KEY `fk_Order_Canal`;
+
+ALTER TABLE `Order`
+DROP INDEX `fk_Order_Canal`;
+
+
+ALTER TABLE `Order`
+DROP COLUMN `CanalId`;
+
+ALTER TABLE `Order`
+ADD COLUMN `Rol` VARCHAR(30) NOT NULL AFTER `StateId`;
+
 
 
 select m.Name, c.*

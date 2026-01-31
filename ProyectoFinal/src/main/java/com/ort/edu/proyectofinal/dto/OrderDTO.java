@@ -1,9 +1,7 @@
 package com.ort.edu.proyectofinal.dto;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.ort.edu.proyectofinal.entities.Cart;
 import com.ort.edu.proyectofinal.entities.Order;
-import com.ort.edu.proyectofinal.entities.Ordercanal;
 import com.ort.edu.proyectofinal.entities.Orderstate;
 import lombok.Getter;
 import lombok.Setter;
@@ -20,7 +18,7 @@ public class OrderDTO {
     private Cart cart;
     private BigDecimal amount;
     private Orderstate state;
-    private Ordercanal canal;
+    private String rol;
     private String description;
 
     public OrderDTO() {}
@@ -31,7 +29,7 @@ public class OrderDTO {
         this.cart = order.getCart();
         this.amount = order.getAmount();
         this.state = order.getState();
-        this.canal = order.getCanal();
+        this.rol = order.getRol();
         this.description = order.getDescription();
     }
 
@@ -43,7 +41,7 @@ public class OrderDTO {
                 ", cart=" + cart +
                 ", amount=" + amount +
                 ", state=" + state +
-                ", canal=" + canal +
+                ", rol=" + rol +
                 ", description='" + description + '\'' +
                 '}';
     }

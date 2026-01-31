@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useNavigate, useSearchParams, Link } from "react-router-dom";
+import { useNavigate, /*useSearchParams,*/ Link } from "react-router-dom";
+import { USER_TYPE, getFromLocalStorage } from "../functions/localStorage";
+
 import {
   Button,
   Input,
@@ -20,7 +22,6 @@ import { setUser, setLoading } from "../redux/features/appSlice";
 export default function Login() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
 
   const isLoading = useSelector((state) => state.app.isLoading);
 
@@ -28,29 +29,30 @@ export default function Login() {
   const [password, setPassword] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
 
+
+
   const handleLogin = async (e) => {
     e.preventDefault();
     setErrorMsg("");
     dispatch(setLoading(true));
 
     try {
-      const userType = searchParams.get("userType") || "LOCAL";
+      let userType = getFromLocalStorage(USER_TYPE);
 
       const data = await loginApi({ username, password, userType });
 
       saveAuth(data);
       dispatch(setUser(data.user ?? data));
 
-      const resolvedType =
-        (data?.user?.type || data?.user?.userType || data?.type || "")
-          .toString()
-          .toUpperCase();
-      const nextPath = resolvedType === "COCINA" ? "/kitchen" : "/menu";
+      const nextPath = userType === "COCINA" ? "/kitchen" : "/menu";
+
       navigate(nextPath);
-    } catch (error) {
+    }
+    catch (error) {
       console.error("Error de login:", error);
       setErrorMsg(error.message || "Credenciales inválidas");
-    } finally {
+    }
+    finally {
       dispatch(setLoading(false));
     }
   };
@@ -68,7 +70,7 @@ export default function Login() {
       <form onSubmit={handleLogin}>
         <VStack spacing={4}>
           <FormControl>
-            <FormLabel>Correo</FormLabel>
+            <FormLabel>Usuario</FormLabel>
             <Input
               type="text"
               placeholder="jperez"

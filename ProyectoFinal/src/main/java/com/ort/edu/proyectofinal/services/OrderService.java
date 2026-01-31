@@ -1,14 +1,11 @@
 package com.ort.edu.proyectofinal.services;
 
-import com.ort.edu.proyectofinal.dto.OrderDTO;
 import com.ort.edu.proyectofinal.dto.OrderUpdateDTO;
 import com.ort.edu.proyectofinal.dto.UserDTO;
 import com.ort.edu.proyectofinal.entities.*;
-import com.ort.edu.proyectofinal.exception.CartException;
 import com.ort.edu.proyectofinal.exception.OrderException;
 import com.ort.edu.proyectofinal.repositories.OrderRepository;
 import com.ort.edu.proyectofinal.repositories.OrderStateRepository;
-import com.ort.edu.proyectofinal.repositories.OrderCanalRepository;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -25,9 +22,6 @@ public class OrderService {
 
     @Autowired
     private OrderStateRepository stateRepo;
-
-    @Autowired
-    private OrderCanalRepository canalRepo;
 
     @Autowired
     private HttpSession httpSession;
@@ -57,10 +51,8 @@ public class OrderService {
                 .orElseThrow(() -> new RuntimeException("Estado inicial de la orden no encontrado"));
         order.setState(initialState);
 
-        // Canal por defecto (por ejemplo, id = 1 "Salón")
-        Ordercanal defaultCanal = canalRepo.findById(1)
-                .orElseThrow(() -> new RuntimeException("Canal por defecto no encontrado"));
-        order.setCanal(defaultCanal);
+        //TODO: Traer rol
+        order.setRol("ROL");
 
         // Podés setear descripción si querés guardar algo del carrito/mesa
         order.setDescription(null);

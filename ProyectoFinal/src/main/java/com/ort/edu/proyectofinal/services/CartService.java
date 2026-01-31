@@ -54,9 +54,6 @@ public class CartService {
     private OrderStateRepository orderStateRepository;
 
     @Autowired
-    private OrderCanalRepository orderCanalRepository;
-
-    @Autowired
     private CartStateRepository cartStateRepository;
 
     @Autowired

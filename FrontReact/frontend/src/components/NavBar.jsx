@@ -1,5 +1,6 @@
 import { NavLink } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
+import { USER_TYPE, getFromLocalStorage } from "../functions/localStorage";
 import {
   Badge,
   Box,
@@ -50,11 +51,9 @@ export default function NavBar() {
   const dispatch = useDispatch();
   const itemsCount = useSelector((state) => state.cart.items.length);
   const totalAmount = useSelector((state) => state.cart.totalAmount);
-  const user = useSelector((state) => state.app.user);
-  const userType = (user?.userType || user?.type || user?.role || "").toString();
-  const normalizedType = userType.toUpperCase();
-  const isLocal = normalizedType === "LOCAL";
-  const isKitchen = normalizedType === "COCINA";
+  const userType = getFromLocalStorage(USER_TYPE);
+  const isLocal = userType === "LOCAL";
+  const isKitchen = userType === "COCINA";
 
   const handleOpenCart = () => {
     dispatch(fetchCartAsync());
@@ -78,15 +77,15 @@ export default function NavBar() {
           {isLocal && (
             <>
               <NavItem to="/menu">Menu</NavItem>
-              <NavAction onClick={() => {}}>Llamar mozo</NavAction>
+              <NavAction onClick={() => { }}>Llamar mozo</NavAction>
             </>
           )}
           {!isLocal && (
             <>
               {isKitchen && <NavItem to="/kitchen">Cocina</NavItem>}
-              <NavItem to="/menu">Menu</NavItem>
-              <NavItem to="/directions">Direcciones</NavItem>
-              <NavItem to="/reserva">Reservas</NavItem>
+              {!isKitchen && <NavItem to="/menu">Menu</NavItem>}
+              {!isKitchen && <NavItem to="/directions">Direcciones</NavItem>}
+              {!isKitchen && <NavItem to="/reserva">Reservas</NavItem>}
             </>
           )}
         </HStack>

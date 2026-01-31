@@ -10,14 +10,14 @@ public class AuthRequestDTO {
 
     private String nombreUsuario;
     private String contrasenia;
-    private CoreManager.UserType type;
+    private String userType;
 
     @Override
     public String toString() {
         return "AuthRequestDTO{" +
                 "nombreUsuario='" + nombreUsuario + '\'' +
                 ", contrasenia='" + contrasenia + '\'' +
-                ", type=" + type +
+                ", userType='" + userType + '\'' +
                 '}';
     }
 }

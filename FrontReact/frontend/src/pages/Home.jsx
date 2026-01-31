@@ -1,7 +1,20 @@
 import { Button, VStack, Heading, Text, Box } from "@chakra-ui/react";
-import { Link } from "react-router-dom";
+import { useSearchParams, Link } from "react-router-dom";
+import { USER_TYPE, saveToLocalStorage } from "../functions/localStorage";
 
 export default function Home() {
+
+  const [searchParams] = useSearchParams();
+
+  try {
+    const userType = searchParams.get("userType")?.toString().toUpperCase() || "LOCAL";
+
+    saveToLocalStorage(USER_TYPE, userType);
+  }
+  catch (error) {
+    console.error("Error rendering Home page:", error);
+  }
+
   return (
     <Box
       minH="100vh"
