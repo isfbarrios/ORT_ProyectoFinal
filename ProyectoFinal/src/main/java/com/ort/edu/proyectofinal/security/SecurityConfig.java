@@ -83,9 +83,13 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOriginPatterns(List.of("http://localhost:5173",
-                "http://10.0.2.2:8081", "http://192.168.0.100:8081",
-                "https://platofuerte.lat/")); // Permitir React
+        configuration.setAllowedOriginPatterns(List.of(
+                "http://localhost:5173",
+                "http://localhost:5176",
+                "http://10.0.2.2:8081",
+                "http://192.168.0.100:8081",
+                "https://platofuerte.lat/"
+        )); // Permitir React
 
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("Authorization", "Content-Type"));
