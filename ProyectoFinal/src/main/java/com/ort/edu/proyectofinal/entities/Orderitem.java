@@ -23,9 +23,9 @@ public class Orderitem {
     private Order order;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "ProductId", nullable = false)
+    @JoinColumn(name = "MenuItemId", nullable = false)
     @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
-    private Product product;
+    private Menuitem menuItem;
 
     @Column(name = "Quantity", nullable = false)
     private Integer quantity;

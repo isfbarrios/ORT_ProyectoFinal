@@ -10,7 +10,6 @@ import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -39,62 +38,28 @@ public class OrderService {
         }
 
         Order order = new Order();
-        order.setDate(LocalDateTime.now());
+        order.setOrderDate(LocalDateTime.now());
         order.setLastUpdate(LocalDateTime.now());
         order.setCart(cart);
-
-        // Número de orden simple (podés cambiar la estrategia)
-        order.setOrderNumber(generateOrderNumber());
 
         // Estado inicial (por ejemplo, id = 1 "Pendiente")
         Orderstate initialState = stateRepo.findById(1)
                 .orElseThrow(() -> new RuntimeException("Estado inicial de la orden no encontrado"));
         order.setState(initialState);
 
-        //TODO: Traer rol
-        order.setRol("ROL");
-
-        // Podés setear descripción si querés guardar algo del carrito/mesa
-        order.setDescription(null);
-
-        // Calcular total y crear Orderitems
-        BigDecimal total = BigDecimal.ZERO;
-
         for (Cartitem cartItem : items) {
-
-            if (cartItem.getItemAmount() != null) {
-                total = total.add(cartItem.getItemAmount());
-            }
-
-            /*
-             OrderId    INT UNSIGNED NOT NULL,
-              CartId     INT UNSIGNED NOT NULL,
-              ItemId     INT UNSIGNED NOT NULL,
-              Quantity   INT UNSIGNED NOT NULL,
-              ExtraData  JSON NULL,
-             */
             Orderitem item = new Orderitem();
-            OrderitemId itemId = new OrderitemId();
-            // El orderId lo setea Hibernate cuando se persista la orden
-            itemId.setItemId(cartItem.getId().getItemId());
-
-            item.setId(itemId);
-            item.setCartItem(cartItem);
+            item.setOrder(order);
+            item.setMenuItem(cartItem.getMenuItem());
             item.setQuantity(cartItem.getQuantity());
-            item.setExtraData(null);
+            item.setUnitPrice(cartItem.getItemAmount());
+            item.setNotes(null);
 
             order.addItem(item);
         }
 
-        order.setAmount(total);
-
         // Hibernate genera order.id y luego los order_item.order_id
         return orderRepo.save(order);
-    }
-
-    private String generateOrderNumber() {
-        // Ejemplo simple: ORD-<timestamp>
-        return "ORD-" + System.currentTimeMillis();
     }
 
     public Order updateOrderState(OrderUpdateDTO dto) {
@@ -111,4 +76,3 @@ public class OrderService {
         return orderRepo.save(order);
     }
 }
-

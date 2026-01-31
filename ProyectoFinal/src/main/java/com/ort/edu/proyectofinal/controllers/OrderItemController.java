@@ -1,13 +1,9 @@
 package com.ort.edu.proyectofinal.controllers;
 
-import com.ort.edu.proyectofinal.dto.CartItemDTO;
 import com.ort.edu.proyectofinal.dto.OrderItemDTO;
-import com.ort.edu.proyectofinal.dto.ResponseDTO;
 import com.ort.edu.proyectofinal.repositories.OrderItemRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -23,9 +19,9 @@ public class OrderItemController {
 
     @GetMapping("/order/{orderId}")
     public ResponseEntity<?> getAllByOrderId(
-            @PathVariable int cartId) {
+            @PathVariable int orderId) {
 
-        List<OrderItemDTO> items = repo.findByCartItem_Id_CartId(cartId)
+        List<OrderItemDTO> items = repo.findByOrder_Id(orderId)
                 .stream()
                 .map(OrderItemDTO::new)
                 .collect(Collectors.toList());

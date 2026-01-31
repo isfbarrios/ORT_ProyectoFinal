@@ -10,7 +10,7 @@ public class OrderItemDTO {
 
     private Integer id;
     private Order order;
-    private Product product;
+    private Menuitem menuItem;
     private Integer quantity;
     private java.math.BigDecimal unitPrice;
     private String notes;
@@ -20,7 +20,7 @@ public class OrderItemDTO {
     public OrderItemDTO(Orderitem item) {
         this.id = item.getId();
         this.order = item.getOrder();
-        this.product = item.getProduct();
+        this.menuItem = item.getMenuItem();
         this.quantity = item.getQuantity();
         this.unitPrice = item.getUnitPrice();
         this.notes = item.getNotes();
