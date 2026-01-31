@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useSelector } from "react-redux";
 import { Link as RouterLink } from "react-router-dom";
 import {
@@ -21,6 +21,7 @@ import {
   Badge,
   Link,
 } from "@chakra-ui/react";
+import { getUserDirections } from "../services/userDirectionService";
 
 export default function Checkout() {
   const { items, totalAmount } = useSelector((state) => state.cart);
@@ -30,9 +31,70 @@ export default function Checkout() {
   const [paymentMethod, setPaymentMethod] = useState("");
   const [phone, setPhone] = useState("");
   const [comments, setComments] = useState("");
+  // Dirección preseleccionada si ya existe en el store.
   const [selectedDirection, setSelectedDirection] = useState(
     direction?.id ? String(direction.id) : ""
   );
+  // Lista de direcciones del API y estados de carga/errores.
+  const [directions, setDirections] = useState([]);
+  const [directionsLoading, setDirectionsLoading] = useState(false);
+  const [directionsError, setDirectionsError] = useState("");
+
+  useEffect(() => {
+    let isMounted = true;
+    const loadDirections = async () => {
+      // Carga inicial de direcciones del usuario.
+      setDirectionsLoading(true);
+      setDirectionsError("");
+      try {
+        // Pido al backend las direcciones del usuario.
+        const data = await getUserDirections();
+        console.log("getUserDirections raw:", data);
+        // respuesta a array.
+        const list = Array.isArray(data?.directions) ? data.directions : [];
+        console.log("getUserDirections list:", list);
+        if (isMounted) {
+          // Guarda la lista para renderizar en el select.
+          setDirections(list);
+        }
+      }
+      catch (error) {
+        console.error("getUserDirections error:", error);
+
+        if (isMounted) {
+          // Muestra error si falla la carga.
+          setDirectionsError("No se pudieron cargar las direcciones.");
+        }
+      }
+      finally {
+        if (isMounted) {
+          // Apaga el loading cuando termina la llamada.
+          setDirectionsLoading(false);
+        }
+      }
+    };
+
+    loadDirections();
+
+    return () => {
+      // Evita setState si el usuario sale de la pantalla.
+      isMounted = false;
+    };
+  }, []);
+
+  const directionOptions = useMemo(() => {
+    // Evita duplicados entre API y store (mismo id).
+    const map = new Map();
+    directions.forEach((item) => {
+      if (item?.id != null) {
+        map.set(String(item.id), item);
+      }
+    });
+    if (direction?.id != null && !map.has(String(direction.id))) {
+      map.set(String(direction.id), direction);
+    }
+    return Array.from(map.values());
+  }, [directions, direction]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -41,7 +103,8 @@ export default function Checkout() {
       paymentMethod,
       phone,
       comments,
-      directionId: selectedDirection || null,
+      // En retiro no se envía dirección.
+      directionId: deliveryMode === "PICKUP" ? null : selectedDirection || null,
     };
     console.log("checkout payload", payload);
   };
@@ -80,12 +143,26 @@ export default function Checkout() {
                   onChange={(e) => setSelectedDirection(e.target.value)}
                   isDisabled={deliveryMode === "PICKUP"}
                 >
-                  {direction && (
-                    <option value={direction.id ?? "default"}>
-                      {direction.streetName} {direction.doorNumber}
+                  {/* Carga las opciones desde el listado de direcciones ya normalizado */}
+                  {directionOptions.map((item) => (
+                    <option key={item.id} value={String(item.id)}>
+                      {/* Texto visible del select */}
+                      {item.streetName} {item.doorNumber}
                     </option>
-                  )}
+                  ))}
                 </Select>
+                {/* Indicador de carga mientras llega el fetch */}
+                {directionsLoading && (
+                  <Text fontSize="sm" color="gray.500" mt={2}>
+                    Cargando direcciones...
+                  </Text>
+                )}
+                {/* Error si no se pudo traer la lista */}
+                {!directionsLoading && directionsError && (
+                  <Text fontSize="sm" color="red.500" mt={2}>
+                    {directionsError}
+                  </Text>
+                )}
                 <Text fontSize="sm" color="gray.500" mt={2}>
                   ¿Necesitás otra?{" "}
                   <Link as={RouterLink} to="/add_direction" color="orange.500">

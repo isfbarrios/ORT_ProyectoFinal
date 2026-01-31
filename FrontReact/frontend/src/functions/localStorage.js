@@ -1,5 +1,6 @@
 export const KEY = "auth";
 export const API_TOKEN = "API_TOKEN";
+export const API_REFRESH_TOKEN = "API_REFRESH_TOKEN";
 export const SESSION_ID = "SESSION_ID";
 export const API_URL = "http://localhost:8080/api";
 export const USER_TYPE = "USER_TYPE";

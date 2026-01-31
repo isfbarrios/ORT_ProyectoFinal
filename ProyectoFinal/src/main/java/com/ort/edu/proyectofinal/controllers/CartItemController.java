@@ -13,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -30,8 +31,7 @@ public class CartItemController {
             description = "Obtener item del carrito (menu_item) por su id"
     )
     @GetMapping("/{cartId}/{menuItemId}")
-    public ResponseEntity<?> get(@PathVariable int cartId,
-        @PathVariable int menuItemId) {
+    public ResponseEntity<?> get(@PathVariable int cartId, @PathVariable int menuItemId) {
 
         CartitemId cartitemId = new CartitemId();
         cartitemId.setCartId(cartId);

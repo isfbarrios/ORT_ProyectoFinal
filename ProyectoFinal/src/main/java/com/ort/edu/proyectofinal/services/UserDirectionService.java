@@ -11,6 +11,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import jakarta.servlet.http.HttpSession;
+
+import java.security.Principal;
 import java.time.LocalDateTime;
 @Service
 public class UserDirectionService {
@@ -23,16 +25,11 @@ public class UserDirectionService {
     @Autowired
     private HttpSession session;
 
-    private final CoreManager manager = CoreManager.getInstance();
+    public void saveOrUpdate(UserDirectionRequestDTO dto, Principal principal) {
 
-    public void saveOrUpdate(UserDirectionRequestDTO dto) {
+        String userName = principal.getName();
 
-        UserDTO userDTO = (UserDTO) session.getAttribute("user");
-        if (userDTO == null) {
-            throw new RuntimeException("Usuario no logueado");
-        }
-
-        User user = userRepository.findByUsername(userDTO.getUsername());
+        User user = userRepository.findByUsername(userName);
 
         if (user == null) {
             throw new RuntimeException("Usuario no encontrado");

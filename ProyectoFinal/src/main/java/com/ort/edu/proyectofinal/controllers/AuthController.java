@@ -68,11 +68,12 @@ public class AuthController {
             if (jwtService.validateToken(refreshToken, userDetails)) {
                 String newAccessToken = jwtService.generateToken(userDetails);
                 return ResponseEntity.ok(Map.of("accessToken", newAccessToken));
-            } else {
+            }
+            else {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Refresh token inválido o expirado");
             }
-
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Token inválido: " + e.getMessage());
         }
     }

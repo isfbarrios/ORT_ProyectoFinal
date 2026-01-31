@@ -3,8 +3,8 @@ import {
   API_URL,
   saveToLocalStorage,
   getFromLocalStorage,
-  removeFromLocalStorage,
   API_TOKEN,
+  API_REFRESH_TOKEN,
   SESSION_ID,
 } from "../functions/localStorage"
 
@@ -23,12 +23,14 @@ export function saveAuth(data) {
 
   // si el back me  devolvió sessionId, lo guardo para el carrito
   const accessToken = data?.accessToken;
-  if (accessToken) {
-    console.log('saveAuth.sessionId: ' + accessToken);
+  const refreshToken = data?.refreshToken;
 
+  if (refreshToken) {
+    saveToLocalStorage(API_REFRESH_TOKEN, String(refreshToken));
+  }
+
+  if (accessToken) {
     saveToLocalStorage(API_TOKEN, String(accessToken));
-    //saveToLocalStorage(SESSION_ID, String(data.user.sessionId));
-    //TODO: Si no tenemos el accessToken, deberiamos cerrar sesion
   }
 }
 
@@ -39,9 +41,7 @@ export function getAuth() {
 
 //borro la sesion guardada en storage
 export function clearAuth() {
-  removeFromLocalStorage(KEY);
-  removeFromLocalStorage(API_TOKEN);
-  removeFromLocalStorage(SESSION_ID);
+  localStorage.clear();
 }
 
 // MOCK login (luego lo vamos a remplazar por fetch al backend)
@@ -70,4 +70,41 @@ export async function loginApi({ username, password, userType }) {
     console.error("Error al parsear JSON:", error);
     throw new Error("Respuesta inválida del servidor");
   }
+}
+
+export async function refreshToken() {
+  let accessToken = getFromLocalStorage(API_TOKEN);
+  let refreshToken = getFromLocalStorage(API_REFRESH_TOKEN);
+
+  if (!accessToken || !refreshToken) {
+    throw new Error("No hay tokens disponibles para refrescar la sesión");
+  }
+
+  const res = await fetch(API_URL + "/auth/refresh", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      accessToken: accessToken,
+      refreshToken: refreshToken
+    }),
+    credentials: "include"
+  });
+
+  if (!res.ok) {
+    const errorText = await res.text();
+    throw new Error(errorText || "Error refrescando la sesión");
+  }
+
+  try {
+    const data = await res.json();
+    return data;
+  }
+  catch (error) {
+    console.error("Error al parsear JSON:", error);
+    throw new Error("Respuesta inválida del servidor");
+  }
+}
+
+export async function closeSession() {
+  clearAuth
 }

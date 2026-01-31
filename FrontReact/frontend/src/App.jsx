@@ -5,6 +5,7 @@ import { useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { fetchCartAsync } from "./redux/features/cartSlice";
 import KitchenLayout from "./components/layout/KitchenLayout";
+import { refreshToken, clearAuth } from "./services/auth";
 
 export default function App() {
   const dispatch = useDispatch();
@@ -17,6 +18,18 @@ export default function App() {
   const isKitchenRoute = location.pathname.startsWith("/kitchen");
 
   useEffect(() => {
+    const refreshSession = async () => {
+      try {
+        await refreshToken();
+      }
+      catch (error) {
+        console.error("Error refrescando sesión:", error);
+        clearAuth();
+      }
+    };
+
+    refreshSession();
+
     // Solo cargamos carrito si NO estamos en rutas públicas
     if (!isPublicRoute && !isKitchenRoute) {
       dispatch(fetchCartAsync());

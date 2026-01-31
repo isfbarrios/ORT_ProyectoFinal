@@ -27,25 +27,6 @@ public class UserController {
     @Autowired
     private UserstateRepository userstateRepository;
 
-    @GetMapping("/me")
-    public ResponseEntity<UserDTO> getCurrentUser(Authentication authentication) {
-        if (authentication == null) {
-            return ResponseEntity.status(401).build();
-        }
-        String username = authentication.getName();
-        User user = repo.findByUsername(username);
-        
-        if (user == null) {
-             user = repo.findByMail(username);
-        }
-        
-        if (user != null) {
-             return ResponseEntity.ok(new UserDTO(user));
-        }
-
-        return ResponseEntity.notFound().build();
-    }
-
     @GetMapping("/{id}")
     public ResponseEntity<?> getUser(@PathVariable int id) {
 
@@ -96,9 +77,6 @@ public class UserController {
             }
             user.setUserstate(defaultState);
         }
-
-        // Nota: Con OAuth2, la contraseña ya no es administrada localmente para usuarios OAuth.
-        // Si mantenemos registro local, podemos dejar el campo password vacío o eliminarlo de la entidad si es 100% OAuth.
         
         User saved = repo.save(user);
         UserDTO dto = new UserDTO(saved);

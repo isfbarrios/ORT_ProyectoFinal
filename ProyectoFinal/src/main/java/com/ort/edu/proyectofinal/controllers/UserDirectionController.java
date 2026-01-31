@@ -1,15 +1,17 @@
 package com.ort.edu.proyectofinal.controllers;
 
 import com.ort.edu.proyectofinal.dto.*;
+import com.ort.edu.proyectofinal.entities.User;
 import com.ort.edu.proyectofinal.repositories.UserDirectionRepository;
+import com.ort.edu.proyectofinal.repositories.UserRepository;
 import com.ort.edu.proyectofinal.services.UserDirectionService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.security.access.prepost.PreAuthorize;
 
+import java.security.Principal;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -24,12 +26,20 @@ public class UserDirectionController {
     private UserDirectionRepository repo;
 
     @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
     private HttpSession session;
 
     @GetMapping
-    public ResponseEntity<?> getAll() {
+    public ResponseEntity<?> getAll(Principal principal) {
 
-        UserDTO user = (UserDTO) session.getAttribute("user");
+        String userName = principal.getName();
+
+        System.out.println("UserDirectionController.saveDirection.get all");
+        System.out.println("userName: " + userName);
+
+        User user = userRepository.findByUsername(userName);
 
         if (user == null) return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
 
@@ -40,14 +50,17 @@ public class UserDirectionController {
 
         UserDirectionsDTO directions = new UserDirectionsDTO(user.getUsername(), items);
 
+        System.out.println("UserDirectionController.saveDirection.get all");
+        System.out.println(directions.toString());
+
         return ResponseEntity.ok(directions);
     }
 
     @PostMapping("/new_direction")
     public ResponseEntity<?> saveDirection(
-            @RequestBody UserDirectionRequestDTO body) {
+            @RequestBody UserDirectionRequestDTO body, Principal principal) {
 
-        service.saveOrUpdate(body);
+        service.saveOrUpdate(body, principal);
 
         return ResponseEntity.ok(
                 new ResponseDTO("Dirección guardada correctamente")

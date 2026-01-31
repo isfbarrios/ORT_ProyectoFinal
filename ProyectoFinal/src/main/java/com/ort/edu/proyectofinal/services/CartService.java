@@ -71,8 +71,6 @@ public class CartService {
     @Autowired
     private UserRepository userRepository;
 
-    private final CoreManager manager = CoreManager.getInstance();
-
     private Cart createNewCart(Principal principal) {
 
         String userName = principal.getName();

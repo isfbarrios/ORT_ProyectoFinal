@@ -1,19 +1,16 @@
 import {
-  buildFetchHeader
-} from "../functions/localStorage"
-
-
-/*
-  Crear o actualizar la dirección del usuario logueado
-*/
+  API_URL,
+  buildFetchHeader,
+} from "../functions/localStorage";
 
 export async function saveUserDirection(direction) {
   try {
-    const response = await fetch("/api/user/direction", {
+    console.log("saveUserDirection direction:", direction);
+    const response = await fetch(API_URL + "/user_direction/new_direction", {
       method: "POST",
       headers: buildFetchHeader(),
       body: JSON.stringify(direction),
-      credentials:"include"
+      credentials: "include"
     });
 
     if (!response.ok) {
@@ -22,7 +19,29 @@ export async function saveUserDirection(direction) {
     }
 
     return await response.json();
-  } catch (error) {
+  }
+  catch (error) {
+    console.error("saveUserDirection error:", error);
+    throw error;
+  }
+}
+
+export async function getUserDirections() {
+  try {
+    const response = await fetch(API_URL + "/user_direction", {
+      method: "GET",
+      headers: buildFetchHeader(),
+      credentials: "include"
+    });
+
+    if (!response.ok) {
+      const error = await response.text();
+      throw new Error(error || "Error al obtener las direcciones del usuario");
+    }
+
+    return await response.json();
+  }
+  catch (error) {
     console.error("saveUserDirection error:", error);
     throw error;
   }
