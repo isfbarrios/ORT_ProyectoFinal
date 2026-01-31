@@ -6,10 +6,12 @@ import com.ort.edu.proyectofinal.entities.*;
 import com.ort.edu.proyectofinal.exception.OrderException;
 import com.ort.edu.proyectofinal.repositories.OrderRepository;
 import com.ort.edu.proyectofinal.repositories.OrderStateRepository;
+import com.ort.edu.proyectofinal.repositories.UserRepository;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.security.Principal;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -23,11 +25,13 @@ public class OrderService {
     private OrderStateRepository stateRepo;
 
     @Autowired
-    private HttpSession httpSession;
+    private UserRepository userRepository;
 
-    public Order createOrder(Cart cart, List<Cartitem> items) throws OrderException {
+    public Order createOrder(Cart cart, List<Cartitem> items, Principal principal) throws OrderException {
 
-        UserDTO user = (UserDTO) httpSession.getAttribute("user");
+        String userName = principal.getName();
+
+        User user = userRepository.findByUsername(userName);
 
         if (user == null) {
             throw new OrderException("No se recibió el identificador de sesión");

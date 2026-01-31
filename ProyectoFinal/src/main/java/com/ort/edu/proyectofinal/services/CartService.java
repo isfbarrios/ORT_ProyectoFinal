@@ -237,7 +237,7 @@ public class CartService {
         // Crear orden
         Order order = null;
         try {
-            order = orderService.createOrder(cart, items);
+            order = orderService.createOrder(cart, items, principal);
             return new OrderDTO(order);
         }
         catch (OrderException e) {

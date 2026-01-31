@@ -36,9 +36,6 @@ public class UserDirectionController {
 
         String userName = principal.getName();
 
-        System.out.println("UserDirectionController.saveDirection.get all");
-        System.out.println("userName: " + userName);
-
         User user = userRepository.findByUsername(userName);
 
         if (user == null) return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
