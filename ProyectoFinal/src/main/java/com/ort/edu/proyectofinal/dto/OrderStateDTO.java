@@ -1,6 +1,5 @@
 package com.ort.edu.proyectofinal.dto;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.ort.edu.proyectofinal.entities.Orderstate;
 import lombok.Getter;
@@ -16,15 +15,12 @@ public class OrderStateDTO {
     private Integer id;
     @JsonProperty("title")
     private String name;
-    @JsonIgnore
-    private String description;
 
     public OrderStateDTO() {}
 
     public OrderStateDTO(Orderstate orderState) {
         this.id = orderState.getId();
         this.name = orderState.getName();
-        this.description = orderState.getDescription();
     }
 
     @Override
@@ -32,7 +28,6 @@ public class OrderStateDTO {
         return "OrderStateDTO{" +
                 "id=" + id +
                 ", name='" + name + '\'' +
-                ", description='" + description + '\'' +
                 '}';
     }
 

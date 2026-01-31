@@ -5,16 +5,18 @@ import jakarta.persistence.Embeddable;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.Hibernate;
+
 import java.io.Serializable;
 import java.util.Objects;
 
 @Getter
 @Setter
 @Embeddable
-public class OrderitemId implements Serializable {
-    private static final long serialVersionUID = -3242071240156899588L;
-    @Column(name = "OrderId", nullable = false)
-    private Integer orderId;
+public class BillitemId implements Serializable {
+    private static final long serialVersionUID = 6698315400934195772L;
+
+    @Column(name = "BillId", nullable = false)
+    private Integer billId;
 
     @Column(name = "ItemId", nullable = false)
     private Integer itemId;
@@ -23,14 +25,13 @@ public class OrderitemId implements Serializable {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
-        OrderitemId entity = (OrderitemId) o;
+        BillitemId entity = (BillitemId) o;
         return Objects.equals(this.itemId, entity.itemId) &&
-                Objects.equals(this.orderId, entity.orderId);
+                Objects.equals(this.billId, entity.billId);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(itemId, orderId);
+        return Objects.hash(itemId, billId);
     }
-
 }

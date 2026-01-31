@@ -7,7 +7,6 @@ import lombok.Setter;
 import org.hibernate.annotations.ColumnDefault;
 
 import java.math.BigDecimal;
-import java.time.Instant;
 import java.time.LocalDateTime;
 
 @Setter
@@ -26,7 +25,7 @@ public class Cart {
     @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private Tables table;
 
-    @JoinColumn(name = "UserName", nullable = false)
+    @Column(name = "UserName", nullable = false, length = 50)
     private String userName;
 
     @ColumnDefault("0.00")

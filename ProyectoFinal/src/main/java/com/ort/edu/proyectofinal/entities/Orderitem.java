@@ -4,8 +4,6 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
 import jakarta.persistence.Table;
 
 @Getter
@@ -14,28 +12,28 @@ import jakarta.persistence.Table;
 @Table(name = "OrderItem", schema = "proyectofinal")
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Orderitem {
-    @EmbeddedId
-    private OrderitemId id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "OrderItemId", nullable = false)
+    private Integer id;
 
-    @MapsId("orderId")
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "OrderId", nullable = false)
     @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private Order order;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumns({
-            @JoinColumn(name = "CartId", referencedColumnName = "CartId", insertable = false, updatable = false),
-            @JoinColumn(name = "ItemId", referencedColumnName = "ItemId", insertable = false, updatable = false)
-    })
+    @JoinColumn(name = "ProductId", nullable = false)
     @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
-    private Cartitem cartItem;
+    private Product product;
 
     @Column(name = "Quantity", nullable = false)
     private Integer quantity;
 
+    @Column(name = "UnitPrice", nullable = false, precision = 12, scale = 2)
+    private java.math.BigDecimal unitPrice;
+
     @Lob
-    @Column(name = "ExtraData")
-    private String extraData;
+    @Column(name = "Notes")
+    private String notes;
 }

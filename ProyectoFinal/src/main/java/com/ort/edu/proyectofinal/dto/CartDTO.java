@@ -16,20 +16,24 @@ public class CartDTO {
 
     private Integer id;
     private Tables table;
+    private String userName;
     private BigDecimal amount;
     private LocalDateTime date;
     private Cartstate cartState;
     private Integer delayTime;
+    private LocalDateTime lastUpdate;
 
     public CartDTO() {}
 
     public CartDTO(Cart cart) {
         this.id = cart.getId();
         this.table = cart.getTable();
+        this.userName = cart.getUserName();
         this.amount = cart.getAmount();
         this.date = cart.getDate();
         this.cartState = cart.getCartState();
         this.delayTime = cart.getDelayTime();
+        this.lastUpdate = cart.getLastUpdate();
     }
 
     @Override
@@ -49,10 +53,12 @@ public class CartDTO {
         return "CartDTO{" +
                 "id=" + id +
                 ", table=" + table +
+                ", userName='" + userName + '\'' +
                 ", amount=" + amount +
                 ", date=" + date +
                 ", cartState=" + cartState +
                 ", delayTime=" + delayTime +
+                ", lastUpdate=" + lastUpdate +
                 '}';
     }
 }
