@@ -36,10 +36,16 @@ export default function CartModal() {
   const userType = getFromLocalStorage(USER_TYPE);
 
   const isLocal = userType === "LOCAL";
+  const hasItems = items.length > 0;
+  const hasUnprocessedItems = items.some(
+    (item) => Number(item.processed) === 0
+  );
+  const canCloseCart = !hasUnprocessedItems && !loading;
 
   if (!isCartModalOpen) return null;
 
   const handleConfirm = async () => {
+    
     if (isLocal) {
       console.log("Confirmando carrito para usuario LOCAL");
       const order = await dispatch(confirmCartAsync());
@@ -133,14 +139,14 @@ export default function CartModal() {
             variant="outline"
             colorScheme="red"
             onClick={handleClose}
-            isDisabled={items.length === 0 || loading}
+            isDisabled={!canCloseCart}
           >
             Cerrar carrito
           </Button>
           <Button
             colorScheme="orange"
             onClick={handleConfirm}
-            isDisabled={items.length === 0 || loading}
+            isDisabled={!hasUnprocessedItems || loading}
           >
             Confirmar pedido
           </Button>
