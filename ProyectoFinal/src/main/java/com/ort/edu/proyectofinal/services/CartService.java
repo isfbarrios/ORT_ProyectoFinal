@@ -33,9 +33,6 @@ import java.util.stream.Collectors;
 public class CartService {
 
     @Autowired
-    private SessionService sessionService;
-
-    @Autowired
     private CartRepository cartRepository;
 
     @Autowired
@@ -45,25 +42,10 @@ public class CartService {
     private MenuItemRepository menuItemRepository;
 
     @Autowired
-    private OrderRepository orderRepository;
-
-    @Autowired
-    private OrderItemRepository orderItemRepository;
-
-    @Autowired
-    private OrderStateRepository orderStateRepository;
-
-    @Autowired
     private CartStateRepository cartStateRepository;
 
     @Autowired
-    private SessionRepository sessionRepository;
-
-    @Autowired
     private TablesRepository tablesRepository;
-
-    @Autowired
-    private HttpSession httpSession;
 
     @Autowired
     private OrderService orderService;
@@ -99,23 +81,20 @@ public class CartService {
 
         cart = cartRepository.save(cart);
         
-        // Guardar tambien en sesion
-        httpSession.setAttribute("cart", cart);
-        
         return cart;
     }
 
     private Cart getOrCreateCartEntity(Principal principal) {
 
-        String userName = principal.getName();
-
-        User user = userRepository.findByUsername(userName);
-
-        Cart cart = cartRepository.findByUserName(userName);
+        Cart cart = getActiveUserCart(principal.getName());
 
         if (cart == null) cart = createNewCart(principal);
 
         return cart;
+    }
+
+    private Cart getActiveUserCart(String userName) {
+        return cartRepository.findTopByUserNameAndCartState_IdOrderByDateDesc(userName, 1);
     }
 
     private SessionCartDTO buildSessionCartDTO(Cart cart) {
@@ -132,7 +111,7 @@ public class CartService {
                 .multiply(BigDecimal.valueOf(ci.getQuantity())))
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-        return new SessionCartDTO(dtoItems, total);
+        return new SessionCartDTO(cart.getId(), dtoItems, total);
     }
 
     @Transactional
@@ -150,14 +129,12 @@ public class CartService {
 
         String userName = principal.getName();
 
-        User user = userRepository.findByUsername(userName);
-
-        Cart cart = cartRepository.findByUserName(userName);
+        Cart cart = cartRepository.findTopByUserNameAndCartState_IdOrderByDateDesc(userName, 1);
 
         Menuitem menuitem = menuItemRepository.findById(menuItemId)
                 .orElseThrow(() -> new IllegalArgumentException("Menuitem no encontrado"));
 
-        List<Cartitem> items = cartItemRepository.findByCartId(cart.getId());
+        List<Cartitem> items = cartItemRepository.findByCartIdAndProcessed(cart.getId(), 0);
 
         Cartitem existing = items.stream()
                 .filter(ci -> ci.getMenuItem().getId().equals(menuItemId))
@@ -176,7 +153,7 @@ public class CartService {
             newItem.setCart(cart);
             newItem.setMenuItem(menuitem);
             newItem.setQuantity(quantity);
-
+            newItem.setProcessed(0);
             newItem.setItemAmount(new BigDecimal("250"));
             newItem.setDelayTime(45);
 
@@ -192,10 +169,6 @@ public class CartService {
         cart.setLastUpdate(LocalDateTime.now());
         cartRepository.save(cart);
 
-        //Actualizo el carrito en la sesion
-        httpSession.removeAttribute("cart");
-        httpSession.setAttribute("cart", cart);
-
         return buildSessionCartDTO(cart);
     }
 
@@ -204,11 +177,7 @@ public class CartService {
     // ============================
     public OrderDTO confirmCart(Principal principal) throws CartException {
 
-        String userName = principal.getName();
-
-        User user = userRepository.findByUsername(userName);
-
-        Cart cart = cartRepository.findByUserName(userName);
+        Cart cart = cartRepository.findTopByUserNameAndCartState_IdOrderByDateDesc(principal.getName(), 1);
 
         List<Cartitem> items = cartItemRepository.findByCartId(cart.getId());
 
@@ -224,20 +193,18 @@ public class CartService {
         cart.setAmount(total);
         cart.setLastUpdate(LocalDateTime.now());
 
-        // Obtener estado "Confirmado"
         Cartstate confirmedState = cartStateRepository.findByName("Cerrado");
 
-        if (confirmedState == null) {
-            throw new RuntimeException("El estado de carrito 'Confirmado' no está configurado en la base");
-        }
-
         cart.setCartState(confirmedState);
+
         cartRepository.saveAndFlush(cart);
 
         // Crear orden
         Order order = null;
+
         try {
-            order = orderService.createOrder(cart, items, principal);
+            order = orderService.createOrder(cart, items);
+
             return new OrderDTO(order);
         }
         catch (OrderException e) {
@@ -257,28 +224,4 @@ public class CartService {
         // Si tenés estado de cart, marcarlo CERRADO
         cartRepository.save(cart);
     }
-
-    /*
-    private UserDTO getAuthenticatedUser() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
-        if (authentication == null || !authentication.isAuthenticated() ||
-            "anonymousUser".equals(authentication.getPrincipal())) {
-            return null;
-        }
-
-        String principalName = authentication.getName();
-        User user = userRepository.findByUsername(principalName);
-
-        if (user == null) {
-            user = userRepository.findByMail(principalName);
-        }
-
-        if (user == null) {
-            return null;
-        }
-
-        return new UserDTO(user);
-    }
-     */
 }

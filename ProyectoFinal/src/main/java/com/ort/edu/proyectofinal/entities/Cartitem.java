@@ -32,6 +32,8 @@ public class Cartitem {
     @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private Menuitem menuItem;
 
+
+
     @Column(name = "Quantity", nullable = false)
     private Integer quantity;
 
@@ -41,4 +43,8 @@ public class Cartitem {
     @ColumnDefault("0")
     @Column(name = "DelayTime", nullable = false)
     private Integer delayTime;
+
+    @ColumnDefault("0")
+    @Column(name = "Processed", nullable = false)
+    private Integer processed;
 }

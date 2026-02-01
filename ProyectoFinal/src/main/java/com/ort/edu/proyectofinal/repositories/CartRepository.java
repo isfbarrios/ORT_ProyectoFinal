@@ -14,5 +14,6 @@ public interface CartRepository extends JpaRepository<Cart, Integer> {
 
     // Consultas automáticas via Spring Data:
     Cart findByDate(Date date);
-    Cart findByUserName(String userName);
+    //Cart findByUserName(String userName);
+    Cart findTopByUserNameAndCartState_IdOrderByDateDesc(String userName, Integer cartStateId);
 }

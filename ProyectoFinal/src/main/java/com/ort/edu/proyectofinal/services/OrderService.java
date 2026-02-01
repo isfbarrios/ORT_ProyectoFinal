@@ -4,6 +4,7 @@ import com.ort.edu.proyectofinal.dto.OrderUpdateDTO;
 import com.ort.edu.proyectofinal.dto.UserDTO;
 import com.ort.edu.proyectofinal.entities.*;
 import com.ort.edu.proyectofinal.exception.OrderException;
+import com.ort.edu.proyectofinal.repositories.CartItemRepository;
 import com.ort.edu.proyectofinal.repositories.OrderRepository;
 import com.ort.edu.proyectofinal.repositories.OrderStateRepository;
 import com.ort.edu.proyectofinal.repositories.UserRepository;
@@ -26,16 +27,10 @@ public class OrderService {
 
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private CartItemRepository cartItemRepository;
 
-    public Order createOrder(Cart cart, List<Cartitem> items, Principal principal) throws OrderException {
-
-        String userName = principal.getName();
-
-        User user = userRepository.findByUsername(userName);
-
-        if (user == null) {
-            throw new OrderException("No se recibió el identificador de sesión");
-        }
+    public Order createOrder(Cart cart, List<Cartitem> items) throws OrderException {
 
         if (items == null || items.isEmpty()) {
             throw new OrderException("La orden debe contener al menos un ítem");
@@ -60,10 +55,18 @@ public class OrderService {
             item.setNotes(null);
 
             order.addItem(item);
+
+            cartItem.setProcessed(1);
+
+            cartItemRepository.saveAndFlush(cartItem);
         }
 
+        System.out.println();
+        System.out.println("confirmCart.order: " + order.toString());
+        System.out.println();
+
         // Hibernate genera order.id y luego los order_item.order_id
-        return orderRepo.save(order);
+        return orderRepo.saveAndFlush(order);
     }
 
     public Order updateOrderState(OrderUpdateDTO dto) {

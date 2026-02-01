@@ -5,6 +5,8 @@ import com.ort.edu.proyectofinal.dto.ResponseDTO;
 import com.ort.edu.proyectofinal.dto.SessionCartDTO;
 import com.ort.edu.proyectofinal.dto.OrderDTO;
 import com.ort.edu.proyectofinal.dto.UserDTO;
+import com.ort.edu.proyectofinal.entities.Cart;
+import com.ort.edu.proyectofinal.entities.User;
 import com.ort.edu.proyectofinal.exception.CartException;
 import com.ort.edu.proyectofinal.exception.OrderException;
 import com.ort.edu.proyectofinal.services.CartService;
@@ -64,47 +66,17 @@ public class SessionCartController {
     @PostMapping("/confirm")
     public ResponseEntity<?> confirm(Principal principal) throws OrderException {
 
-        System.out.println();
-        System.out.println(getClass().getSimpleName()+".confirm.INI");
-        System.out.println();
-        System.out.println("session.id: " + session.getId());
-        System.out.println("session.user: " + session.getAttribute("user"));
-        System.out.println();
-        System.out.println(getClass().getSimpleName()+".confirm.END");
-        System.out.println();
-
         OrderDTO order = null;
 
         try {
-            UserDTO user = (UserDTO) session.getAttribute("user");
-
-            if (user == null) {
-                // Try to recover from SecurityContext if session is empty (should rely on success handler ideally)
-                Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-                if (auth != null && auth.isAuthenticated()) {
-                     // logic to re-populate session if needed, or CartService should handle it
-                     // For now, assuming session has user or CartService can handle logic
-                }
-            }
-            
-            if (user == null && SecurityContextHolder.getContext().getAuthentication() == null) {
-                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ResponseDTO("Usuario no logueado"));
-            }
-            
             order = cartService.confirmCart(principal);
         }
         catch (CartException ce) {
-            System.out.println();
             System.out.println(getClass().getSimpleName()+".confirm.exception:"+ce.getMessage());
-            System.out.println();
             throw new OrderException("No pudimos confirmar tu orden");
         }
         catch (Exception e) {
             throw new RuntimeException(e);
-        }
-
-        if (order == null) {
-            return ResponseEntity.notFound().build();
         }
 
         return ResponseEntity.ok(order);

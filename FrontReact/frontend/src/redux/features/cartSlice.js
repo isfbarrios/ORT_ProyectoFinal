@@ -114,15 +114,14 @@ export const addItemToCartAsync = (menuItemId, quantity) =>
  * Devuelve la OrderDTO para que el componente pueda, por ejemplo, navegar al dashboard.
  */
 export const confirmCartAsync = () => async (dispatch) => {
+  console.log("confirmCartAsync called");
   dispatch(setCartLoading(true));
   dispatch(setCartError(null));
 
   try {
-    const sessionId = getFromLocalStorage(SESSION_ID);
-    const data = await apiConfirmCart(sessionId);
+    const data = await apiConfirmCart();
 
     dispatch(clearCartState());
-    //clearLocalStorage();
 
     return data; // OrderDTO
   }

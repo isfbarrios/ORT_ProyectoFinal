@@ -3,6 +3,7 @@ import {
   API_URL,
   saveToLocalStorage,
   getFromLocalStorage,
+  removeFromLocalStorage,
   API_TOKEN,
   API_REFRESH_TOKEN,
   SESSION_ID,
@@ -41,7 +42,10 @@ export function getAuth() {
 
 //borro la sesion guardada en storage
 export function clearAuth() {
-  localStorage.clear();
+  removeFromLocalStorage(API_TOKEN);
+  removeFromLocalStorage(API_REFRESH_TOKEN);
+  removeFromLocalStorage(SESSION_ID);
+  //removeFromLocalStorage(KEY);
 }
 
 // MOCK login (luego lo vamos a remplazar por fetch al backend)

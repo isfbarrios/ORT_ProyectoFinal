@@ -24,6 +24,7 @@ import {
   closeCartAsync,
 } from "../redux/features/cartSlice";
 import { useNavigate } from "react-router-dom";
+import { USER_TYPE, getFromLocalStorage } from "../functions/localStorage";
 
 export default function CartModal() {
   const dispatch = useDispatch();
@@ -32,14 +33,15 @@ export default function CartModal() {
   const { isCartModalOpen, items, totalAmount, loading, error } = useSelector(
     (state) => state.cart
   );
-  const user = useSelector((state) => state.app.user);
-  const userType = user?.userType || user?.type || user?.role;
+  const userType = getFromLocalStorage(USER_TYPE);
+
   const isLocal = userType === "LOCAL";
 
   if (!isCartModalOpen) return null;
 
   const handleConfirm = async () => {
     if (isLocal) {
+      console.log("Confirmando carrito para usuario LOCAL");
       const order = await dispatch(confirmCartAsync());
       if (order) {
         dispatch(closeCartModal());

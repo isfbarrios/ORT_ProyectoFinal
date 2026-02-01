@@ -9,6 +9,8 @@ export default function Home() {
   try {
     const userType = searchParams.get("userType")?.toString().toUpperCase() || "LOCAL";
 
+    console.log("Home page userType:", userType);
+
     saveToLocalStorage(USER_TYPE, userType);
   }
   catch (error) {

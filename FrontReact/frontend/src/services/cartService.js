@@ -11,10 +11,11 @@ export async function apiGetCart() {
   const res = await fetch(`${API_URL}/session_cart`, {
     method: "GET",
     headers: buildFetchHeader(),
-    credentials:"include"
+    credentials: "include"
   });
 
   const data = await safeJson(res);
+  console.log("apiGetCart data:", data);
   if (!res.ok) throw new Error(data.message);
 
   return data;
@@ -28,7 +29,7 @@ export async function apiAddItemToCart(menuItemId, quantity = 1) {
     method: "POST",
     headers: buildFetchHeader(),
     body: JSON.stringify({ menuItemId, quantity }),
-    credentials:"include"
+    credentials: "include"
   });
 
   const data = await safeJson(res);
@@ -41,10 +42,11 @@ export async function apiAddItemToCart(menuItemId, quantity = 1) {
 // POST /session_cart/confirm  (confirmar carrito)
 // ===============================================
 export async function apiConfirmCart() {
+  console.log("apiConfirmCart called");
   const res = await fetch(`${API_URL}/session_cart/confirm`, {
     method: "POST",
     headers: buildFetchHeader(),
-    credentials:"include"
+    credentials: "include"
   });
 
   const data = await safeJson(res);
@@ -60,7 +62,7 @@ export async function apiCloseCart() {
   const res = await fetch(`${API_URL}/session_cart/close`, {
     method: "POST",
     headers: buildFetchHeader(),
-    credentials:"include"
+    credentials: "include"
   });
 
   const data = await safeJson(res);

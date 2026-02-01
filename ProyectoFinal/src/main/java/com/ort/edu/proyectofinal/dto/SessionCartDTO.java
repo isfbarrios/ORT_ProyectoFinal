@@ -10,12 +10,14 @@ import java.util.List;
 @Getter
 public class SessionCartDTO {
 
+    private Integer cartId;
     private List<SessionCartItemDTO> items;
     private BigDecimal totalAmount;
 
     public SessionCartDTO() {}
 
-    public SessionCartDTO(List<SessionCartItemDTO> items, BigDecimal totalAmount) {
+    public SessionCartDTO(Integer cartId, List<SessionCartItemDTO> items, BigDecimal totalAmount) {
+        this.cartId = cartId;
         this.items = items;
         this.totalAmount = totalAmount;
     }

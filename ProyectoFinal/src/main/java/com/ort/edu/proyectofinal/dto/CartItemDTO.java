@@ -15,6 +15,7 @@ public class CartItemDTO {
 
     private CartitemId id;
     private Menuitem menuItem;
+    private Integer processed;
     private Integer quantity;
     private BigDecimal itemAmount;
     private Integer delayTime;
@@ -27,6 +28,7 @@ public class CartItemDTO {
         this.quantity = item.getQuantity();
         this.itemAmount = item.getItemAmount();
         this.delayTime = item.getDelayTime();
+        this.processed = item.getProcessed();
     }
 
     @Override
@@ -34,6 +36,7 @@ public class CartItemDTO {
         return "CartItemDTO{" +
                 "id=" + id +
                 ", menuItem=" + menuItem +
+                ", processed=" + processed +
                 ", quantity=" + quantity +
                 ", itemAmount=" + itemAmount +
                 ", delayTime=" + delayTime +
