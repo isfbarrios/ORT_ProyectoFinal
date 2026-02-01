@@ -30,7 +30,7 @@ export default function CartModal() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const { isCartModalOpen, items, totalAmount, loading, error } = useSelector(
+  const { isCartModalOpen, items, totalAmount, loading, error, cartId } = useSelector(
     (state) => state.cart
   );
   const userType = getFromLocalStorage(USER_TYPE);
@@ -45,9 +45,8 @@ export default function CartModal() {
   if (!isCartModalOpen) return null;
 
   const handleConfirm = async () => {
-    
+
     if (isLocal) {
-      console.log("Confirmando carrito para usuario LOCAL");
       const order = await dispatch(confirmCartAsync());
       if (order) {
         dispatch(closeCartModal());
@@ -61,7 +60,7 @@ export default function CartModal() {
   };
 
   const handleClose = async () => {
-    await dispatch(closeCartAsync());
+    await dispatch(closeCartAsync(cartId));
     dispatch(closeCartModal());
   };
 

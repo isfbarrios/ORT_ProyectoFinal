@@ -11,6 +11,7 @@ import {
 } from "../../functions/localStorage"
 
 const initialState = {
+  cartId: 0,
   items: [],
   totalAmount: 0,
   loading: false,
@@ -23,6 +24,7 @@ const cartSlice = createSlice({
   initialState,
   reducers: {
     setCart(state, action) {
+      state.cartId = action.payload.cartId || 0;
       state.items = action.payload.items || [];
       state.totalAmount = action.payload.totalAmount || 0;
       state.error = null;
@@ -93,7 +95,7 @@ export const addItemToCartAsync = (menuItemId, quantity) =>
 
     try {
       const data = await apiAddItemToCart(menuItemId, quantity);
-
+      console.log("addItemToCartAsync data:", data);
       dispatch(setCart(data));
     }
     catch (error) {
@@ -137,12 +139,12 @@ export const confirmCartAsync = () => async (dispatch) => {
  * - llama al backend (/api/session-cart/close)
  * - limpia carrito y borra sessionId local
  */
-export const closeCartAsync = () => async (dispatch) => {
+export const closeCartAsync = (cartId) => async (dispatch) => {
   dispatch(setCartLoading(true));
   dispatch(setCartError(null));
 
   try {
-    const data = await apiCloseCart();
+    const data = await apiCloseCart(cartId);
 
     console.log(data);
 

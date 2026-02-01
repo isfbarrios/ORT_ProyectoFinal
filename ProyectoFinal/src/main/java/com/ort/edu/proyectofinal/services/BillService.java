@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 
@@ -34,15 +35,14 @@ public class BillService {
     @Autowired
     private CartStateRepository cartStateRepository;
 
-    public String createBillNumber(Integer billId) {
+    public String createBillNumber(Integer cartId) {
         LocalDateTime now = LocalDateTime.now();
-        int shortYear = now.getYear() % 100;
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyMMddHHmmss");
 
         return String.format(
-                "BILL-%02d-%02d-%04d",
-                shortYear,
-                now.getMonthValue(),
-                billId
+                "BILL-%s-%04d",
+                now.format(formatter),
+                cartId
         );
     }
 
@@ -70,7 +70,7 @@ public class BillService {
 
         Bill bill = new Bill();
 
-        bill.setBillNumber(createBillNumber(bill.getId()));
+        bill.setBillNumber(createBillNumber(request.getCartId()));
         bill.setAmount(BigDecimal.ZERO);
         bill.setDate(LocalDateTime.now());
 
@@ -80,6 +80,14 @@ public class BillService {
 
         for (Cartitem cartItem : items) {
             Billitem bItem = new Billitem();
+
+            BillitemId bItemId = new BillitemId();
+
+            bItemId.setBillId(bill.getId());
+            bItemId.setItemId(cartItem.getMenuItem().getId());
+
+            bItem.setId(bItemId);
+
             bItem.setBill(bill);
             bItem.setCartItem(cartItem);
             bItem.setQuantity(cartItem.getQuantity());

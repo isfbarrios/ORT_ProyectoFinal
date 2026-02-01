@@ -122,7 +122,17 @@ select * from `Order` o;
 
 select * from OrderItem;
 
-select * from Cart c order by c.CartId desc;
+select * from Cart c where c.CartId = 168 order by c.CartId desc;
+
+select * from CartItem c where c.CartId = 168;
+
+select * from CartState;
+
+select * from Bill;
+
+update Cart set CartStateId = 3 where CartId < 180;
+
+select * from BillItem;
 
 CREATE TABLE `Order` (
   OrderId int(10) unsigned NOT NULL AUTO_INCREMENT,

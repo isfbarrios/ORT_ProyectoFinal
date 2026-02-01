@@ -58,10 +58,11 @@ export async function apiConfirmCart() {
 // ===============================================
 // POST /session_cart/close  (cerrar carrito)
 // ===============================================
-export async function apiCloseCart() {
+export async function apiCloseCart(cartId) {
   const res = await fetch(`${API_URL}/bill/create`, {
     method: "POST",
     headers: buildFetchHeader(),
+    body: JSON.stringify({ cartId: cartId }),
     credentials: "include"
   });
 

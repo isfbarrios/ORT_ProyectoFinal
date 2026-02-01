@@ -3,6 +3,8 @@ package com.ort.edu.proyectofinal.entities;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.ort.edu.proyectofinal.dto.CartItemDTO;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -54,7 +56,8 @@ public class Cartitem {
     public String toJson() {
         try {
             ObjectMapper mapper = new ObjectMapper();
-            return mapper.writeValueAsString(this);
+            mapper.registerModule(new JavaTimeModule());
+            return mapper.writeValueAsString(new CartItemDTO(this));
         }
         catch (JsonProcessingException e) {
             throw new RuntimeException("Error serializando Cartitem a JSON", e);
