@@ -1,22 +1,14 @@
 package com.ort.edu.proyectofinal.controllers;
 
-import com.ort.edu.proyectofinal.dto.CartDTO;
 import com.ort.edu.proyectofinal.dto.OrderDTO;
 import com.ort.edu.proyectofinal.dto.OrderUpdateDTO;
-import com.ort.edu.proyectofinal.dto.ResponseDTO;
 import com.ort.edu.proyectofinal.entities.Order;
 import com.ort.edu.proyectofinal.repositories.OrderRepository;
-import org.springframework.security.access.prepost.PreAuthorize;
 import com.ort.edu.proyectofinal.services.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.security.Principal;
-import java.util.Iterator;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/orders")

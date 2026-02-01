@@ -3,17 +3,12 @@ package com.ort.edu.proyectofinal.controllers;
 import com.ort.edu.proyectofinal.CoreManager;
 import com.ort.edu.proyectofinal.dto.*;
 import com.ort.edu.proyectofinal.exception.TableException;
-import com.ort.edu.proyectofinal.repositories.TableReservationRepository;
 import com.ort.edu.proyectofinal.repositories.TableShiftRepository;
 import com.ort.edu.proyectofinal.repositories.TablesRepository;
-import org.springframework.http.HttpStatus;
-import org.springframework.security.access.prepost.PreAuthorize;
 import com.ort.edu.proyectofinal.services.TableReservationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -26,9 +21,6 @@ public class TableReservationController {
 
     @Autowired
     private TableShiftRepository tableShiftRepo;
-
-    @Autowired
-    private TableReservationRepository tableReservationRepo;
 
     @Autowired
     private TableReservationService service;

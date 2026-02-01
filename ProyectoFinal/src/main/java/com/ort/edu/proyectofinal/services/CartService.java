@@ -1,32 +1,21 @@
 package com.ort.edu.proyectofinal.services;
 
-import com.ort.edu.proyectofinal.CoreManager;
-import com.ort.edu.proyectofinal.dto.UserDTO;
 import com.ort.edu.proyectofinal.dto.SessionCartDTO;
 import com.ort.edu.proyectofinal.dto.SessionCartItemDTO;
 import com.ort.edu.proyectofinal.dto.OrderDTO;
 import com.ort.edu.proyectofinal.entities.Cart;
 import com.ort.edu.proyectofinal.entities.Cartitem;
-import com.ort.edu.proyectofinal.entities.Session;
 import com.ort.edu.proyectofinal.entities.*;
 import com.ort.edu.proyectofinal.exception.CartException;
 import com.ort.edu.proyectofinal.exception.OrderException;
 import com.ort.edu.proyectofinal.repositories.*;
-import jakarta.servlet.http.HttpSession;
 import jakarta.transaction.Transactional;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
-
 import java.security.Principal;
-import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -193,10 +182,11 @@ public class CartService {
         cart.setAmount(total);
         cart.setLastUpdate(LocalDateTime.now());
 
+        /*
         Cartstate confirmedState = cartStateRepository.findByName("Cerrado");
 
         cart.setCartState(confirmedState);
-
+        */
         cartRepository.saveAndFlush(cart);
 
         // Crear orden

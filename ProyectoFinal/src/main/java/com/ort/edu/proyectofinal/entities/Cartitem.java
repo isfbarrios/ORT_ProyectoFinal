@@ -1,6 +1,8 @@
 package com.ort.edu.proyectofinal.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -47,4 +49,15 @@ public class Cartitem {
     @ColumnDefault("0")
     @Column(name = "Processed", nullable = false)
     private Integer processed;
+
+    @Transient
+    public String toJson() {
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            return mapper.writeValueAsString(this);
+        }
+        catch (JsonProcessingException e) {
+            throw new RuntimeException("Error serializando Cartitem a JSON", e);
+        }
+    }
 }
