@@ -23,7 +23,6 @@ public class BillController {
 
     @PostMapping("/create")
     public ResponseEntity<?> create(@RequestBody BillRequestDTO request) {
-
         try {
             return ResponseEntity.ok(service.create(request));
         }

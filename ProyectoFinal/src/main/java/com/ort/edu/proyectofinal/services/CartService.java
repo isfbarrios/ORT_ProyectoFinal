@@ -88,7 +88,7 @@ public class CartService {
 
     private SessionCartDTO buildSessionCartDTO(Cart cart) {
 
-        List<Cartitem> items = cartItemRepository.findByCartId(cart.getId());
+        List<Cartitem> items = cartItemRepository.findByCartIdAndProcessed(cart.getId(), 0);
 
         List<SessionCartItemDTO> dtoItems = items.stream()
                 .map(SessionCartItemDTO::new)
@@ -168,7 +168,7 @@ public class CartService {
 
         Cart cart = cartRepository.findTopByUserNameAndCartState_IdOrderByDateDesc(principal.getName(), 1);
 
-        List<Cartitem> items = cartItemRepository.findByCartId(cart.getId());
+        List<Cartitem> items = cartItemRepository.findByCartIdAndProcessed(cart.getId(), 0);
 
         if (items.isEmpty()) {
             throw new CartException("El carrito está vacío, no se puede confirmar");

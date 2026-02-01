@@ -7,8 +7,6 @@ import {
 } from "../../services/cartService";
 
 import {
-  SESSION_ID,
-  getFromLocalStorage,
   clearLocalStorage
 } from "../../functions/localStorage"
 
@@ -144,8 +142,7 @@ export const closeCartAsync = () => async (dispatch) => {
   dispatch(setCartError(null));
 
   try {
-    const sessionId = getFromLocalStorage(SESSION_ID);
-    const data = await apiCloseCart(sessionId);
+    const data = await apiCloseCart();
 
     console.log(data);
 

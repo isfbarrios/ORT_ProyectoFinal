@@ -59,7 +59,7 @@ export async function apiConfirmCart() {
 // POST /session_cart/close  (cerrar carrito)
 // ===============================================
 export async function apiCloseCart() {
-  const res = await fetch(`${API_URL}/session_cart/close`, {
+  const res = await fetch(`${API_URL}/bill/create`, {
     method: "POST",
     headers: buildFetchHeader(),
     credentials: "include"
