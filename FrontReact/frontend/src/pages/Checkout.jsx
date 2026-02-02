@@ -22,11 +22,12 @@ import {
   Link,
 } from "@chakra-ui/react";
 import { getUserDirections } from "../services/userDirectionService";
+import { USER_TYPE, getFromLocalStorage } from "../functions/localStorage";
 
 export default function Checkout() {
   const { items, totalAmount } = useSelector((state) => state.cart);
   const direction = useSelector((state) => state.userDirection.direction);
-
+  const isLocal = getFromLocalStorage(USER_TYPE) === "LOCAL";
   const [deliveryMode, setDeliveryMode] = useState("DELIVERY");
   const [paymentMethod, setPaymentMethod] = useState("");
   const [phone, setPhone] = useState("");
@@ -49,10 +50,8 @@ export default function Checkout() {
       try {
         // Pido al backend las direcciones del usuario.
         const data = await getUserDirections();
-        console.log("getUserDirections raw:", data);
         // respuesta a array.
         const list = Array.isArray(data?.directions) ? data.directions : [];
-        console.log("getUserDirections list:", list);
         if (isMounted) {
           // Guarda la lista para renderizar en el select.
           setDirections(list);
@@ -122,9 +121,9 @@ export default function Checkout() {
         <Card flex="1" borderWidth="1px" borderColor="orange.100">
           <CardBody>
             <VStack spacing={4} align="stretch">
-              <Heading size="md">Entrega</Heading>
+              {!isLocal && <Heading size="md">Entrega</Heading>}
 
-              <FormControl>
+              {!isLocal && <FormControl>
                 <FormLabel>Tipo de entrega</FormLabel>
                 <Select
                   value={deliveryMode}
@@ -133,9 +132,9 @@ export default function Checkout() {
                   <option value="DELIVERY">Envío a domicilio</option>
                   <option value="PICKUP">Retiro en local</option>
                 </Select>
-              </FormControl>
+              </FormControl>}
 
-              <FormControl>
+              {!isLocal && <FormControl>
                 <FormLabel>Dirección</FormLabel>
                 <Select
                   placeholder="Seleccionar dirección"
@@ -169,27 +168,27 @@ export default function Checkout() {
                     Agregar dirección
                   </Link>
                 </Text>
-              </FormControl>
+              </FormControl>}
 
-              <FormControl isRequired>
+              {!isLocal && <FormControl isRequired>
                 <FormLabel>Teléfono de contacto</FormLabel>
                 <Input
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
                   placeholder="Ej: 11 1234 5678"
                 />
-              </FormControl>
+              </FormControl>}
 
-              <FormControl>
+              {!isLocal && <FormControl>
                 <FormLabel>Comentarios</FormLabel>
                 <Textarea
                   value={comments}
                   onChange={(e) => setComments(e.target.value)}
                   placeholder="Aclaraciones para la entrega"
                 />
-              </FormControl>
+              </FormControl>}
 
-              <Divider />
+              {!isLocal && <Divider />}
 
               <Heading size="md">Pago</Heading>
               <FormControl isRequired>

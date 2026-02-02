@@ -10,7 +10,7 @@ import {
   Text,
   Button,
 } from "@chakra-ui/react";
-import { openCartModal, fetchCartAsync } from "../redux/features/cartSlice";
+import { openCartModal } from "../redux/features/cartSlice";
 
 function NavItem({ to, children }) {
   return (
@@ -56,7 +56,7 @@ export default function NavBar() {
   const isKitchen = userType === "COCINA";
 
   const handleOpenCart = () => {
-    dispatch(fetchCartAsync());
+    //dispatch(fetchCartAsync());
     dispatch(openCartModal());
   };
 

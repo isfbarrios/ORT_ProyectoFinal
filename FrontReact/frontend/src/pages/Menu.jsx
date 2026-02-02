@@ -17,7 +17,7 @@ import {
 } from "@chakra-ui/react";
 
 import { getMenuItemsByMenu } from "../services/menuService";
-import { addItemToCartAsync, fetchCartAsync } from "../redux/features/cartSlice";
+import { addItemToCartAsync } from "../redux/features/cartSlice";
 
 export default function Menu({ menuId = 1 }) {
   const dispatch = useDispatch();
@@ -48,9 +48,9 @@ export default function Menu({ menuId = 1 }) {
   }, [menuId]);
 
   // Cargar carrito (si existe sesión)
-  useEffect(() => {
+  /*useEffect(() => {
     dispatch(fetchCartAsync());
-  }, [dispatch]);
+  }, [dispatch]);*/
 
   const handleAddToCart = (menuItemId) => {
     dispatch(addItemToCartAsync(menuItemId, 1));

@@ -111,8 +111,6 @@ public class BillService {
 
         BillResponseDTO bResponseDTO = new BillResponseDTO(bill);
 
-        System.out.println("\n\n"+bResponseDTO.toString()+"\n\n");
-
         return bResponseDTO;
     }
 }

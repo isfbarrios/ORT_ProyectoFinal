@@ -27,7 +27,7 @@ export default function Dashboard() {
 
     if (!auth?.isLogged) {
       clearAuth();
-      navigate("/login", { replace: true });
+      navigate("/", { replace: true });
 
     }
   }, [auth, navigate]);

@@ -21,7 +21,7 @@ import {
 import {
   closeCartModal,
   confirmCartAsync,
-  closeCartAsync,
+  //closeCartAsync,
 } from "../redux/features/cartSlice";
 import { useNavigate } from "react-router-dom";
 import { USER_TYPE, getFromLocalStorage } from "../functions/localStorage";
@@ -30,13 +30,13 @@ export default function CartModal() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const { isCartModalOpen, items, totalAmount, loading, error, cartId } = useSelector(
+  const { isCartModalOpen, items, totalAmount, loading, error, /*cartId*/ } = useSelector(
     (state) => state.cart
   );
   const userType = getFromLocalStorage(USER_TYPE);
 
   const isLocal = userType === "LOCAL";
-  const hasItems = items.length > 0;
+  //const hasItems = items.length > 0;
   const hasUnprocessedItems = items.some(
     (item) => Number(item.processed) === 0
   );
@@ -60,8 +60,9 @@ export default function CartModal() {
   };
 
   const handleClose = async () => {
-    await dispatch(closeCartAsync(cartId));
+    //await dispatch(closeCartAsync(cartId));
     dispatch(closeCartModal());
+    navigate("/checkout");
   };
 
   return (
