@@ -85,6 +85,7 @@ public class BillService {
 
             bItemId.setBillId(bill.getId());
             bItemId.setItemId(cartItem.getMenuItem().getId());
+            bItemId.setCartId(cart.getId());
 
             bItem.setId(bItemId);
 
@@ -108,6 +109,10 @@ public class BillService {
 
         cartRepository.save(cart);
 
-        return new BillResponseDTO(bill);
+        BillResponseDTO bResponseDTO = new BillResponseDTO(bill);
+
+        System.out.println("\n\n"+bResponseDTO.toString()+"\n\n");
+
+        return bResponseDTO;
     }
 }

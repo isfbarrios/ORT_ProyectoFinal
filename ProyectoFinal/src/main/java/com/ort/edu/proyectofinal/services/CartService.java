@@ -69,7 +69,7 @@ public class CartService {
         cart.setDelayTime(120);
 
         cart = cartRepository.save(cart);
-        
+
         return cart;
     }
 
@@ -96,11 +96,14 @@ public class CartService {
 
         //TODO: Ver el tema de los precios de las variantes
         BigDecimal total = items.stream()
-                .map(ci -> ci.getMenuItem().getBasePrice()
-                .multiply(BigDecimal.valueOf(ci.getQuantity())))
+                .map(ci -> calculateItemAmount(ci.getMenuItem(), ci.getQuantity()))
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
         return new SessionCartDTO(cart.getId(), dtoItems, total);
+    }
+
+    private BigDecimal calculateItemAmount(Menuitem menuitem, int quantity) {
+        return menuitem.getBasePrice().multiply(BigDecimal.valueOf(quantity));
     }
 
     @Transactional
@@ -113,7 +116,7 @@ public class CartService {
     public SessionCartDTO addItemToCart(Principal principal, int menuItemId, int quantity) throws CartException {
 
         if (quantity <= 0) {
-             throw new CartException("Cantidad insuficiente para el item " + menuItemId);
+            throw new CartException("Cantidad insuficiente para el item " + menuItemId);
         }
 
         String userName = principal.getName();
@@ -143,7 +146,7 @@ public class CartService {
             newItem.setMenuItem(menuitem);
             newItem.setQuantity(quantity);
             newItem.setProcessed(0);
-            newItem.setItemAmount(new BigDecimal("250"));
+            newItem.setItemAmount(calculateItemAmount(menuitem, quantity));
             newItem.setDelayTime(45);
 
             cartItemRepository.save(newItem);
@@ -151,7 +154,7 @@ public class CartService {
         else {
             //TODO: Validar si tiene variantes, xq pueden ser el mismo menuId pero con variantes
             existing.setQuantity(existing.getQuantity() + quantity);
-            // Si usás itemAmount, recalculalo acá
+            existing.setItemAmount(calculateItemAmount(menuitem, existing.getQuantity()));
             cartItemRepository.save(existing);
         }
 
@@ -182,11 +185,6 @@ public class CartService {
         cart.setAmount(total);
         cart.setLastUpdate(LocalDateTime.now());
 
-        /*
-        Cartstate confirmedState = cartStateRepository.findByName("Cerrado");
-
-        cart.setCartState(confirmedState);
-        */
         cartRepository.saveAndFlush(cart);
 
         // Crear orden
@@ -200,18 +198,5 @@ public class CartService {
         catch (OrderException e) {
             throw new RuntimeException(e);
         }
-    }
-
-    // ============================
-    // Cerrar carrito sin confirmar
-    // ============================
-
-    // TODO: revisar
-    @Transactional
-    public void closeCart(Principal principal) {
-        Cart cart = getOrCreateCartEntity(principal);
-        cart.setLastUpdate(LocalDateTime.now());
-        // Si tenés estado de cart, marcarlo CERRADO
-        cartRepository.save(cart);
     }
 }

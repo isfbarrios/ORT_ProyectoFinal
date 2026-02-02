@@ -21,13 +21,17 @@ public class BillitemId implements Serializable {
     @Column(name = "ItemId", nullable = false)
     private Integer itemId;
 
+    @Column(name = "CartId", nullable = false)
+    private Integer cartId;
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
         BillitemId entity = (BillitemId) o;
         return Objects.equals(this.itemId, entity.itemId) &&
-                Objects.equals(this.billId, entity.billId);
+                Objects.equals(this.billId, entity.billId) &&
+                Objects.equals(this.cartId, entity.cartId);
     }
 
     @Override

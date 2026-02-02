@@ -1,24 +1,14 @@
 package com.ort.edu.proyectofinal.controllers;
 
 import com.ort.edu.proyectofinal.dto.AddCartItemRequestDTO;
-import com.ort.edu.proyectofinal.dto.ResponseDTO;
 import com.ort.edu.proyectofinal.dto.SessionCartDTO;
 import com.ort.edu.proyectofinal.dto.OrderDTO;
-import com.ort.edu.proyectofinal.dto.UserDTO;
-import com.ort.edu.proyectofinal.entities.Cart;
-import com.ort.edu.proyectofinal.entities.User;
 import com.ort.edu.proyectofinal.exception.CartException;
 import com.ort.edu.proyectofinal.exception.OrderException;
 import com.ort.edu.proyectofinal.services.CartService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import jakarta.servlet.http.HttpSession;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import com.ort.edu.proyectofinal.repositories.UserRepository;
 
 import java.security.Principal;
@@ -32,9 +22,6 @@ public class SessionCartController {
 
     @Autowired
     private UserRepository userRepository;
-
-    @Autowired
-    private HttpSession session;
 
     @GetMapping
     public ResponseEntity<?> getCart(Principal principal) {
@@ -80,12 +67,5 @@ public class SessionCartController {
         }
 
         return ResponseEntity.ok(order);
-    }
-
-    @PostMapping("/close")
-    public ResponseEntity<Void> close(Principal principal) {
-
-        cartService.closeCart(principal);
-        return ResponseEntity.ok().build();
     }
 }

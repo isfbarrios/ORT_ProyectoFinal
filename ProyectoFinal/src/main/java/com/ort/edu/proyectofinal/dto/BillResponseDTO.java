@@ -1,17 +1,20 @@
 package com.ort.edu.proyectofinal.dto;
 
 import com.ort.edu.proyectofinal.entities.Bill;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
+@Getter
+@Setter
 public class BillResponseDTO {
 
     private Integer billId;
     private String billNumber;
     private BigDecimal amount;
     private LocalDateTime date;
-
 
     public BillResponseDTO() {}
 
@@ -20,5 +23,15 @@ public class BillResponseDTO {
         this.billNumber = bill.getBillNumber();
         this.amount = bill.getAmount();
         this.date = bill.getDate();
+    }
+
+    @Override
+    public String toString() {
+        return "BillResponseDTO{" +
+                "billId=" + billId +
+                ", billNumber='" + billNumber + '\'' +
+                ", amount=" + amount +
+                ", date=" + date +
+                '}';
     }
 }

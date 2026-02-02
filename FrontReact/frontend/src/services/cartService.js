@@ -56,7 +56,7 @@ export async function apiConfirmCart() {
 }
 
 // ===============================================
-// POST /session_cart/close  (cerrar carrito)
+// POST /bill/create  (cerrar carrito)
 // ===============================================
 export async function apiCloseCart(cartId) {
   const res = await fetch(`${API_URL}/bill/create`, {
@@ -66,8 +66,15 @@ export async function apiCloseCart(cartId) {
     credentials: "include"
   });
 
-  const data = await safeJson(res);
-  if (!res.ok) throw new Error(data.message);
+  try {
+    const data = await res.json(res);
 
-  return data;
+    if (!res.ok) throw new Error(data.message);
+
+    return data;
+  }
+  catch (error) {
+    console.error("Error al parsear JSON:", error);
+    throw new Error("Respuesta inválida del servidor");
+  }
 }
