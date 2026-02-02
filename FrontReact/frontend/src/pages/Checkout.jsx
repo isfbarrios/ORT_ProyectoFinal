@@ -1,33 +1,22 @@
 import { useEffect, useMemo, useState } from "react";
 import { useSelector } from "react-redux";
-import { Link as RouterLink } from "react-router-dom";
-import {
-  Box,
-  Button,
-  Divider,
-  FormControl,
-  FormLabel,
-  Heading,
-  HStack,
-  Input,
-  Select,
-  Stack,
-  Text,
-  Textarea,
-  VStack,
-  Card,
-  CardBody,
-  CardFooter,
-  Badge,
-  Link,
-} from "@chakra-ui/react";
+import { useLocation } from "react-router-dom";
+import { Button, Heading, Stack, Text, VStack, Card, CardBody, CardFooter } from "@chakra-ui/react";
 import { getUserDirections } from "../services/userDirectionService";
+import DeliverySection from "../components/checkout/DeliverySection";
+import PaymentSection from "../components/checkout/PaymentSection";
+import OrderSummaryCard from "../components/checkout/OrderSummaryCard";
+import BillSummaryCard from "../components/checkout/BillSummaryCard";
 import { USER_TYPE, getFromLocalStorage } from "../functions/localStorage";
 
 export default function Checkout() {
   const { items, totalAmount } = useSelector((state) => state.cart);
   const direction = useSelector((state) => state.userDirection.direction);
-  const isLocal = getFromLocalStorage(USER_TYPE) === "LOCAL";
+  const location = useLocation();
+  const userType = getFromLocalStorage(USER_TYPE);
+  const isLocal = userType === "LOCAL";
+  const bill = location.state?.bill || null;
+
   const [deliveryMode, setDeliveryMode] = useState("DELIVERY");
   const [paymentMethod, setPaymentMethod] = useState("");
   const [phone, setPhone] = useState("");
@@ -50,8 +39,10 @@ export default function Checkout() {
       try {
         // Pido al backend las direcciones del usuario.
         const data = await getUserDirections();
+        console.log("getUserDirections raw:", data);
         // respuesta a array.
         const list = Array.isArray(data?.directions) ? data.directions : [];
+        console.log("getUserDirections list:", list);
         if (isMounted) {
           // Guarda la lista para renderizar en el select.
           setDirections(list);
@@ -121,87 +112,26 @@ export default function Checkout() {
         <Card flex="1" borderWidth="1px" borderColor="orange.100">
           <CardBody>
             <VStack spacing={4} align="stretch">
-              {!isLocal && <Heading size="md">Entrega</Heading>}
-
-              {!isLocal && <FormControl>
-                <FormLabel>Tipo de entrega</FormLabel>
-                <Select
-                  value={deliveryMode}
-                  onChange={(e) => setDeliveryMode(e.target.value)}
-                >
-                  <option value="DELIVERY">Envío a domicilio</option>
-                  <option value="PICKUP">Retiro en local</option>
-                </Select>
-              </FormControl>}
-
-              {!isLocal && <FormControl>
-                <FormLabel>Dirección</FormLabel>
-                <Select
-                  placeholder="Seleccionar dirección"
-                  value={selectedDirection}
-                  onChange={(e) => setSelectedDirection(e.target.value)}
-                  isDisabled={deliveryMode === "PICKUP"}
-                >
-                  {/* Carga las opciones desde el listado de direcciones ya normalizado */}
-                  {directionOptions.map((item) => (
-                    <option key={item.id} value={String(item.id)}>
-                      {/* Texto visible del select */}
-                      {item.streetName} {item.doorNumber}
-                    </option>
-                  ))}
-                </Select>
-                {/* Indicador de carga mientras llega el fetch */}
-                {directionsLoading && (
-                  <Text fontSize="sm" color="gray.500" mt={2}>
-                    Cargando direcciones...
-                  </Text>
-                )}
-                {/* Error si no se pudo traer la lista */}
-                {!directionsLoading && directionsError && (
-                  <Text fontSize="sm" color="red.500" mt={2}>
-                    {directionsError}
-                  </Text>
-                )}
-                <Text fontSize="sm" color="gray.500" mt={2}>
-                  ¿Necesitás otra?{" "}
-                  <Link as={RouterLink} to="/add_direction" color="orange.500">
-                    Agregar dirección
-                  </Link>
-                </Text>
-              </FormControl>}
-
-              {!isLocal && <FormControl isRequired>
-                <FormLabel>Teléfono de contacto</FormLabel>
-                <Input
-                  value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
-                  placeholder="Ej: 11 1234 5678"
+              {!isLocal && (
+                <DeliverySection
+                  deliveryMode={deliveryMode}
+                  setDeliveryMode={setDeliveryMode}
+                  selectedDirection={selectedDirection}
+                  setSelectedDirection={setSelectedDirection}
+                  directionOptions={directionOptions}
+                  directionsLoading={directionsLoading}
+                  directionsError={directionsError}
+                  phone={phone}
+                  setPhone={setPhone}
+                  comments={comments}
+                  setComments={setComments}
                 />
-              </FormControl>}
+              )}
 
-              {!isLocal && <FormControl>
-                <FormLabel>Comentarios</FormLabel>
-                <Textarea
-                  value={comments}
-                  onChange={(e) => setComments(e.target.value)}
-                  placeholder="Aclaraciones para la entrega"
-                />
-              </FormControl>}
-
-              {!isLocal && <Divider />}
-
-              <Heading size="md">Pago</Heading>
-              <FormControl isRequired>
-                <FormLabel>Método de pago</FormLabel>
-                <Select
-                  placeholder="Seleccionar"
-                  value={paymentMethod}
-                  onChange={(e) => setPaymentMethod(e.target.value)}
-                >
-                  <option value="CASH">Efectivo</option>
-                  <option value="MERCADO_PAGO">Mercado Pago</option>
-                </Select>
-              </FormControl>
+              <PaymentSection
+                paymentMethod={paymentMethod}
+                setPaymentMethod={setPaymentMethod}
+              />
             </VStack>
           </CardBody>
           <CardFooter>
@@ -210,37 +140,11 @@ export default function Checkout() {
             </Button>
           </CardFooter>
         </Card>
-
-        <Card w={{ base: "100%", lg: "360px" }} borderWidth="1px">
-          <CardBody>
-            <Heading size="md" mb={4}>
-              Resumen
-            </Heading>
-            <VStack spacing={3} align="stretch">
-              {items.map((item) => (
-                <HStack key={item.cartItemId} justify="space-between">
-                  <Box>
-                    <Text fontWeight="semibold">{item.name}</Text>
-                    <Text fontSize="sm" color="gray.500">
-                      x{item.quantity}
-                    </Text>
-                  </Box>
-                  <Text fontWeight="semibold">
-                    ${Number(item.unitPrice) * item.quantity}
-                  </Text>
-                </HStack>
-              ))}
-              {items.length === 0 && (
-                <Text color="gray.500">No hay productos en el carrito.</Text>
-              )}
-              <Divider />
-              <HStack justify="space-between">
-                <Text fontWeight="bold">Total</Text>
-                <Text fontWeight="bold">${totalAmount}</Text>
-              </HStack>
-            </VStack>
-          </CardBody>
-        </Card>
+        {isLocal ? (
+          <BillSummaryCard bill={bill} />
+        ) : (
+          <OrderSummaryCard items={items} totalAmount={totalAmount} />
+        )}
       </Stack>
     </Stack>
   );
