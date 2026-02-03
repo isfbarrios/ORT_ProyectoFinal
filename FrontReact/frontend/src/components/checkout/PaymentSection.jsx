@@ -14,8 +14,8 @@ export default function PaymentSection({
           value={paymentMethod}
           onChange={(e) => setPaymentMethod(e.target.value)}
         >
-          <option value="CASH">Efectivo</option>
-          <option value="MERCADO_PAGO">Mercado Pago</option>
+          <option value="1">Efectivo</option>
+          <option value="3">Mercado Pago</option>
         </Select>
       </FormControl>
     </>

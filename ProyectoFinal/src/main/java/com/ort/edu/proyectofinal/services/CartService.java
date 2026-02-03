@@ -123,6 +123,8 @@ public class CartService {
 
         Cart cart = cartRepository.findTopByUserNameAndCartState_IdOrderByDateDesc(userName, 1);
 
+        if (cart == null) cart = createNewCart(principal);
+
         Menuitem menuitem = menuItemRepository.findById(menuItemId)
                 .orElseThrow(() -> new IllegalArgumentException("Menuitem no encontrado"));
 

@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { useLocation } from "react-router-dom";
 import { Button, Heading, Stack, Text, VStack, Card, CardBody, CardFooter } from "@chakra-ui/react";
 import { getUserDirections } from "../services/userDirectionService";
@@ -8,16 +8,18 @@ import PaymentSection from "../components/checkout/PaymentSection";
 import OrderSummaryCard from "../components/checkout/OrderSummaryCard";
 import BillSummaryCard from "../components/checkout/BillSummaryCard";
 import { USER_TYPE, getFromLocalStorage } from "../functions/localStorage";
+import { closeCartAsync } from "../redux/features/cartSlice";
 
 export default function Checkout() {
-  const { items, totalAmount } = useSelector((state) => state.cart);
+  const dispatch = useDispatch();
+  const { items, totalAmount, cartId } = useSelector((state) => state.cart);
   const direction = useSelector((state) => state.userDirection.direction);
   const location = useLocation();
   const userType = getFromLocalStorage(USER_TYPE);
   const isLocal = userType === "LOCAL";
   const bill = location.state?.bill || null;
 
-  const [deliveryMode, setDeliveryMode] = useState("DELIVERY");
+  const [deliveryMode, setDeliveryMode] = useState(isLocal ? "LOCAL" : "DELIVERY");
   const [paymentMethod, setPaymentMethod] = useState("");
   const [phone, setPhone] = useState("");
   const [comments, setComments] = useState("");
@@ -88,15 +90,20 @@ export default function Checkout() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+
     const payload = {
+      cartId,
       deliveryMode,
       paymentMethod,
       phone,
       comments,
       // En retiro no se envía dirección.
-      directionId: deliveryMode === "PICKUP" ? null : selectedDirection || null,
+      directionId: deliveryMode === "LOCAL" ? -1 : selectedDirection || -1,
     };
+
     console.log("checkout payload", payload);
+
+    dispatch(closeCartAsync(payload));
   };
 
   return (
@@ -136,7 +143,7 @@ export default function Checkout() {
           </CardBody>
           <CardFooter>
             <Button colorScheme="orange" onClick={handleSubmit}>
-              Confirmar pedido
+              Pagar
             </Button>
           </CardFooter>
         </Card>

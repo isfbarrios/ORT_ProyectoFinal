@@ -33,7 +33,12 @@ public class BillService {
     private BillRepository billRepository;
 
     @Autowired
+    private PaymentTypeRepository paymenttypeRepository;
+
+    @Autowired
     private CartStateRepository cartStateRepository;
+    @Autowired
+    private UserDirectionRepository userDirectionRepository;
 
     public String createBillNumber(Integer cartId) {
         LocalDateTime now = LocalDateTime.now();
@@ -73,6 +78,20 @@ public class BillService {
         bill.setBillNumber(createBillNumber(request.getCartId()));
         bill.setAmount(BigDecimal.ZERO);
         bill.setDate(LocalDateTime.now());
+
+        Optional<Paymenttype> optionalPaymenttype = paymenttypeRepository.findById(request.getPaymentMethod());
+
+        if (optionalPaymenttype.isPresent()) {
+            bill.setPaymentType(optionalPaymenttype.get());
+        }
+
+        Optional<UserDirection> userDirection = userDirectionRepository.findById(request.getDirectionId());
+
+        if (userDirection.isPresent()) {
+            request.setDirectionStr(userDirection.get().toJson());
+        }
+
+        bill.setExtraData(request.toJson());
 
         billRepository.save(bill);
 

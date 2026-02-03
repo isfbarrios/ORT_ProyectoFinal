@@ -6,10 +6,6 @@ import {
   apiCloseCart,
 } from "../../services/cartService";
 
-import {
-  clearLocalStorage
-} from "../../functions/localStorage"
-
 const initialState = {
   cartId: 0,
   items: [],
@@ -149,7 +145,7 @@ export const closeCartAsync = (cartId) => async (dispatch) => {
     console.log(data);
 
     dispatch(clearCartState());
-    clearLocalStorage();
+    //clearLocalStorage();
   }
   catch (error) {
     dispatch(setCartError(error.message));

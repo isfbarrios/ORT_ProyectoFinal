@@ -105,10 +105,11 @@ export async function refreshToken() {
   }
   catch (error) {
     console.error("Error al parsear JSON:", error);
+    closeSession();
     throw new Error("Respuesta inválida del servidor");
   }
 }
 
 export async function closeSession() {
-  clearAuth
+  clearAuth();
 }

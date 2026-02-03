@@ -45,22 +45,27 @@ export default function CartModal() {
   if (!isCartModalOpen) return null;
 
   const handleConfirm = async () => {
-
     if (isLocal) {
       const order = await dispatch(confirmCartAsync());
       if (order) {
         dispatch(closeCartModal());
         navigate("/menu");
       }
+
       return;
     }
+    else {
+      const order = await dispatch(confirmCartAsync());
+      if (order) {
+        dispatch(closeCartModal());
+        navigate("/checkout");
+      }
 
-    dispatch(closeCartModal());
-    navigate("/checkout");
+      return;
+    }
   };
 
   const handleClose = async () => {
-    //await dispatch(closeCartAsync(cartId));
     dispatch(closeCartModal());
     navigate("/checkout");
   };

@@ -23,6 +23,9 @@ public class BillController {
 
     @PostMapping("/create")
     public ResponseEntity<?> create(@RequestBody BillRequestDTO request) {
+
+        System.out.println("\n\n"+request.toString()+"\n\n");
+
         try {
             return ResponseEntity.ok(service.create(request));
         }
