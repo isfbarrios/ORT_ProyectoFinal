@@ -1,6 +1,8 @@
 package com.ort.edu.proyectofinal.controllers;
 
+import com.ort.edu.proyectofinal.dto.BillProcessDTO;
 import com.ort.edu.proyectofinal.dto.BillRequestDTO;
+import com.ort.edu.proyectofinal.dto.BillResponseDTO;
 import com.ort.edu.proyectofinal.dto.ResponseDTO;
 import com.ort.edu.proyectofinal.entities.*;
 import com.ort.edu.proyectofinal.exception.BillException;
@@ -23,23 +25,23 @@ public class BillController {
 
     @PostMapping("/create")
     public ResponseEntity<?> create(@RequestBody BillRequestDTO request) {
-
-        System.out.println("\n\n"+request.toString()+"\n\n");
-
         try {
             return ResponseEntity.ok(service.create(request));
         }
-        catch(CartException ce) {
-            ce.printStackTrace();
-            return ResponseEntity.ok(new ResponseDTO(ce.getMessage()));
-        }
-        catch(BillException be) {
-            be.printStackTrace();
-            return ResponseEntity.ok(new ResponseDTO(be.getMessage()));
-        }
         catch (Exception e) {
             e.printStackTrace();
-            throw new RuntimeException(e);
+            return ResponseEntity.ok(new ResponseDTO(e.getMessage()));
+        }
+    }
+
+    @PostMapping("/process")
+    public ResponseEntity<?> create(@RequestBody BillProcessDTO request) throws Exception {
+        try {
+            return ResponseEntity.ok(service.process(request));
+        }
+        catch(Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.ok(new ResponseDTO(e.getMessage()));
         }
     }
 }

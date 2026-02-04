@@ -1,5 +1,6 @@
 package com.ort.edu.proyectofinal.services;
 
+import com.ort.edu.proyectofinal.dto.BillProcessDTO;
 import com.ort.edu.proyectofinal.dto.BillRequestDTO;
 import com.ort.edu.proyectofinal.dto.BillResponseDTO;
 import com.ort.edu.proyectofinal.dto.ResponseDTO;
@@ -37,6 +38,7 @@ public class BillService {
 
     @Autowired
     private CartStateRepository cartStateRepository;
+
     @Autowired
     private UserDirectionRepository userDirectionRepository;
 
@@ -79,7 +81,8 @@ public class BillService {
         bill.setAmount(BigDecimal.ZERO);
         bill.setDate(LocalDateTime.now());
 
-        Optional<Paymenttype> optionalPaymenttype = paymenttypeRepository.findById(request.getPaymentMethod());
+        // Asignamos un valor por defecto, para mostrar previo a efectuar el pago
+        Optional<Paymenttype> optionalPaymenttype = paymenttypeRepository.findById(99);
 
         if (optionalPaymenttype.isPresent()) {
             bill.setPaymentType(optionalPaymenttype.get());
@@ -127,6 +130,24 @@ public class BillService {
         cart.setCartState(confirmedState);
 
         cartRepository.save(cart);
+
+        BillResponseDTO bResponseDTO = new BillResponseDTO(bill);
+
+        return bResponseDTO;
+    }
+
+    public BillResponseDTO process(BillProcessDTO request) throws Exception {
+        Optional<Bill> optionalBill = billRepository.findById(request.getBillId());
+
+        if (!optionalBill.isPresent()) throw new Exception("No pudimos procesar el pago. Intente nuevamente");
+
+        Bill bill = optionalBill.get();
+
+        Optional<Paymenttype> optionalPaymenttype = paymenttypeRepository.findById(request.getPaymentTypeId());
+
+        if (optionalPaymenttype.isPresent()) {
+            bill.setPaymentType(optionalPaymenttype.get());
+        }
 
         BillResponseDTO bResponseDTO = new BillResponseDTO(bill);
 
