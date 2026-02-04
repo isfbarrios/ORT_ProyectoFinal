@@ -135,20 +135,26 @@ export const confirmCartAsync = () => async (dispatch) => {
  * - llama al backend (/api/session-cart/close)
  * - limpia carrito y borra sessionId local
  */
-export const closeCartAsync = (cartId) => async (dispatch) => {
+export const closeCartAsync = (payload) => async (dispatch) => {
   dispatch(setCartLoading(true));
   dispatch(setCartError(null));
 
   try {
-    const data = await apiCloseCart(cartId);
+    const data = await apiCloseCart(payload);
+
+    if (data?.message) {
+      throw new Error(data.message);
+    }
 
     console.log(data);
 
     dispatch(clearCartState());
     //clearLocalStorage();
+    return data;
   }
   catch (error) {
     dispatch(setCartError(error.message));
+    return null;
   }
   finally {
     dispatch(setCartLoading(false));
