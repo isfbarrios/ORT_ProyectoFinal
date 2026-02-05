@@ -78,3 +78,26 @@ export async function apiCloseCart(payload) {
     throw new Error("Respuesta inválida del servidor");
   }
 }
+
+
+export async function apiProcessBill(payload) {
+  console.log(payload);
+  const res = await fetch(`${API_URL}/bill/process`, {
+    method: "POST",
+    headers: buildFetchHeader(),
+    body: JSON.stringify(payload),
+    credentials: "include"
+  });
+
+  try {
+    const data = await res.json(res);
+
+    if (!res.ok) throw new Error(data.message);
+
+    return data;
+  }
+  catch (error) {
+    console.error("Error al parsear JSON:", error);
+    throw new Error("Respuesta inválida del servidor");
+  }
+}

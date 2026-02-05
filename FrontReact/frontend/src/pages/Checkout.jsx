@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useLocation } from "react-router-dom";
 import { Button, Heading, Stack, Text, VStack, Card, CardBody, CardFooter } from "@chakra-ui/react";
@@ -7,9 +7,8 @@ import DeliverySection from "../components/checkout/DeliverySection";
 import PaymentSection from "../components/checkout/PaymentSection";
 import OrderSummaryCard from "../components/checkout/OrderSummaryCard";
 import BillSummaryCard from "../components/checkout/BillSummaryCard";
-import { USER_TYPE, getFromLocalStorage } from "../functions/localStorage";
-import { closeCartAsync } from "../redux/features/cartSlice";
-
+import { BILL, BILL_ID, USER_TYPE, getFromLocalStorage } from "../functions/localStorage";
+import { closeCartAsync, apiProcessBillAsync } from "../redux/features/cartSlice";
 
 export default function Checkout() {
   const dispatch = useDispatch();
@@ -18,7 +17,7 @@ export default function Checkout() {
   const location = useLocation();
   const userType = getFromLocalStorage(USER_TYPE);
   const isLocal = userType === "LOCAL";
-  const billFromLocation = location.state?.bill || null;
+  const bill = location.state?.bill || getFromLocalStorage(BILL) || null;
 
   const [deliveryMode, setDeliveryMode] = useState(isLocal ? "LOCAL" : "DELIVERY");
   const [paymentMethod, setPaymentMethod] = useState("");
@@ -32,10 +31,6 @@ export default function Checkout() {
   const [directions, setDirections] = useState([]);
   const [directionsLoading, setDirectionsLoading] = useState(false);
   const [directionsError, setDirectionsError] = useState("");
-  const [bill, setBill] = useState(billFromLocation);
-  const [summaryItems, setSummaryItems] = useState(items);
-  const [summaryTotal, setSummaryTotal] = useState(totalAmount);
-  const hasCreatedBillRef = useRef(false);
 
   useEffect(() => {
     let isMounted = true;
@@ -73,51 +68,33 @@ export default function Checkout() {
 
     loadDirections();
 
+    let billId = getFromLocalStorage(BILL_ID) || null;
+
+    const payload = {
+      cartId,
+      billId,
+      deliveryMode,
+      paymentMethod,
+      phone,
+      comments,
+      // En retiro no se envía dirección.
+      directionId: deliveryMode === "LOCAL" ? -1 : selectedDirection || -1,
+    };
+
+    console.log('---------------------');
+    console.log('Payload en useEffect de Checkout:');
+    console.log(payload);
+    console.log('bill: ');
+    console.log(bill);
+    console.log('---------------------');
+
+    dispatch(closeCartAsync(payload));
+
     return () => {
       // Evita setState si el usuario sale de la pantalla.
       isMounted = false;
     };
   }, []);
-
-  useEffect(() => {
-    if (items.length > 0 && summaryItems.length === 0) {
-      setSummaryItems(items);
-    }
-    if (totalAmount > 0 && summaryTotal === 0) {
-      setSummaryTotal(totalAmount);
-    }
-  }, [items, summaryItems.length, totalAmount, summaryTotal]);
-
-  useEffect(() => {
-    if (hasCreatedBillRef.current || bill) return;
-    if (!cartId) return;
-
-    const payload = {
-      cartId,
-      deliveryMode,
-      paymentMethod,
-      phone,
-      comments,
-      directionId: deliveryMode === "LOCAL" ? -1 : selectedDirection || -1,
-    };
-
-    hasCreatedBillRef.current = true;
-
-    dispatch(closeCartAsync(payload)).then((data) => {
-      if (data?.billNumber) {
-        setBill(data);
-      }
-    });
-  }, [
-    bill,
-    cartId,
-    comments,
-    deliveryMode,
-    dispatch,
-    paymentMethod,
-    phone,
-    selectedDirection,
-  ]);
 
   const directionOptions = useMemo(() => {
     // Evita duplicados entre API y store (mismo id).
@@ -135,6 +112,21 @@ export default function Checkout() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+
+    let billId = getFromLocalStorage(BILL_ID) || null;
+
+    const payload = {
+      cartId: cartId,
+      billId: billId,
+      deliveryMode: deliveryMode,
+      paymentTypeId: paymentMethod,
+      phone: phone,
+      comments: comments,
+      // En retiro no se envía dirección.
+      directionId: deliveryMode === "LOCAL" ? -1 : selectedDirection || -1,
+    };
+
+    dispatch(apiProcessBillAsync(payload));
   };
 
   return (
@@ -178,12 +170,11 @@ export default function Checkout() {
             </Button>
           </CardFooter>
         </Card>
-        <VStack spacing={4} align="stretch">
+        {isLocal ? (
           <BillSummaryCard bill={bill} />
-          {!isLocal && (
-            <OrderSummaryCard items={summaryItems} totalAmount={summaryTotal} />
-          )}
-        </VStack>
+        ) : (
+          <OrderSummaryCard items={items} totalAmount={totalAmount} />
+        )}
       </Stack>
     </Stack>
   );

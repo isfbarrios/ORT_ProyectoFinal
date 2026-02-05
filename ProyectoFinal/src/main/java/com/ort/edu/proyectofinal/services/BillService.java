@@ -8,13 +8,16 @@ import com.ort.edu.proyectofinal.entities.*;
 import com.ort.edu.proyectofinal.exception.BillException;
 import com.ort.edu.proyectofinal.exception.CartException;
 import com.ort.edu.proyectofinal.repositories.*;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -37,7 +40,7 @@ public class BillService {
     private PaymentTypeRepository paymenttypeRepository;
 
     @Autowired
-    private CartStateRepository cartStateRepository;
+    private CartService cartService;
 
     @Autowired
     private UserDirectionRepository userDirectionRepository;
@@ -54,6 +57,14 @@ public class BillService {
     }
 
     public BillResponseDTO create(BillRequestDTO request) throws CartException, BillException {
+
+        System.out.println();
+        System.out.println("---------- create ---------------");
+        System.out.println(request.toString());
+        System.out.println("---------- create ---------------");
+        System.out.println();
+
+
         Optional<Cart> optionalCart = cartRepository.findById(request.getCartId());
 
         if (optionalCart.isEmpty()) throw new CartException("Carrito inexistente");
@@ -75,11 +86,44 @@ public class BillService {
             throw new BillException("Debe haber pedidos procesados para generar la factura");
         }
 
+        if (request.getBillId() > 0) {
+            Optional<Bill> bill = billRepository.findById(request.getBillId());
+
+            if (bill.isPresent()) {
+                // Llamada asincrona
+                buildBill(request, bill.get(), cart, items);
+
+                return new BillResponseDTO(bill.get());
+            }
+        }
+
         Bill bill = new Bill();
 
         bill.setBillNumber(createBillNumber(request.getCartId()));
         bill.setAmount(BigDecimal.ZERO);
         bill.setDate(LocalDateTime.now());
+
+        BigDecimal amount = BigDecimal.ZERO;
+
+        for (Cartitem cartItem : items) {
+            amount = amount.add(cartItem.getItemAmount());
+        }
+
+        bill.setAmount(amount);
+
+        //billRepository.save(bill);
+
+        // Llamada asincrona
+        buildBill(request, bill, cart, items);
+
+        BillResponseDTO bResponseDTO = new BillResponseDTO(bill);
+
+        return bResponseDTO;
+    }
+
+    @Async
+    @Transactional
+    public void buildBill(BillRequestDTO request, Bill bill, Cart cart, List<Cartitem> items) {
 
         // Asignamos un valor por defecto, para mostrar previo a efectuar el pago
         Optional<Paymenttype> optionalPaymenttype = paymenttypeRepository.findById(99);
@@ -100,43 +144,42 @@ public class BillService {
 
         BigDecimal amount = BigDecimal.ZERO;
 
+        List<Billitem> bItems = new ArrayList<>();
+
         for (Cartitem cartItem : items) {
             Billitem bItem = new Billitem();
-
             BillitemId bItemId = new BillitemId();
 
             bItemId.setBillId(bill.getId());
-            bItemId.setItemId(cartItem.getMenuItem().getId());
+            bItemId.setItemId(cartItem.getId().getItemId());
             bItemId.setCartId(cart.getId());
 
             bItem.setId(bItemId);
-
             bItem.setBill(bill);
             bItem.setCartItem(cartItem);
             bItem.setQuantity(cartItem.getQuantity());
             bItem.setExtraData(cartItem.toJson());
 
-            billItemRepository.save(bItem);
+            bItems.add(bItem);
 
             amount = amount.add(cartItem.getItemAmount());
         }
 
+        billItemRepository.saveAll(bItems);
+
         bill.setAmount(amount);
 
         billRepository.save(bill);
-
-        Cartstate confirmedState = cartStateRepository.findByName("Cerrado");
-
-        cart.setCartState(confirmedState);
-
-        cartRepository.save(cart);
-
-        BillResponseDTO bResponseDTO = new BillResponseDTO(bill);
-
-        return bResponseDTO;
     }
 
     public BillResponseDTO process(BillProcessDTO request) throws Exception {
+
+        System.out.println();
+        System.out.println("---------- process ---------------");
+        System.out.println(request.toString());
+        System.out.println("---------- process ---------------");
+        System.out.println();
+
         Optional<Bill> optionalBill = billRepository.findById(request.getBillId());
 
         if (!optionalBill.isPresent()) throw new Exception("No pudimos procesar el pago. Intente nuevamente");
@@ -148,6 +191,9 @@ public class BillService {
         if (optionalPaymenttype.isPresent()) {
             bill.setPaymentType(optionalPaymenttype.get());
         }
+
+        // Llamada asincrona
+        cartService.closeCart(request.getCartId());
 
         BillResponseDTO bResponseDTO = new BillResponseDTO(bill);
 

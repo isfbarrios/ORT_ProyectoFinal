@@ -12,10 +12,12 @@ import com.ort.edu.proyectofinal.repositories.*;
 import jakarta.transaction.Transactional;
 import java.security.Principal;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -164,6 +166,25 @@ public class CartService {
         cartRepository.save(cart);
 
         return buildSessionCartDTO(cart);
+    }
+
+    @Async
+    @Transactional
+    public void closeCart(Integer cartId) {
+        Optional<Cart> cart = cartRepository.findById(cartId);
+
+        if (cart.isPresent())
+            closeCart(cart.get());
+    }
+
+    @Async
+    @Transactional
+    public void closeCart(Cart cart) {
+        Cartstate confirmedState = cartStateRepository.findByName("Cerrado");
+
+        cart.setCartState(confirmedState);
+
+        cartRepository.save(cart);
     }
 
     // ============================

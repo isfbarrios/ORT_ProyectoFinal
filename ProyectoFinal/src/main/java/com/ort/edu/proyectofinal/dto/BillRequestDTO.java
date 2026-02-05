@@ -12,6 +12,7 @@ import lombok.Setter;
 public class BillRequestDTO {
 
     private Integer cartId;
+    private Integer billId;
     private String deliveryMode;
     private Integer paymentMethod;
     private String phone;
@@ -25,6 +26,7 @@ public class BillRequestDTO {
     public String toString() {
         return "BillRequestDTO{" +
                 "cartId=" + cartId +
+                "billId=" + billId +
                 ", deliveryMode='" + deliveryMode + '\'' +
                 ", paymentMethod='" + paymentMethod + '\'' +
                 ", phone='" + phone + '\'' +

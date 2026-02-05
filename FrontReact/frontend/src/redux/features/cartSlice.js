@@ -1,10 +1,12 @@
 import { createSlice } from "@reduxjs/toolkit";
 import {
+  apiProcessBill,
   apiAddItemToCart,
   apiGetCart,
   apiConfirmCart,
   apiCloseCart,
 } from "../../services/cartService";
+import { BILL, BILL_ID, saveToLocalStorage } from "../../functions/localStorage";
 
 const initialState = {
   cartId: 0,
@@ -146,6 +148,9 @@ export const closeCartAsync = (payload) => async (dispatch) => {
       throw new Error(data.message);
     }
 
+    saveToLocalStorage(BILL, data);
+    saveToLocalStorage(BILL_ID, data?.billId);
+
     console.log(data);
 
     dispatch(clearCartState());
@@ -158,5 +163,23 @@ export const closeCartAsync = (payload) => async (dispatch) => {
   }
   finally {
     dispatch(setCartLoading(false));
+  }
+};
+
+export const apiProcessBillAsync = (payload) => async (dispatch) => {
+  try {
+    const data = await apiProcessBill(payload);
+
+    if (data?.message) {
+      throw new Error(data.message);
+    }
+
+    console.log(data);
+
+    return data;
+  }
+  catch (error) {
+    dispatch(setCartError(error.message));
+    return null;
   }
 };
