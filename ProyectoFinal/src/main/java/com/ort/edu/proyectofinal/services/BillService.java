@@ -85,7 +85,7 @@ public class BillService {
         if (items.isEmpty()) {
             throw new BillException("Debe haber pedidos procesados para generar la factura");
         }
-
+        /*
         if (request.getBillId() > 0) {
             Optional<Bill> bill = billRepository.findById(request.getBillId());
 
@@ -96,7 +96,7 @@ public class BillService {
                 return new BillResponseDTO(bill.get());
             }
         }
-
+        */
         Bill bill = new Bill();
 
         bill.setBillNumber(createBillNumber(request.getCartId()));
@@ -177,8 +177,7 @@ public class BillService {
         System.out.println();
         System.out.println("---------- process ---------------");
         System.out.println(request.toString());
-        System.out.println("---------- process ---------------");
-        System.out.println();
+
 
         Optional<Bill> optionalBill = billRepository.findById(request.getBillId());
 
@@ -191,11 +190,17 @@ public class BillService {
         if (optionalPaymenttype.isPresent()) {
             bill.setPaymentType(optionalPaymenttype.get());
         }
+        else {
+            System.out.println("No pude cargar el paymentId: " + request.getPaymentTypeId());
+        }
 
         // Llamada asincrona
         cartService.closeCart(request.getCartId());
 
         BillResponseDTO bResponseDTO = new BillResponseDTO(bill);
+
+        System.out.println("---------- process ---------------");
+        System.out.println();
 
         return bResponseDTO;
     }

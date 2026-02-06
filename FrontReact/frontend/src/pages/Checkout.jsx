@@ -8,16 +8,18 @@ import PaymentSection from "../components/checkout/PaymentSection";
 import OrderSummaryCard from "../components/checkout/OrderSummaryCard";
 import BillSummaryCard from "../components/checkout/BillSummaryCard";
 import { BILL, BILL_ID, USER_TYPE, getFromLocalStorage } from "../functions/localStorage";
-import { closeCartAsync, apiProcessBillAsync } from "../redux/features/cartSlice";
+import { apiProcessBillAsync } from "../redux/features/cartSlice";
 
 export default function Checkout() {
+
+  const location = useLocation();
+  const { bill } = location.state || {};
+
   const dispatch = useDispatch();
   const { items, totalAmount, cartId } = useSelector((state) => state.cart);
   const direction = useSelector((state) => state.userDirection.direction);
-  const location = useLocation();
   const userType = getFromLocalStorage(USER_TYPE);
   const isLocal = userType === "LOCAL";
-  const bill = location.state?.bill || getFromLocalStorage(BILL) || null;
 
   const [deliveryMode, setDeliveryMode] = useState(isLocal ? "LOCAL" : "DELIVERY");
   const [paymentMethod, setPaymentMethod] = useState("");
@@ -68,28 +70,6 @@ export default function Checkout() {
 
     loadDirections();
 
-    let billId = getFromLocalStorage(BILL_ID) || null;
-
-    const payload = {
-      cartId,
-      billId,
-      deliveryMode,
-      paymentMethod,
-      phone,
-      comments,
-      // En retiro no se envía dirección.
-      directionId: deliveryMode === "LOCAL" ? -1 : selectedDirection || -1,
-    };
-
-    console.log('---------------------');
-    console.log('Payload en useEffect de Checkout:');
-    console.log(payload);
-    console.log('bill: ');
-    console.log(bill);
-    console.log('---------------------');
-
-    dispatch(closeCartAsync(payload));
-
     return () => {
       // Evita setState si el usuario sale de la pantalla.
       isMounted = false;
@@ -113,16 +93,13 @@ export default function Checkout() {
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    let billId = getFromLocalStorage(BILL_ID) || null;
-
     const payload = {
-      cartId: cartId,
-      billId: billId,
-      deliveryMode: deliveryMode,
-      paymentTypeId: paymentMethod,
-      phone: phone,
-      comments: comments,
-      // En retiro no se envía dirección.
+      cartId: cartId || -1,
+      billId: bill?.billId || -1,
+      deliveryMode: deliveryMode || '',
+      paymentTypeId: paymentMethod || 99,
+      phone: phone || '',
+      comments: comments || '',
       directionId: deliveryMode === "LOCAL" ? -1 : selectedDirection || -1,
     };
 
