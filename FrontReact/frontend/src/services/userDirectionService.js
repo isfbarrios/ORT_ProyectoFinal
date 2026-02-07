@@ -2,23 +2,30 @@ import {
   API_URL,
   buildFetchHeader,
 } from "../functions/localStorage";
+import { clearAuth } from "./auth";
 
 export async function saveUserDirection(direction) {
   try {
     console.log("saveUserDirection direction:", direction);
-    const response = await fetch(API_URL + "/user_direction/new_direction", {
+    const res = await fetch(API_URL + "/user_direction/new_direction", {
       method: "POST",
       headers: buildFetchHeader(),
       body: JSON.stringify(direction),
       credentials: "include"
     });
 
-    if (!response.ok) {
-      const error = await response.text();
+    if (res.status === 401) {
+      clearAuth();
+      window.location.href = "/";
+      throw new Error("Unauthorized");
+    }
+
+    if (!res.ok) {
+      const error = await res.text();
       throw new Error(error || "Error al guardar la dirección");
     }
 
-    return await response.json();
+    return await res.json();
   }
   catch (error) {
     console.error("saveUserDirection error:", error);
@@ -28,18 +35,24 @@ export async function saveUserDirection(direction) {
 
 export async function getUserDirections() {
   try {
-    const response = await fetch(API_URL + "/user_direction", {
+    const res = await fetch(API_URL + "/user_direction", {
       method: "GET",
       headers: buildFetchHeader(),
       credentials: "include"
     });
 
-    if (!response.ok) {
-      const error = await response.text();
+    if (res.status === 401) {
+      clearAuth();
+      window.location.href = "/";
+      throw new Error("Unauthorized");
+    }
+
+    if (!res.ok) {
+      const error = await res.text();
       throw new Error(error || "Error al obtener las direcciones del usuario");
     }
 
-    return await response.json();
+    return await res.json();
   }
   catch (error) {
     console.error("saveUserDirection error:", error);
@@ -49,18 +62,24 @@ export async function getUserDirections() {
 
 export async function deleteUserDirection(id) {
   try {
-    const response = await fetch(API_URL + `/user_direction/${id}`, {
+    const res = await fetch(API_URL + `/user_direction/${id}`, {
       method: "DELETE",
       headers: buildFetchHeader(),
       credentials: "include"
     });
 
-    if (!response.ok) {
-      const error = await response.text();
+    if (res.status === 401) {
+      clearAuth();
+      window.location.href = "/";
+      throw new Error("Unauthorized");
+    }
+
+    if (!res.ok) {
+      const error = await res.text();
       throw new Error(error || "Error al eliminar la dirección");
     }
 
-    return await response.json();
+    return await res.json();
   }
   catch (error) {
     console.error("deleteUserDirection error:", error);

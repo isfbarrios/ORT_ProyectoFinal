@@ -6,10 +6,7 @@ import com.ort.edu.proyectofinal.repositories.CartRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/cart")
@@ -29,23 +26,4 @@ public class CartController {
 
         return ResponseEntity.ok(new CartDTO(optionalCart.get()));
     }
-    /*
-    @GetMapping
-    public ResponseEntity<?> getAll() {
-
-        List<CartDTO> carts = repo.findAll()
-                .stream()
-                .map(CartDTO::new)
-                .collect(Collectors.toList());
-
-        //TODO: Revisar
-        for (Iterator<CartDTO> it = carts.iterator(); it.hasNext();) {
-            CartDTO temp = it.next();
-            if (temp.getCartState().getId() != 2) {
-                it.remove();
-            }
-        }
-        return ResponseEntity.ok(carts);
-    }
-    */
 }

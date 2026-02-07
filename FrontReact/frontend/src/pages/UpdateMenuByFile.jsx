@@ -1,60 +1,31 @@
 import { useState } from "react";
-import { updateMenuByFileAsync } from "../redux/features/menuSlice";
-import { useDispatch } from "react-redux";
+import { Box, Heading, Stack, Text } from "@chakra-ui/react";
+import UploadMenuExcel from "../components/UploadMenuExcel";
+import Menu from "./Menu";
 
-function FileUploadForm() {
-  const dispatch = useDispatch();
-  const [file, setFile] = useState(null);
+function UpdateMenuByFile() {
+  const [refreshKey, setRefreshKey] = useState(0);
 
-  const handleFileChange = (event) => {
-    setFile(event.target.files[0]);
-  };
-
-  const handleSubmit = (event) => {
-    event.preventDefault();
-
-    if (!file) {
-      alert("Seleccioná un archivo");
-      return;
-    }
-
-    // Ejemplo de uso
-    console.log("Archivo seleccionado:", file);
-    console.log("Nombre:", file.name);
-    console.log("Tamaño:", file.size);
-    console.log("Tipo:", file.type);
-
-    // Acá normalmente armarías el FormData
-    // y lo enviarías al backend
-    const formData = new FormData();
-    formData.append("file", file);
-
-    dispatch(updateMenuByFileAsync(formData));
+  const handleImported = () => {
+    setRefreshKey((prev) => prev + 1);
   };
 
   return (
-    <div style={{ maxWidth: "400px", margin: "2rem auto" }}>
-      <h2>Cargar archivo</h2>
+    <Box maxW="960px" mx="auto" py={6} textAlign="center">
+      <Stack spacing={2} mb={6} align="center">
+        <Heading size="lg">Actualizar menú por Excel</Heading>
+        <Text color="gray.500">
+          Cargá un archivo `.xlsx` para actualizar el menú del restaurante.
+        </Text>
+      </Stack>
 
-      <form onSubmit={handleSubmit}>
-        <input
-          type="file"
-          onChange={handleFileChange}
-        />
+      <UploadMenuExcel onImported={handleImported} />
 
-        <button type="submit" style={{ marginTop: "1rem" }}>
-          Enviar
-        </button>
-      </form>
-
-      {file && (
-        <div style={{ marginTop: "1rem" }}>
-          <strong>Archivo seleccionado:</strong>
-          <div>{file.name}</div>
-        </div>
-      )}
-    </div>
+      <Box mt={8}>
+        <Menu menuId={1} refreshKey={refreshKey} />
+      </Box>
+    </Box>
   );
 }
 
-export default FileUploadForm;
+export default UpdateMenuByFile;

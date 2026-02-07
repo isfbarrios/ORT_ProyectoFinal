@@ -2,8 +2,8 @@ import {
   API_URL,
   buildFetchHeader,
   getFromLocalStorage
-} from "../functions/localStorage"
-
+} from "../functions/localStorage";
+import { clearAuth } from "./auth";
 
 export async function getMenuItemsByMenu(menuId) {
   const res = await fetch(`${API_URL}/menu_item/menu/${menuId}`, {
@@ -11,6 +11,12 @@ export async function getMenuItemsByMenu(menuId) {
     headers: buildFetchHeader(),
     credentials: "include"
   });
+
+  if (res.status === 401) {
+    clearAuth();
+    window.location.href = "/";
+    throw new Error("Unauthorized");
+  }
 
   if (!res.ok) {
     const text = await res.text().catch(() => "");
@@ -35,10 +41,22 @@ export async function updateMenuByFile(formData) {
     credentials: "include"
   });
 
+  if (res.status === 401) {
+    clearAuth();
+    window.location.href = "/";
+    throw new Error("Unauthorized");
+  }
+
   if (!res.ok) {
     const text = await res.text().catch(() => "");
     throw new Error(text || "Error al actualizar el menú");
   }
 
-  return await res.json();
+  const text = await res.text().catch(() => "");
+  if (!text) return "";
+  try {
+    return JSON.parse(text);
+  } catch {
+    return text;
+  }
 }

@@ -46,8 +46,7 @@ public class TableReservationController {
     }
 
     @PostMapping("/reserve")
-    public ResponseEntity<?> reserveTableShift(
-        @RequestBody ReservationRequestDTO request) {
+    public ResponseEntity<?> reserveTableShift(@RequestBody ReservationRequestDTO request) {
 
         try {
             boolean isReserved = service.reserve(request.getTableId(), request.getShiftId(), request.getDate(), request.getCustomerName());

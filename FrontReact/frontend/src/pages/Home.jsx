@@ -1,6 +1,7 @@
 import { Button, VStack, Heading, Text, Box } from "@chakra-ui/react";
 import { useSearchParams, Link } from "react-router-dom";
-import { USER_TYPE, saveToLocalStorage } from "../functions/localStorage";
+import { USER_TYPE, saveToLocalStorage, TABLE_ID } from "../functions/localStorage";
+
 
 export default function Home() {
 
@@ -9,9 +10,11 @@ export default function Home() {
   try {
     const userType = searchParams.get("userType")?.toString().toUpperCase() || "LOCAL";
 
-    console.log("Home page userType:", userType);
+    const tableId = searchParams.get("tableId") || "-1";
 
     saveToLocalStorage(USER_TYPE, userType);
+    saveToLocalStorage(TABLE_ID, tableId);
+    
   }
   catch (error) {
     console.error("Error rendering Home page:", error);

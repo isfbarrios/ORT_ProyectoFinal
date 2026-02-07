@@ -30,22 +30,11 @@ public class OrderController {
     @GetMapping
     public ResponseEntity<?> getAll() {
 
-        List<OrderDTO> orders = repo.findAll()
+        List<OrderDTO> orders = repo.findByStateIdIn(List.of(1, 2, 3))
                 .stream()
                 .map(OrderDTO::new)
                 .toList();
 
-        //TODO: Revisar
-        /*
-        if (!orders.isEmpty()) {
-            for (Iterator<OrderDTO> it = orders.iterator(); it.hasNext();) {
-                OrderDTO temp = it.next();
-                if (temp.getState().getId() > 3) {
-                    it.remove();
-                }
-            }
-        }
-        */
         return ResponseEntity.ok(orders);
     }
 }

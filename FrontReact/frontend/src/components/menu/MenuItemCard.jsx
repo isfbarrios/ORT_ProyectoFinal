@@ -8,8 +8,12 @@ import {
   Stack,
   Text,
 } from "@chakra-ui/react";
+import { USER_TYPE, getFromLocalStorage } from "../../functions/localStorage";
 
 export default function MenuItemCard({ item, onAddToCart, isLoading }) {
+  const userType = getFromLocalStorage(USER_TYPE);
+  const isKitchen = userType === "COCINA";
+
   return (
     <Card borderWidth="1px" borderColor="orange.100">
       <CardBody>
@@ -23,17 +27,19 @@ export default function MenuItemCard({ item, onAddToCart, isLoading }) {
           </Text>
         </Stack>
       </CardBody>
-      <CardFooter>
-        <Button
-          colorScheme="orange"
-          width="100%"
-          onClick={() => onAddToCart(item.id)}
-          isLoading={isLoading}
-          loadingText="Agregando..."
-        >
-          Añadir al pedido
-        </Button>
-      </CardFooter>
+      {!isKitchen && (
+        <CardFooter>
+          <Button
+            colorScheme="orange"
+            width="100%"
+            onClick={() => onAddToCart(item.id)}
+            isLoading={isLoading}
+            loadingText="Agregando..."
+          >
+            Añadir al pedido
+          </Button>
+        </CardFooter>
+      )}
     </Card>
   );
 }

@@ -83,6 +83,7 @@ export default function NavBar() {
           {!isLocal && (
             <>
               {isKitchen && <NavItem to="/kitchen">Cocina</NavItem>}
+              {isKitchen && <NavItem to="/update_menu">Cargar menú</NavItem>}
               {!isKitchen && <NavItem to="/menu">Menu</NavItem>}
               {!isKitchen && <NavItem to="/directions">Direcciones</NavItem>}
               {!isKitchen && <NavItem to="/reserva">Reservas</NavItem>}
@@ -90,22 +91,24 @@ export default function NavBar() {
           )}
         </HStack>
 
-        <Button
-          onClick={handleOpenCart}
-          colorScheme="orange"
-          variant="solid"
-          size="sm"
-        >
-          <HStack spacing={2}>
-            <Text>Carrito</Text>
-            <Badge colorScheme="whiteAlpha" bg="whiteAlpha.900" color="orange.700">
-              {itemsCount}
-            </Badge>
-            {totalAmount > 0 && (
-              <Text fontWeight="semibold">- ${totalAmount}</Text>
-            )}
-          </HStack>
-        </Button>
+        {!isKitchen && (
+          <Button
+            onClick={handleOpenCart}
+            colorScheme="orange"
+            variant="solid"
+            size="sm"
+          >
+            <HStack spacing={2}>
+              <Text>Carrito</Text>
+              <Badge colorScheme="whiteAlpha" bg="whiteAlpha.900" color="orange.700">
+                {itemsCount}
+              </Badge>
+              {totalAmount > 0 && (
+                <Text fontWeight="semibold">- ${totalAmount}</Text>
+              )}
+            </HStack>
+          </Button>
+        )}
       </Flex>
     </Box>
   );

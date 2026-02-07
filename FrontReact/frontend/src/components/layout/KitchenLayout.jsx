@@ -1,6 +1,7 @@
 import { Outlet } from "react-router-dom";
 import { AppBar, Box, CssBaseline, Toolbar, Typography } from "@mui/material";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
+import NavBar from "../NavBar";
 
 export default function KitchenLayout() {
   return (
@@ -18,6 +19,7 @@ export default function KitchenLayout() {
           </Toolbar>
         </AppBar>
         <Box sx={{ p: 2, minHeight: "calc(100vh - 64px)" }}>
+          <NavBar />
           <Outlet />
         </Box>
       </Box>

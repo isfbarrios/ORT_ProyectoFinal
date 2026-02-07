@@ -1,6 +1,14 @@
 // src/components/UploadMenuExcel.jsx
 import { useRef, useState } from "react";
-import { uploadMenuExcelService } from "../services/menuService";
+import {
+  Box,
+  Button,
+  Heading,
+  Input,
+  Stack,
+  Text,
+} from "@chakra-ui/react";
+import { updateMenuByFile } from "../services/menuService";
 
 function UploadMenuExcel({ onImported }) {
   const fileInputRef = useRef(null);
@@ -21,8 +29,13 @@ function UploadMenuExcel({ onImported }) {
 
     try {
       setLoading(true);
-      const respuesta = await uploadMenuExcelService(file);
-      setMensaje(respuesta);
+      const formData = new FormData();
+      formData.append("file", file);
+
+      const respuesta = await updateMenuByFile(formData);
+      setMensaje(
+        typeof respuesta === "string" ? respuesta : "Menú importado correctamente."
+      );
 
       // si el padre pasa un callback para refrescar la lista, lo ejecutamos
       if (typeof onImported === "function") {
@@ -36,40 +49,65 @@ function UploadMenuExcel({ onImported }) {
   };
 
   return (
-    <div className="card p-3 mt-3">
-      <h5 className="mb-3">Cargar menú desde Excel</h5>
+    <Box
+      borderWidth="1px"
+      borderColor="orange.100"
+      bg="white"
+      rounded="lg"
+      p={4}
+      boxShadow="sm"
+      maxW="520px"
+      mx="auto"
+      textAlign="center"
+    >
+      <Stack spacing={3} align="center">
+        <Box>
+          <Heading size="sm" mb={1}>
+            Cargar menú desde Excel
+          </Heading>
+          <Text color="gray.500" fontSize="sm">
+            Formato esperado: columnas Nombre, Descripción, Precio y Tipo.
+          </Text>
+        </Box>
 
-      <form onSubmit={handleSubmit}>
-        <div className="mb-2">
-          <input
-            type="file"
-            ref={fileInputRef}
-            accept=".xlsx,.xls"
-            className="form-control"
-          />
-        </div>
+        <form onSubmit={handleSubmit}>
+          <Stack spacing={3} align="center">
+            <Input
+              type="file"
+              ref={fileInputRef}
+              accept=".xlsx"
+              variant="filled"
+              bg="orange.50"
+              focusBorderColor="orange.400"
+              maxW="420px"
+            />
 
-        <button
-          type="submit"
-          className="btn btn-primary"
-          disabled={loading}
-        >
-          {loading ? "Importando..." : "Importar menú"}
-        </button>
-      </form>
+            <Button
+              type="submit"
+              colorScheme="orange"
+              alignSelf="center"
+              isLoading={loading}
+              loadingText="Importando..."
+              mt={2}
+            >
+              Importar menú
+            </Button>
+          </Stack>
+        </form>
 
-      {mensaje && (
-        <p className="mt-2 text-success">
-          {mensaje}
-        </p>
-      )}
+        {mensaje && (
+          <Text color="green.600" fontSize="sm">
+            {mensaje}
+          </Text>
+        )}
 
-      {error && (
-        <p className="mt-2 text-danger">
-          {error}
-        </p>
-      )}
-    </div>
+        {error && (
+          <Text color="red.500" fontSize="sm">
+            {error}
+          </Text>
+        )}
+      </Stack>
+    </Box>
   );
 }
 

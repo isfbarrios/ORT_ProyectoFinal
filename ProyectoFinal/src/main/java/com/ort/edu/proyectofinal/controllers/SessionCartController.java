@@ -24,9 +24,9 @@ public class SessionCartController {
     private UserRepository userRepository;
 
     @GetMapping
-    public ResponseEntity<?> getCart(Principal principal) {
+    public ResponseEntity<?> getCart(@PathVariable Integer tableId, Principal principal) {
 
-        SessionCartDTO cart = cartService.getOrCreateCart(principal);
+        SessionCartDTO cart = cartService.getOrCreateCart(tableId, principal);
 
         return ResponseEntity.ok(cart);
     }
@@ -35,7 +35,8 @@ public class SessionCartController {
     public ResponseEntity<?> addItem(@RequestBody AddCartItemRequestDTO body, Principal principal) {
 
         try {
-            SessionCartDTO cart = cartService.addItemToCart(principal, body.getMenuItemId(), body.getQuantity());
+            SessionCartDTO cart = cartService
+                    .addItemToCart(principal, body.getMenuItemId(), body.getQuantity(), body.getTableId());
 
             return ResponseEntity.ok(cart);
         }

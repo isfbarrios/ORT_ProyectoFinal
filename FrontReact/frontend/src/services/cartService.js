@@ -1,21 +1,32 @@
 import {
   API_URL,
   buildFetchHeader,
+  getFromLocalStorage,
   safeJson,
+  TABLE_ID
 } from "../functions/localStorage";
+import { clearAuth } from "./auth";
 
 // ===============================================
 // GET /session_cart
 // ===============================================
 export async function apiGetCart() {
+  const tableId = getFromLocalStorage(TABLE_ID);
   const res = await fetch(`${API_URL}/session_cart`, {
     method: "GET",
     headers: buildFetchHeader(),
+    body: JSON.stringify({ tableId: tableId }),
     credentials: "include"
   });
 
   const data = await safeJson(res);
-  console.log("apiGetCart data:", data);
+
+  if (res.status === 401) {
+    clearAuth();
+    window.location.href = "/";
+    throw new Error("Unauthorized");
+  }
+
   if (!res.ok) throw new Error(data.message);
 
   return data;
@@ -25,14 +36,22 @@ export async function apiGetCart() {
 // POST /session_cart/items  (agregar item)
 // ===============================================
 export async function apiAddItemToCart(menuItemId, quantity = 1) {
+  const tableId = getFromLocalStorage(TABLE_ID);
   const res = await fetch(`${API_URL}/session_cart/items`, {
     method: "POST",
     headers: buildFetchHeader(),
-    body: JSON.stringify({ menuItemId, quantity }),
+    body: JSON.stringify({ menuItemId, quantity, tableId }),
     credentials: "include"
   });
 
   const data = await safeJson(res);
+
+  if (res.status === 401) {
+    clearAuth();
+    window.location.href = "/";
+    throw new Error("Unauthorized");
+  }
+
   if (!res.ok) throw new Error(data.message);
 
   return data;
@@ -50,6 +69,13 @@ export async function apiConfirmCart() {
   });
 
   const data = await safeJson(res);
+
+  if (res.status === 401) {
+    clearAuth();
+    window.location.href = "/";
+    throw new Error("Unauthorized");
+  }
+
   if (!res.ok) throw new Error(data.message);
 
   return data;
@@ -68,6 +94,12 @@ export async function apiCloseCart(payload) {
 
   try {
     const data = await res.json(res);
+
+    if (res.status === 401) {
+      clearAuth();
+      window.location.href = "/";
+      throw new Error("Unauthorized");
+    }
 
     if (!res.ok) throw new Error(data.message);
 
@@ -91,6 +123,12 @@ export async function apiProcessBill(payload) {
 
   try {
     const data = await res.json(res);
+
+    if (res.status === 401) {
+      clearAuth();
+      window.location.href = "/";
+      throw new Error("Unauthorized");
+    }
 
     if (!res.ok) throw new Error(data.message);
 

@@ -1,3 +1,4 @@
+import { isTokenExpired } from "./api";
 import {
   KEY,
   API_URL,
@@ -65,6 +66,12 @@ export async function loginApi({ username, password, userType }) {
     const errorText = await res.text();
     throw new Error(errorText || "Credenciales inválidas");
   }
+
+  if (res.status === 401) {
+    clearAuth();
+    window.location.href = "/";
+    throw new Error("Unauthorized");
+  }
   // El backend devuelve JSON solo en caso de éxito (AuthResponseDTO)
   try {
     const data = await res.json();
@@ -80,8 +87,9 @@ export async function refreshToken() {
   let accessToken = getFromLocalStorage(API_TOKEN);
   let refreshToken = getFromLocalStorage(API_REFRESH_TOKEN);
 
-  if (!accessToken || !refreshToken) {
-    throw new Error("No hay tokens disponibles para refrescar la sesión");
+  if (accessToken && isTokenExpired(accessToken)) {
+    closeSession();
+    return;
   }
 
   const res = await fetch(API_URL + "/auth/refresh", {
@@ -99,6 +107,12 @@ export async function refreshToken() {
     throw new Error(errorText || "Error refrescando la sesión");
   }
 
+  if (res.status === 401) {
+    closeSession();
+    window.location.href = "/";
+    throw new Error("Unauthorized");
+  }
+
   try {
     const data = await res.json();
     return data;
@@ -106,7 +120,6 @@ export async function refreshToken() {
   catch (error) {
     console.error("Error al parsear JSON:", error);
     closeSession();
-    throw new Error("Respuesta inválida del servidor");
   }
 }
 

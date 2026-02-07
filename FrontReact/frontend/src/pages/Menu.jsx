@@ -16,7 +16,7 @@ import MenuHeader from "../components/menu/MenuHeader";
 import MenuItemCard from "../components/menu/MenuItemCard";
 import MenuEmptyState from "../components/menu/MenuEmptyState";
 
-export default function Menu({ menuId = 1 }) {
+export default function Menu({ menuId = 1, refreshKey = 0 }) {
 
   const dispatch = useDispatch();
   const cart = useSelector((state) => state.cart);
@@ -44,7 +44,7 @@ export default function Menu({ menuId = 1 }) {
     };
 
     loadMenu();
-  }, [menuId]);
+  }, [menuId, refreshKey]);
 
   // Cargar carrito (si existe sesión)
   /*useEffect(() => {

@@ -55,7 +55,7 @@ public class CartItemController {
     @GetMapping("/cart/{cartId}")
     public ResponseEntity<?> getAllByCart(@PathVariable int cartId) {
 
-        List<CartItemDTO> items = repo.findByCartIdAndProcessed(cartId, 0)
+        List<CartItemDTO> items = repo.findByCartIdAndProcessed(cartId, 1)
                 .stream()
                 .map(CartItemDTO::new)
                 .collect(Collectors.toList());

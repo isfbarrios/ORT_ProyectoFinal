@@ -1,4 +1,4 @@
-import { Outlet, useLocation } from "react-router-dom";
+import { Outlet, useLocation, /*useNavigate*/ } from "react-router-dom";
 import NavBar from "./components/NavBar";
 import CartModal from "./components/CartModal";
 import { useEffect } from "react";
@@ -9,6 +9,7 @@ import { refreshToken, clearAuth } from "./services/auth";
 
 export default function App() {
   const dispatch = useDispatch();
+  //const navigate = useNavigate();
   const location = useLocation();
 
   const isPublicRoute =
@@ -25,6 +26,7 @@ export default function App() {
       catch (error) {
         console.error("Error refrescando sesión:", error);
         clearAuth();
+        //navigate("/");
       }
     };
 

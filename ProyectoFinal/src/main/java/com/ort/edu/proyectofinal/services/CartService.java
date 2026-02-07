@@ -41,19 +41,16 @@ public class CartService {
     @Autowired
     private OrderService orderService;
 
-    @Autowired
-    private UserRepository userRepository;
 
-    private Cart createNewCart(Principal principal) {
+    @Transactional
+    private Cart createNewCart(Integer tableId, Principal principal) {
 
         String userName = principal.getName();
 
-        User user = userRepository.findByUsername(userName);
-
         Cartstate cartState = cartStateRepository.getReferenceById(1);
 
-        //TODO: Ajustar para pedir por fecha
-        Tables table = tablesRepository.getReferenceById(1);
+        // Si tengo el tableId, le asigno esa, sino, por defecto es el 1
+        Tables table = tablesRepository.getReferenceById((tableId > 0 ? tableId : 1));
 
         //Traigo mesas disponibles
 
@@ -64,22 +61,20 @@ public class CartService {
         cart.setCartState(cartState);
         cart.setTable(table);
 
-        BigDecimal amount = BigDecimal.ZERO;
-
-        //TODO: Recalcular
-        cart.setAmount(amount);
-        cart.setDelayTime(120);
+        // Por defecto, el carrito empieza con precio cero y 45 minutos de demora
+        cart.setAmount(BigDecimal.ZERO);
+        cart.setDelayTime(45);
 
         cart = cartRepository.save(cart);
 
         return cart;
     }
 
-    private Cart getOrCreateCartEntity(Principal principal) {
+    private Cart getOrCreateCartEntity(Integer tableId, Principal principal) {
 
         Cart cart = getActiveUserCart(principal.getName());
 
-        if (cart == null) cart = createNewCart(principal);
+        if (cart == null) cart = createNewCart(tableId, principal);
 
         return cart;
     }
@@ -109,13 +104,14 @@ public class CartService {
     }
 
     @Transactional
-    public SessionCartDTO getOrCreateCart(Principal principal) {
-        Cart cart = getOrCreateCartEntity(principal);
+    public SessionCartDTO getOrCreateCart(Integer tableId, Principal principal) {
+        Cart cart = getOrCreateCartEntity(tableId, principal);
         return buildSessionCartDTO(cart);
     }
 
     @Transactional
-    public SessionCartDTO addItemToCart(Principal principal, int menuItemId, int quantity) throws CartException {
+    public SessionCartDTO addItemToCart(Principal principal,
+                                        Integer menuItemId, Integer quantity, Integer tableId) throws CartException {
 
         if (quantity <= 0) {
             throw new CartException("Cantidad insuficiente para el item " + menuItemId);
@@ -125,7 +121,9 @@ public class CartService {
 
         Cart cart = cartRepository.findTopByUserNameAndCartState_IdOrderByDateDesc(userName, 1);
 
-        if (cart == null) cart = createNewCart(principal);
+        if (cart == null) cart = createNewCart(tableId, principal);
+
+        Integer delayTimeTemp = cart.getDelayTime();
 
         Menuitem menuitem = menuItemRepository.findById(menuItemId)
                 .orElseThrow(() -> new IllegalArgumentException("Menuitem no encontrado"));
@@ -151,6 +149,7 @@ public class CartService {
             newItem.setQuantity(quantity);
             newItem.setProcessed(0);
             newItem.setItemAmount(calculateItemAmount(menuitem, quantity));
+
             newItem.setDelayTime(45);
 
             cartItemRepository.save(newItem);
