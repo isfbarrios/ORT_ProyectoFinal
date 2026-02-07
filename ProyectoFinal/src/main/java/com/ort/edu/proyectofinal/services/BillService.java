@@ -56,6 +56,7 @@ public class BillService {
         );
     }
 
+    @Transactional
     public BillResponseDTO create(BillRequestDTO request) throws CartException, BillException {
 
         System.out.println();
@@ -63,7 +64,6 @@ public class BillService {
         System.out.println(request.toString());
         System.out.println("---------- create ---------------");
         System.out.println();
-
 
         Optional<Cart> optionalCart = cartRepository.findById(request.getCartId());
 
@@ -85,18 +85,7 @@ public class BillService {
         if (items.isEmpty()) {
             throw new BillException("Debe haber pedidos procesados para generar la factura");
         }
-        /*
-        if (request.getBillId() > 0) {
-            Optional<Bill> bill = billRepository.findById(request.getBillId());
 
-            if (bill.isPresent()) {
-                // Llamada asincrona
-                buildBill(request, bill.get(), cart, items);
-
-                return new BillResponseDTO(bill.get());
-            }
-        }
-        */
         Bill bill = new Bill();
 
         bill.setBillNumber(createBillNumber(request.getCartId()));
@@ -110,8 +99,6 @@ public class BillService {
         }
 
         bill.setAmount(amount);
-
-        //billRepository.save(bill);
 
         // Llamada asincrona
         buildBill(request, bill, cart, items);
@@ -128,15 +115,11 @@ public class BillService {
         // Asignamos un valor por defecto, para mostrar previo a efectuar el pago
         Optional<Paymenttype> optionalPaymenttype = paymenttypeRepository.findById(99);
 
-        if (optionalPaymenttype.isPresent()) {
-            bill.setPaymentType(optionalPaymenttype.get());
-        }
+        optionalPaymenttype.ifPresent(bill::setPaymentType);
 
         Optional<UserDirection> userDirection = userDirectionRepository.findById(request.getDirectionId());
 
-        if (userDirection.isPresent()) {
-            request.setDirectionStr(userDirection.get().toJson());
-        }
+        userDirection.ifPresent(direction -> request.setDirectionStr(direction.toJson()));
 
         bill.setExtraData(request.toJson());
 
@@ -172,27 +155,22 @@ public class BillService {
         billRepository.save(bill);
     }
 
+    @Transactional
     public BillResponseDTO process(BillProcessDTO request) throws Exception {
 
         System.out.println();
         System.out.println("---------- process ---------------");
         System.out.println(request.toString());
 
-
         Optional<Bill> optionalBill = billRepository.findById(request.getBillId());
 
-        if (!optionalBill.isPresent()) throw new Exception("No pudimos procesar el pago. Intente nuevamente");
+        if (optionalBill.isEmpty()) throw new Exception("No pudimos procesar el pago. Intente nuevamente");
 
         Bill bill = optionalBill.get();
 
         Optional<Paymenttype> optionalPaymenttype = paymenttypeRepository.findById(request.getPaymentTypeId());
 
-        if (optionalPaymenttype.isPresent()) {
-            bill.setPaymentType(optionalPaymenttype.get());
-        }
-        else {
-            System.out.println("No pude cargar el paymentId: " + request.getPaymentTypeId());
-        }
+        optionalPaymenttype.ifPresent(bill::setPaymentType);
 
         // Llamada asincrona
         cartService.closeCart(request.getCartId());

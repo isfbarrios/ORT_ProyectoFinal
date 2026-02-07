@@ -15,7 +15,6 @@ import java.util.function.Function;
 @Service
 public class JwtService {
 
-    //TODO: Levantar de algun archivo de configuracion
     private static final String SECRET_KEY = "clave_secreta_para_jwt_super_segura_y_lo_suficientemente_larga_para_hs256";
 
     private Key getSigningKey() {
