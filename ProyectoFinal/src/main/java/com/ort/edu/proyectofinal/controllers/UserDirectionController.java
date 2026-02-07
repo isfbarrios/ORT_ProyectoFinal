@@ -5,7 +5,6 @@ import com.ort.edu.proyectofinal.entities.User;
 import com.ort.edu.proyectofinal.repositories.UserDirectionRepository;
 import com.ort.edu.proyectofinal.repositories.UserRepository;
 import com.ort.edu.proyectofinal.services.UserDirectionService;
-import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

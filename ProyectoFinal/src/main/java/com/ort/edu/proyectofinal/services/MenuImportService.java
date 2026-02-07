@@ -59,6 +59,9 @@ public class MenuImportService {
         Menu menu = menuRepository.findById(menuId)
                 .orElseThrow(() -> new RuntimeException("Menu no encontrado: " + menuId));
 
+        Menuitemstate state = stateRepository.findById(1)
+                .orElseThrow(() -> new RuntimeException("StateId no encontrado: " + 1));
+
         // try-with-resources para cerrar el workbook automáticamente
         try (Workbook workbook = new XSSFWorkbook(file.getInputStream())) {
             Sheet sheet = workbook.getSheetAt(0);
@@ -75,10 +78,6 @@ public class MenuImportService {
                 Menuitemtype type = typeRepository.findById(typeId)
                         .orElseThrow(() -> new RuntimeException("TypeId no encontrado: " + typeId));
 
-                Menuitemstate state = stateRepository.findById(1)
-                        .orElseThrow(() -> new RuntimeException("StateId no encontrado: " + 1));
-
-                // Creamos el item
                 Menuitem item = new Menuitem();
                 item.setName(name);
                 item.setDescription(description);

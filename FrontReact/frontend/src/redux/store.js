@@ -4,6 +4,7 @@ import dashboardReducer from "./features/dashboardSlice";
 import cartReducer from "./features/cartSlice";
 import tableReservationReducer from "./features/tableReservationSlice";
 import userDirectionReducer from "./features/userDirectionSlice";
+import menuReducer from "./features/menuSlice";
 
 export const store = configureStore({
   reducer: {
@@ -11,6 +12,7 @@ export const store = configureStore({
     dashboard: dashboardReducer,
     cart: cartReducer,
     tableReservation: tableReservationReducer,
-    userDirection: userDirectionReducer
+    userDirection: userDirectionReducer,
+    menu: menuReducer,
   },
 })

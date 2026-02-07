@@ -1,7 +1,6 @@
-// src/pages/MenuPage.jsx
 import { useEffect, useState } from "react";
-import { getMenuItemsByMenu } from "../services/menuService";
-import UploadMenuExcel from "../components/UploadMenuExcel";
+import { getMenuItemsByMenu } from "../../services/menuService";
+import UploadMenuExcel from "../UploadMenuExcel";
 
 function MenuPage({ menuId = 1 }) {
   const [items, setItems] = useState([]);

@@ -9,12 +9,14 @@ import {
   IconButton,
   Stack,
   Table,
+  TableContainer,
   Tbody,
   Td,
   Text,
   Th,
   Thead,
   Tr,
+  VStack,
 } from "@chakra-ui/react";
 import { CloseIcon } from "@chakra-ui/icons";
 import Swal from "sweetalert2";
@@ -84,7 +86,7 @@ export default function UserDirectionPage() {
     e.preventDefault();
 
     // para mas adelate paymentMethod
-    const { paymentMethod, ...directionData } = formData;
+    const { ...directionData } = formData;
 
     const action = await dispatch(saveUserDirectionAsync(directionData));
     if (!action.error) {
@@ -225,24 +227,35 @@ export default function UserDirectionPage() {
         )}
 
         {directions.length > 0 && (
-          <Table size="sm">
-            <Thead>
-              <Tr>
-                <Th>Calle</Th>
-                <Th>Puerta</Th>
-                <Th>Teléfono</Th>
-                <Th>Comentarios</Th>
-                <Th textAlign="right"></Th>
-              </Tr>
-            </Thead>
-            <Tbody>
+          <>
+            <VStack
+              spacing={3}
+              align="stretch"
+              display={{ base: "flex", md: "none" }}
+            >
               {directions.map((d) => (
-                <Tr key={d.id}>
-                  <Td>{d.streetName}</Td>
-                  <Td>{d.doorNumber}</Td>
-                  <Td>{d.phone}</Td>
-                  <Td>{d.comments}</Td>
-                  <Td textAlign="right">
+                <Box
+                  key={d.id}
+                  borderWidth="1px"
+                  borderColor="orange.100"
+                  rounded="lg"
+                  p={4}
+                >
+                  <Stack spacing={1}>
+                    <Text fontSize="sm">
+                      <strong>Calle:</strong> {d.streetName}
+                    </Text>
+                    <Text fontSize="sm">
+                      <strong>Puerta:</strong> {d.doorNumber}
+                    </Text>
+                    <Text fontSize="sm">
+                      <strong>Teléfono:</strong> {d.phone}
+                    </Text>
+                    <Text fontSize="sm">
+                      <strong>Comentarios:</strong> {d.comments || "—"}
+                    </Text>
+                  </Stack>
+                  <Box mt={2} textAlign="right">
                     <IconButton
                       aria-label="Eliminar dirección"
                       icon={<CloseIcon />}
@@ -251,11 +264,49 @@ export default function UserDirectionPage() {
                       colorScheme="red"
                       onClick={() => handleDelete(d.id)}
                     />
-                  </Td>
-                </Tr>
+                  </Box>
+                </Box>
               ))}
-            </Tbody>
-          </Table>
+            </VStack>
+
+            <TableContainer
+              width="100%"
+              overflowX="auto"
+              display={{ base: "none", md: "block" }}
+            >
+              <Table size="sm" width="100%">
+                <Thead>
+                  <Tr>
+                    <Th>Calle</Th>
+                    <Th>Puerta</Th>
+                    <Th>Teléfono</Th>
+                    <Th>Comentarios</Th>
+                    <Th textAlign="right"></Th>
+                  </Tr>
+                </Thead>
+                <Tbody>
+                  {directions.map((d) => (
+                    <Tr key={d.id}>
+                      <Td>{d.streetName}</Td>
+                      <Td>{d.doorNumber}</Td>
+                      <Td>{d.phone}</Td>
+                      <Td>{d.comments}</Td>
+                      <Td textAlign="right">
+                        <IconButton
+                          aria-label="Eliminar dirección"
+                          icon={<CloseIcon />}
+                          size="sm"
+                          variant="ghost"
+                          colorScheme="red"
+                          onClick={() => handleDelete(d.id)}
+                        />
+                      </Td>
+                    </Tr>
+                  ))}
+                </Tbody>
+              </Table>
+            </TableContainer>
+          </>
         )}
       </Box>
     </Stack>

@@ -21,6 +21,7 @@ import RequireAuth from "./routes/RequireAuth.jsx";
 import RequireRole from "./routes/RequireRole.jsx";
 import UserDirectionPage from "./pages/UserDirectionPage.jsx";
 import Checkout from "./pages/Checkout.jsx";
+import UpdateMenuByFile from "./pages/UpdateMenuByFile.jsx";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
@@ -35,7 +36,7 @@ ReactDOM.createRoot(document.getElementById("root")).render(
               <Route path="qr" element={<QR value="userType=DELIVERY" />} />
               <Route path="directions" element={<UserDirectionPage />} />
               <Route path="add_direction" element={<UserDirectionPage />} />
-
+              <Route path="update_menu" element={<UpdateMenuByFile />} />
               {/* Rutas protegidas */}
               <Route element={<RequireAuth />}>
                 <Route element={<RequireRole allowed={["COCINA"]} />}>

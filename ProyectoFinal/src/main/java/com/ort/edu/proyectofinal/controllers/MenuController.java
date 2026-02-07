@@ -46,7 +46,7 @@ public class MenuController {
         return ResponseEntity.ok(items);
     }
 
-    @PostMapping("/import")
+    @PutMapping("/import")
     public ResponseEntity<?> uploadExcel(@RequestParam("file") MultipartFile file) {
 
         try {

@@ -2,8 +2,8 @@ import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { useDispatch, useSelector } from "react-redux";
 
-import { getMenuItemsByMenu } from "../services/menuService";
-import { addItemToCartAsync, fetchCartAsync } from "../redux/features/cartSlice";
+import { getMenuItemsByMenu } from "../../services/menuService";
+import { addItemToCartAsync, fetchCartAsync } from "../../redux/features/cartSlice";
 
 export default function Menu({ menuId = 1 }) {
   const dispatch = useDispatch();

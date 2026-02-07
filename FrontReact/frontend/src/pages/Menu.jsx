@@ -2,30 +2,29 @@ import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
   Box,
-  Button,
-  Heading,
   SimpleGrid,
   Spinner,
   Text,
   VStack,
   Alert,
   AlertIcon,
-  Card,
-  CardBody,
-  CardFooter,
-  Stack,
 } from "@chakra-ui/react";
 
 import { getMenuItemsByMenu } from "../services/menuService";
 import { addItemToCartAsync } from "../redux/features/cartSlice";
+import MenuHeader from "../components/menu/MenuHeader";
+import MenuItemCard from "../components/menu/MenuItemCard";
+import MenuEmptyState from "../components/menu/MenuEmptyState";
 
 export default function Menu({ menuId = 1 }) {
+
   const dispatch = useDispatch();
   const cart = useSelector((state) => state.cart);
 
   const [items, setItems] = useState([]);
   const [loadingMenu, setLoadingMenu] = useState(true);
   const [errorMenu, setErrorMenu] = useState(null);
+  const [searchQuery, setSearchQuery] = useState("");
 
   // Cargar items del menú
   useEffect(() => {
@@ -56,14 +55,16 @@ export default function Menu({ menuId = 1 }) {
     dispatch(addItemToCartAsync(menuItemId, 1));
   };
 
+  const filteredItems = items.filter((item) =>
+    item.name.toLowerCase().includes(searchQuery.trim().toLowerCase())
+  );
+
   return (
     <Box>
-      <VStack spacing={2} textAlign="center" mb={6}>
-        <Heading size="lg">Menú del Restaurante</Heading>
-        <Text color="gray.500">
-          Elegí tus platos y confirmá el pedido cuando estés listo.
-        </Text>
-      </VStack>
+      <MenuHeader
+        searchQuery={searchQuery}
+        onSearchChange={setSearchQuery}
+      />
 
       {loadingMenu && (
         <VStack spacing={3} py={10}>
@@ -81,41 +82,23 @@ export default function Menu({ menuId = 1 }) {
 
       {!loadingMenu && !errorMenu && (
         <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} spacing={6}>
-          {items.map((item) => (
-            <Card key={item.id} borderWidth="1px" borderColor="orange.100">
-              <CardBody>
-                <Stack spacing={3}>
-                  <Heading size="md">{item.name}</Heading>
-                  {item.description && (
-                    <Text color="gray.500">{item.description}</Text>
-                  )}
-                  <Text fontSize="xl" fontWeight="bold" color="orange.600">
-                    {item.basePrice !== undefined && item.basePrice !== null
-                      ? `$${item.basePrice.toFixed(2)}`
-                      : "—"}
-                  </Text>
-                </Stack>
-              </CardBody>
-              <CardFooter>
-                <Button
-                  colorScheme="orange"
-                  width="100%"
-                  onClick={() => handleAddToCart(item.id)}
-                  isLoading={cart.loading}
-                  loadingText="Agregando..."
-                >
-                  Añadir al pedido
-                </Button>
-              </CardFooter>
-            </Card>
+          {filteredItems.map((item) => (
+            <MenuItemCard
+              key={item.id}
+              item={item}
+              onAddToCart={handleAddToCart}
+              isLoading={cart.loading}
+            />
           ))}
         </SimpleGrid>
       )}
 
       {!loadingMenu && !errorMenu && items.length === 0 && (
-        <Text textAlign="center" color="gray.500" mt={6}>
-          No hay ítems cargados para este menú.
-        </Text>
+        <MenuEmptyState message="No hay ítems cargados para este menú." />
+      )}
+
+      {!loadingMenu && !errorMenu && items.length > 0 && filteredItems.length === 0 && (
+        <MenuEmptyState message="No se encontraron platos con ese nombre." />
       )}
     </Box>
   );
