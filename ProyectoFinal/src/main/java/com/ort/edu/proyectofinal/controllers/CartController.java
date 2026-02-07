@@ -1,16 +1,11 @@
 package com.ort.edu.proyectofinal.controllers;
 
 import com.ort.edu.proyectofinal.dto.CartDTO;
-import com.ort.edu.proyectofinal.dto.ResponseDTO;
 import com.ort.edu.proyectofinal.entities.Cart;
 import com.ort.edu.proyectofinal.repositories.CartRepository;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.security.Principal;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
@@ -34,7 +29,7 @@ public class CartController {
 
         return ResponseEntity.ok(new CartDTO(optionalCart.get()));
     }
-
+    /*
     @GetMapping
     public ResponseEntity<?> getAll() {
 
@@ -50,7 +45,7 @@ public class CartController {
                 it.remove();
             }
         }
-
         return ResponseEntity.ok(carts);
     }
+    */
 }

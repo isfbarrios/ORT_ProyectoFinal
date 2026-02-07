@@ -1,9 +1,6 @@
 package com.ort.edu.proyectofinal.services;
 
-import com.ort.edu.proyectofinal.dto.BillProcessDTO;
-import com.ort.edu.proyectofinal.dto.BillRequestDTO;
-import com.ort.edu.proyectofinal.dto.BillResponseDTO;
-import com.ort.edu.proyectofinal.dto.ResponseDTO;
+import com.ort.edu.proyectofinal.dto.*;
 import com.ort.edu.proyectofinal.entities.*;
 import com.ort.edu.proyectofinal.exception.BillException;
 import com.ort.edu.proyectofinal.exception.CartException;
@@ -117,12 +114,6 @@ public class BillService {
 
         optionalPaymenttype.ifPresent(bill::setPaymentType);
 
-        Optional<UserDirection> userDirection = userDirectionRepository.findById(request.getDirectionId());
-
-        userDirection.ifPresent(direction -> request.setDirectionStr(direction.toJson()));
-
-        bill.setExtraData(request.toJson());
-
         billRepository.save(bill);
 
         BigDecimal amount = BigDecimal.ZERO;
@@ -171,6 +162,14 @@ public class BillService {
         Optional<Paymenttype> optionalPaymenttype = paymenttypeRepository.findById(request.getPaymentTypeId());
 
         optionalPaymenttype.ifPresent(bill::setPaymentType);
+
+        Optional<UserDirection> userDirection = userDirectionRepository.findById(request.getDirectionId());
+
+        userDirection.ifPresent(direction -> request.setDirection(new UserDirectionDTO(direction)));
+
+        bill.setExtraData(request.toJson());
+
+        billRepository.save(bill);
 
         // Llamada asincrona
         cartService.closeCart(request.getCartId());

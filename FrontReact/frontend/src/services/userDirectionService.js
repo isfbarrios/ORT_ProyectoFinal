@@ -46,3 +46,24 @@ export async function getUserDirections() {
     throw error;
   }
 }
+
+export async function deleteUserDirection(id) {
+  try {
+    const response = await fetch(API_URL + `/user_direction/${id}`, {
+      method: "DELETE",
+      headers: buildFetchHeader(),
+      credentials: "include"
+    });
+
+    if (!response.ok) {
+      const error = await response.text();
+      throw new Error(error || "Error al eliminar la dirección");
+    }
+
+    return await response.json();
+  }
+  catch (error) {
+    console.error("deleteUserDirection error:", error);
+    throw error;
+  }
+}

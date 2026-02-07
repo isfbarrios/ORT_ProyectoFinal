@@ -28,9 +28,6 @@ public class UserDirectionController {
     @Autowired
     private UserRepository userRepository;
 
-    @Autowired
-    private HttpSession session;
-
     @GetMapping
     public ResponseEntity<?> getAll(Principal principal) {
 
@@ -47,20 +44,29 @@ public class UserDirectionController {
 
         UserDirectionsDTO directions = new UserDirectionsDTO(user.getUsername(), items);
 
-        System.out.println("UserDirectionController.saveDirection.get all");
+        System.out.println("UserDirectionController.getAll all");
         System.out.println(directions.toString());
 
         return ResponseEntity.ok(directions);
     }
 
     @PostMapping("/new_direction")
-    public ResponseEntity<?> saveDirection(
-            @RequestBody UserDirectionRequestDTO body, Principal principal) {
+    public ResponseEntity<?> save(@RequestBody UserDirectionRequestDTO body, Principal principal) {
 
-        service.saveOrUpdate(body, principal);
+        service.save(body, principal);
 
         return ResponseEntity.ok(
                 new ResponseDTO("Dirección guardada correctamente")
+        );
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> delete(@PathVariable Integer id, Principal principal) {
+
+        service.deleteDirection(id, principal);
+
+        return ResponseEntity.ok(
+                new ResponseDTO("Dirección eliminada correctamente")
         );
     }
 }

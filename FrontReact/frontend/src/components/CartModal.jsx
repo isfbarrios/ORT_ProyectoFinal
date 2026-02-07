@@ -57,8 +57,21 @@ export default function CartModal() {
     else {
       const order = await dispatch(confirmCartAsync());
       if (order) {
+        const payload = {
+          cartId: cartId,
+          deliveryMode: userType,
+          paymentMethod: 99,
+          phone: '',
+          comments: '',
+          directionId: -1,
+        };
+
+        const bill = await dispatch(closeCartAsync(payload));
+
         dispatch(closeCartModal());
-        navigate("/checkout");
+
+        navigate("/checkout", { state: { bill } });
+
       }
 
       return;
@@ -77,8 +90,6 @@ export default function CartModal() {
   const handleClose = async () => {
     dispatch(closeCartModal());
     const bill = await dispatch(closeCartAsync(payload));
-
-    console.log("handleClose bill: ", bill);
 
     navigate("/checkout", { state: { bill } });
   };
@@ -153,14 +164,16 @@ export default function CartModal() {
           <Button variant="ghost" onClick={() => dispatch(closeCartModal())}>
             Volver
           </Button>
-          <Button
-            variant="outline"
-            colorScheme="red"
-            onClick={handleClose}
-            isDisabled={!canCloseCart}
-          >
-            Cerrar carrito
-          </Button>
+          {isLocal && (
+            <Button
+              variant="outline"
+              colorScheme="red"
+              onClick={handleClose}
+              isDisabled={!canCloseCart}
+            >
+              Cerrar carrito
+            </Button>
+          )}
           <Button
             colorScheme="orange"
             onClick={handleConfirm}

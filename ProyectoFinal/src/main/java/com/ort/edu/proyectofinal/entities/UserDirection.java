@@ -46,6 +46,20 @@ public class UserDirection {
     @Column(name = "LastUpdate")
     private LocalDateTime lastUpdate;
 
+    @Override
+    public String toString() {
+        return "UserDirection{" +
+                "id=" + id +
+                ", user=" + user +
+                ", streetName='" + streetName + '\'' +
+                ", doorNumber='" + doorNumber + '\'' +
+                ", phone='" + phone + '\'' +
+                ", comments='" + comments + '\'' +
+                ", createdDate=" + createdDate +
+                ", lastUpdate=" + lastUpdate +
+                '}';
+    }
+
     @Transient
     public String toJson() {
         try {

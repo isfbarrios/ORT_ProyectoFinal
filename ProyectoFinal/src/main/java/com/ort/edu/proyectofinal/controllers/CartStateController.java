@@ -1,16 +1,11 @@
 package com.ort.edu.proyectofinal.controllers;
 
 import com.ort.edu.proyectofinal.dto.CartStateDTO;
-import com.ort.edu.proyectofinal.dto.ResponseDTO;
 import com.ort.edu.proyectofinal.entities.Cartstate;
 import com.ort.edu.proyectofinal.repositories.CartStateRepository;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.security.Principal;
 import java.util.Optional;
 
 @RestController

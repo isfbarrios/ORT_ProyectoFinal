@@ -118,21 +118,45 @@ DROP  COLUMN ExtraData;
 ALTER TABLE OrderItem
 ADD COLUMN Notes TEXT DEFAULT NULL,
 
-select * from `Order` o;
-
-select * from OrderItem;
-
-select * from Cart c where c.CartId = 168 order by c.CartId desc;
-
-select * from CartItem c where c.CartId = 168;
+select * from `Order` o where o.CartId = 170;
 
 select * from CartState;
 
-select * from Bill;
+select * from Cart c order by c.CartId desc;
+
+select * from CartItem c where c.CartId = 181;
+
+select * from UserDirection u;
+
+ALTER TABLE UserDirection
+DROP INDEX uq_userdirection_user;
+
+alter table UserDirection drop foreign key `fk_userdirection_users`;
+
+CREATE INDEX idx_userdirection_user
+ON UserDirection (UserId);
+
+ALTER TABLE UserDirection
+ADD CONSTRAINT fk_userdirection_users
+FOREIGN KEY (UserId)
+REFERENCES Users (UserId)
+ON DELETE CASCADE;
+
+select * from Bill b order by b.BillId desc;
+
+select * from TableReservation t;
+
+select * from MenuItem t;
+
+select * from MenuItemType t;
+
+select * from Menu t;
+
+insert into PaymentType values (99, 'Pendiente');
 
 update Cart set CartStateId = 3 where CartId < 180;
 
-select * from BillItem;
+select * from BillItem b order by b.BillId desc;
 
 CREATE TABLE `Order` (
   OrderId int(10) unsigned NOT NULL AUTO_INCREMENT,

@@ -16,7 +16,7 @@ export default function Checkout() {
   const { bill } = location.state || {};
 
   const dispatch = useDispatch();
-  const { items, totalAmount, cartId } = useSelector((state) => state.cart);
+  const { cartId } = useSelector((state) => state.cart);
   const direction = useSelector((state) => state.userDirection.direction);
   const userType = getFromLocalStorage(USER_TYPE);
   const isLocal = userType === "LOCAL";
@@ -25,6 +25,8 @@ export default function Checkout() {
   const [paymentMethod, setPaymentMethod] = useState("");
   const [phone, setPhone] = useState("");
   const [comments, setComments] = useState("");
+  const [billResult, setBillResult] = useState(bill || null); // Guarda la boleta confirmada (o la que viene por state).
+  const [showOnlyBill, setShowOnlyBill] = useState(false); // Controla si se muestra solo la boleta en pantalla.
   // Dirección preseleccionada si ya existe en el store.
   const [selectedDirection, setSelectedDirection] = useState(
     direction?.id ? String(direction.id) : ""
@@ -90,7 +92,7 @@ export default function Checkout() {
     return Array.from(map.values());
   }, [directions, direction]);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => { // Maneja el click en "Pagar" con llamada async.
     e.preventDefault();
 
     const payload = {
@@ -103,8 +105,20 @@ export default function Checkout() {
       directionId: deliveryMode === "LOCAL" ? -1 : selectedDirection || -1,
     };
 
-    dispatch(apiProcessBillAsync(payload));
+    const data = await dispatch(apiProcessBillAsync(payload)); // Envía al backend y espera la boleta.
+    if (data) { // Si hay respuesta válida, actualiza la UI.
+      setBillResult(data); // Guarda la boleta devuelta para mostrarla.
+      setShowOnlyBill(true); // Oculta el checkout y deja solo la boleta.
+    }
   };
+
+  if (showOnlyBill) { // Si el pago fue procesado, renderiza solo la boleta.
+    return (
+      <Stack spacing={6} align="center"> {/* Contenedor centrado para la boleta. */}
+        <BillSummaryCard bill={billResult} /> {/* Componente que muestra el detalle de la boleta. */}
+      </Stack>
+    );
+  }
 
   return (
     <Stack spacing={6}>
@@ -142,16 +156,16 @@ export default function Checkout() {
             </VStack>
           </CardBody>
           <CardFooter>
-            <Button colorScheme="orange" onClick={handleSubmit}>
+            <Button 
+              colorScheme="orange" 
+              onClick={handleSubmit}
+              isDisabled={!paymentMethod || paymentMethod <= 0}
+            >
               Pagar
             </Button>
           </CardFooter>
         </Card>
-        {isLocal ? (
-          <BillSummaryCard bill={bill} />
-        ) : (
-          <OrderSummaryCard items={items} totalAmount={totalAmount} />
-        )}
+        <BillSummaryCard bill={bill} />
       </Stack>
     </Stack>
   );
