@@ -44,9 +44,6 @@ public class UserDirectionController {
 
         UserDirectionsDTO directions = new UserDirectionsDTO(user.getUsername(), items);
 
-        System.out.println("UserDirectionController.getAll all");
-        System.out.println(directions.toString());
-
         return ResponseEntity.ok(directions);
     }
 
@@ -63,7 +60,7 @@ public class UserDirectionController {
     @DeleteMapping("/{id}")
     public ResponseEntity<?> delete(@PathVariable Integer id, Principal principal) {
 
-        service.deleteDirection(id, principal);
+        service.delete(id, principal);
 
         return ResponseEntity.ok(
                 new ResponseDTO("Dirección eliminada correctamente")

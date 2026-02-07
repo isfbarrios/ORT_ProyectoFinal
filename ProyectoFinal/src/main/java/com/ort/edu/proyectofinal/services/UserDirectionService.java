@@ -47,7 +47,7 @@ public class UserDirectionService {
     }
 
     @Transactional
-    public void deleteDirection(Integer id, Principal principal) {
+    public void delete(Integer id, Principal principal) {
         String userName = principal.getName();
         User user = userRepository.findByUsername(userName);
 
