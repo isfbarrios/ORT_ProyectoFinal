@@ -20,19 +20,24 @@ export default function Board() {
   if (!columns || columns.length === 0)
     return <p>No hay columnas cargadas...</p>;
 
-  const getTargetColumnId = (over) => {
+  const getTargetColumnId = (over, sourceColId) => {
     if (!over) return null;
 
     if (typeof over.id === "string" && over.id.startsWith("column-")) {
       return Number(over.id.replace("column-", ""));
     }
 
-    const raw =
-      over.data?.current?.columnId ??
-      over.data?.current?.sortable?.containerId ??
-      null;
+    let raw = over.data?.current?.columnId ?? null;
 
-    if (typeof raw === "string" && raw.startsWith("column-")) {
+    if (raw !== null) {
+      if (Number(raw) === sourceColId) {
+        let temp = over.data?.current?.sortable?.containerId ?? '';
+
+        raw = Number(temp.startsWith("Sortable-") ? temp.replace("Sortable-", "") : raw);
+      }
+    }
+
+    if (typeof raw === "string" && (raw.startsWith("column-") || raw.startsWith("Sortable-"))) {
       return Number(raw.replace("column-", ""));
     }
 
@@ -57,7 +62,7 @@ export default function Board() {
   const handleDragEnd = async ({ active, over }) => {
     const orderId = active.data?.current?.orderId;
     const sourceColId = active.data?.current?.columnId;
-    const targetColId = getTargetColumnId(over);
+    const targetColId = getTargetColumnId(over, sourceColId);
 
     console.log("handleDragEnd - active:", active);
     console.log("handleDragEnd - over:", over);
