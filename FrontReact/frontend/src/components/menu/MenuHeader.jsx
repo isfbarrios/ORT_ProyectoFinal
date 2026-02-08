@@ -12,13 +12,24 @@ import { SearchIcon } from "@chakra-ui/icons";
 
 export default function MenuHeader({ searchQuery, onSearchChange }) {
   return (
-    <Box className="surface-card" p={{ base: 4, md: 5 }} mb={6}>
-      <VStack spacing={2} textAlign="center">
-        <Heading size="lg">Menú del Restaurante</Heading>
-        <Text color="gray.500">
+    <Box
+      className="surface-card"
+      p={{ base: 5, md: 6 }}
+      mb={6}
+      borderWidth="1px"
+      borderColor="orange.100"
+      rounded="2xl"
+      boxShadow="sm"
+      bgGradient="linear(to-r, orange.50, yellow.50)"
+    >
+      <VStack spacing={3} textAlign="center">
+        <Heading size="lg" color="orange.700">
+          Menú del Restaurante
+        </Heading>
+        <Text color="gray.600">
           Elegí tus platos y confirmá el pedido cuando estés listo.
         </Text>
-        <InputGroup maxW="420px">
+        <InputGroup maxW="440px">
           <InputLeftElement pointerEvents="none">
             <SearchIcon color="orange.400" />
           </InputLeftElement>
@@ -28,10 +39,10 @@ export default function MenuHeader({ searchQuery, onSearchChange }) {
             onChange={(e) => onSearchChange(e.target.value)}
             variant="filled"
             size="md"
-            bg="orange.50"
+            bg="white"
             focusBorderColor="orange.400"
-            _hover={{ bg: "orange.100" }}
-            _focus={{ bg: "orange.100" }}
+            _hover={{ bg: "orange.50" }}
+            _focus={{ bg: "orange.50" }}
             borderRadius="full"
           />
         </InputGroup>

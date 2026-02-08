@@ -6,7 +6,7 @@ export default function Home() {
   const [searchParams] = useSearchParams();
 
   try {
-    const userType = searchParams.get("userType")?.toString().toUpperCase() || "LOCAL";
+    const userType = searchParams.get("userType")?.toString().toUpperCase() || "DELIVERY";
     const tableId = searchParams.get("tableId") || "-1";
 
     saveToLocalStorage(USER_TYPE, userType);

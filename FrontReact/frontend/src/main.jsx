@@ -33,7 +33,7 @@ ReactDOM.createRoot(document.getElementById("root")).render(
               <Route index element={<Home />} />
               <Route path="login" element={<Login />} />
               <Route path="register" element={<Register />} />
-              <Route path="qr" element={<QR value="userType=DELIVERY" />} />
+              <Route path="qr" element={<QR value="userType=LOCAL" />} />
               <Route path="directions" element={<UserDirectionPage />} />
               <Route path="add_direction" element={<UserDirectionPage />} />
               <Route path="update_menu" element={<UpdateMenuByFile />} />

@@ -1,6 +1,14 @@
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { USER_TYPE, getFromLocalStorage } from "../../functions/localStorage";
+import {
+  BILL,
+  BILL_ID,
+  KEY,
+  TABLE_ID,
+  USER_TYPE,
+  getFromLocalStorage,
+  removeFromLocalStorage,
+} from "../../functions/localStorage";
 import {
   Badge,
   Box,
@@ -11,6 +19,7 @@ import {
   Button,
 } from "@chakra-ui/react";
 import { openCartModal } from "../../redux/features/cartSlice";
+import { clearAuth } from "../../services/auth";
 
 function NavItem({ to, children }) {
   return (
@@ -49,6 +58,7 @@ function NavAction({ onClick, children }) {
 
 export default function NavBar() {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const itemsCount = useSelector((state) => state.cart.items.length);
   const totalAmount = useSelector((state) => state.cart.totalAmount);
   const userType = getFromLocalStorage(USER_TYPE);
@@ -57,6 +67,16 @@ export default function NavBar() {
 
   const handleOpenCart = () => {
     dispatch(openCartModal());
+  };
+
+  const handleLogout = () => {
+    clearAuth();
+    removeFromLocalStorage(KEY);
+    removeFromLocalStorage(USER_TYPE);
+    removeFromLocalStorage(TABLE_ID);
+    removeFromLocalStorage(BILL_ID);
+    removeFromLocalStorage(BILL);
+    navigate("/", { replace: true });
   };
 
   return (
@@ -92,17 +112,22 @@ export default function NavBar() {
           )}
         </HStack>
 
-        {!isKitchen && (
-          <Button onClick={handleOpenCart} colorScheme="orange" variant="solid" size="sm">
-            <HStack spacing={2}>
-              <Text>Carrito</Text>
-              <Badge colorScheme="whiteAlpha" bg="whiteAlpha.900" color="orange.700">
-                {itemsCount}
-              </Badge>
-              {totalAmount > 0 && <Text fontWeight="semibold">- ${totalAmount}</Text>}
-            </HStack>
+        <HStack spacing={2}>
+          {!isKitchen && (
+            <Button onClick={handleOpenCart} colorScheme="orange" variant="solid" size="sm">
+              <HStack spacing={2}>
+                <Text>Carrito</Text>
+                <Badge colorScheme="whiteAlpha" bg="whiteAlpha.900" color="orange.700">
+                  {itemsCount}
+                </Badge>
+                {totalAmount > 0 && <Text fontWeight="semibold">- ${totalAmount}</Text>}
+              </HStack>
+            </Button>
+          )}
+          <Button onClick={handleLogout} variant="outline" colorScheme="orange" size="sm">
+            Cerrar sesión
           </Button>
-        )}
+        </HStack>
       </Flex>
     </Box>
   );
