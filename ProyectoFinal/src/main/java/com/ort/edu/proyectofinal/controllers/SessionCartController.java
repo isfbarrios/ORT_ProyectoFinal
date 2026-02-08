@@ -23,7 +23,7 @@ public class SessionCartController {
     @Autowired
     private UserRepository userRepository;
 
-    @GetMapping
+    @GetMapping("/table/{tableId}")
     public ResponseEntity<?> getCart(@PathVariable Integer tableId, Principal principal) {
 
         SessionCartDTO cart = cartService.getOrCreateCart(tableId, principal);

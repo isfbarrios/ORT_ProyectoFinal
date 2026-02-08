@@ -12,10 +12,9 @@ import { clearAuth } from "./auth";
 // ===============================================
 export async function apiGetCart() {
   const tableId = getFromLocalStorage(TABLE_ID);
-  const res = await fetch(`${API_URL}/session_cart`, {
+  const res = await fetch(`${API_URL}/session_cart/table/${tableId}`, {
     method: "GET",
     headers: buildFetchHeader(),
-    body: JSON.stringify({ tableId: tableId }),
     credentials: "include"
   });
 
