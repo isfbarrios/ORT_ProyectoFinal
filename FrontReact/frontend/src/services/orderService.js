@@ -1,5 +1,5 @@
 import { API_URL, buildFetchHeader } from "../functions/localStorage";
-import { clearAuth } from "./auth";
+
 
 //GET items de la orden
 export async function fetchOrderServiceFromApi(cartId) {
@@ -10,16 +10,10 @@ export async function fetchOrderServiceFromApi(cartId) {
     credentials: "include"
   });
 
-  const data = await safeJson(res);
-
-  if (res.status === 401) {
-    clearAuth();
-    window.location.href = "/";
-    throw new Error("Unauthorized");
-  }
+  const data = await safeJsonStrict(res);
 
   if (!res.ok) {
-    throw new Error(data.message || "No se pudieron obtener los ítems de la orden");
+    throw new Error(data?.message ?? "No se pudieron obtener los ítems de la orden");
   }
 
   console.log("fetchOrderServiceFromApi - data:", data);
@@ -31,6 +25,7 @@ export async function fetchOrderServiceFromApi(cartId) {
 export async function updateOrderState(orderId, stateId) {
 
   const res = await fetch(`${API_URL}/orders/update_state`, {
+
     method: "POST",
     headers: buildFetchHeader(),
     body: JSON.stringify({
@@ -40,20 +35,20 @@ export async function updateOrderState(orderId, stateId) {
     credentials: "include"
   });
 
-  if (res.status === 401) {
-    clearAuth();
-    window.location.href = "/";
-    throw new Error("Unauthorized");
-  }
+  const data = await safeJsonLoose(res);
 
   if (!res.ok) {
-    throw new Error("No se pudo actualizar el estado del pedido");
+    throw new Error(data?.message ?? "No se pudo actualizar el estado del pedido");
   }
 
-  return true;
+  if (data?.state?.id != null && Number(data.state.id) !== Number(stateId)) {
+    throw new Error("El servidor no confirmó el cambio de estado");
+  }
+
+  return data ?? true;
 }
 
-async function safeJson(res) {
+async function safeJsonStrict(res) {
   try {
     return await res.json();
   } catch {
@@ -61,3 +56,10 @@ async function safeJson(res) {
   }
 }
 
+async function safeJsonLoose(res) {
+  try {
+    return await res.json();
+  } catch {
+    return null;
+  }
+}

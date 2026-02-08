@@ -1,4 +1,3 @@
-// src/components/OrderCard.jsx
 import Swal from "sweetalert2";
 import "sweetalert2/dist/sweetalert2.min.css";
 import { fetchOrderServiceFromApi } from "../services/orderService";
@@ -7,7 +6,6 @@ import { CSS } from "@dnd-kit/utilities";
 import { Button, Card, CardContent, Chip, Stack, Typography } from "@mui/material";
 
 export default function OrderCard({ order, columnId }) {
-  const isLocked = Number(columnId) === 4;
   const statusStyle =
     {
       1: { label: "Pendiente", color: "#DC2626", chipBg: "#FEE2E2" },
@@ -26,7 +24,6 @@ export default function OrderCard({ order, columnId }) {
   } = useSortable({
     id: order.id,
     data: { orderId: order.id, columnId },
-    disabled: isLocked,
   });
 
   const style = {
@@ -34,7 +31,7 @@ export default function OrderCard({ order, columnId }) {
     transition,
   };
 
-  const mesa = order.table?.name ?? "—";
+  const mesa = order.table?.name ?? order.cart?.table?.name ?? "—";
   const estimatedMinutes = Number(order.delayTime) || 0;
 
 
@@ -143,16 +140,16 @@ export default function OrderCard({ order, columnId }) {
       ref={setNodeRef}
       variant="outlined"
       sx={{
-        cursor: isLocked ? "not-allowed" : "grab",
+        cursor: "grab",
         minHeight: 80,
-        opacity: isLocked ? 0.6 : isDragging ? 0.6 : 1,
+        opacity: isDragging ? 0.6 : 1,
         boxShadow: isDragging ? 3 : 1,
         borderColor: "transparent",
-        bgcolor: isLocked ? "grey.100" : statusStyle.chipBg,
+        bgcolor: statusStyle.chipBg,
         ...style,
       }}
-      {...(!isLocked ? listeners : {})}
-      {...(!isLocked ? attributes : {})}
+      {...listeners}
+      {...attributes}
     >
       <CardContent sx={{ pb: 2 }}>
         <Stack spacing={0.5}>

@@ -42,13 +42,13 @@ export default function Dashboard() {
 
         const data = await fetchBoardFromApi(); //  devuelve SOLO array de pedidos
 
-        console.log(data);
-
         dispatch(setBoard(data));              // le paso el array cdirecto
 
-      } catch (err) {
+      }
+      catch (err) {
         dispatch(setError(err.message));
-      } finally {
+      }
+      finally {
         dispatch(setLoading(false));
       }
     }

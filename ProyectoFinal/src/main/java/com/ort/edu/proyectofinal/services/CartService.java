@@ -61,9 +61,9 @@ public class CartService {
         cart.setCartState(cartState);
         cart.setTable(table);
 
-        // Por defecto, el carrito empieza con precio cero y 45 minutos de demora
+        // Por defecto, el carrito empieza con precio cero y 30 minutos de demora
         cart.setAmount(BigDecimal.ZERO);
-        cart.setDelayTime(45);
+        cart.setDelayTime(30);
 
         cart = cartRepository.save(cart);
 
@@ -150,9 +150,15 @@ public class CartService {
             newItem.setProcessed(0);
             newItem.setItemAmount(calculateItemAmount(menuitem, quantity));
 
-            newItem.setDelayTime(45);
+            newItem.setDelayTime(delayCalculator(newItem));
+
+            delayTimeTemp += newItem.getDelayTime();
 
             cartItemRepository.save(newItem);
+
+            cart.setDelayTime(delayTimeTemp);
+
+            cartRepository.save(cart);
         }
         else {
             //TODO: Validar si tiene variantes, xq pueden ser el mismo menuId pero con variantes
@@ -220,5 +226,16 @@ public class CartService {
         catch (OrderException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private Integer delayCalculator(Cartitem cartItem) {
+        if (cartItem.getMenuItem().getType().getId() == 1)
+            return 10;
+        else if (cartItem.getMenuItem().getType().getId() == 2)
+            return 15;
+        else if (cartItem.getMenuItem().getType().getId() == 3)
+            return 5;
+        else
+            return 0;
     }
 }

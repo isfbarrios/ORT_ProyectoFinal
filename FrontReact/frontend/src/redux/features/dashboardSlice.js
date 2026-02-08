@@ -159,9 +159,8 @@ export const {
 
 export const syncOrderStatus =
   ({ orderId, targetColId }) =>
-  async () => {
-    await updateOrderState(orderId, targetColId);
-    return true;
-  };
+    async () => {
+      return await updateOrderState(orderId, targetColId);
+    };
 
 export default dashboardSlice.reducer;

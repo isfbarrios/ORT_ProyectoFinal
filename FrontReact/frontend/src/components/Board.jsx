@@ -9,6 +9,7 @@ import {
   moveOrder,
   reorderColumn,
   syncOrderStatus,
+  updateOrder,
 } from "../redux/features/dashboardSlice";
 
 export default function Board() {
@@ -21,10 +22,28 @@ export default function Board() {
 
   const getTargetColumnId = (over) => {
     if (!over) return null;
+
     if (typeof over.id === "string" && over.id.startsWith("column-")) {
       return Number(over.id.replace("column-", ""));
     }
-    return over.data?.current?.columnId ?? null;
+
+    const raw =
+      over.data?.current?.columnId ??
+      over.data?.current?.sortable?.containerId ??
+      null;
+
+    if (typeof raw === "string" && raw.startsWith("column-")) {
+      return Number(raw.replace("column-", ""));
+    }
+
+    if (raw != null) return Number(raw);
+
+    const overOrderId = Number(over.id);
+    if (!Number.isNaN(overOrderId)) {
+      return Number(orders[overOrderId]?.state?.id ?? null);
+    }
+
+    return null;
   };
 
   const handleDragStart = ({ active }) => {
@@ -40,7 +59,22 @@ export default function Board() {
     const sourceColId = active.data?.current?.columnId;
     const targetColId = getTargetColumnId(over);
 
-    if (!orderId || !sourceColId || !targetColId) {
+    console.log("handleDragEnd - active:", active);
+    console.log("handleDragEnd - over:", over);
+    console.log("handleDragEnd - sourceColId:", sourceColId);
+    console.log("handleDragEnd - targetColId:", targetColId);
+
+    if (!orderId || !sourceColId) {
+      setActiveOrderId(null);
+      return;
+    }
+
+    if (!over || !targetColId) {
+      Swal.fire({
+        icon: "info",
+        title: "Movimiento no aplicado",
+        text: "Soltá la tarjeta sobre una columna válida.",
+      });
       setActiveOrderId(null);
       return;
     }
@@ -88,15 +122,21 @@ export default function Board() {
           typeof over?.id === "string" && over.id.startsWith("column-")
             ? undefined
             : (columns
-                .find((col) => Number(col.id) === targetColId)
-                ?.orderIds || []
-              ).indexOf(over.id),
+              .find((col) => Number(col.id) === targetColId)
+              ?.orderIds || []
+            ).indexOf(over.id),
       })
     );
 
     try {
-      await dispatch(syncOrderStatus({ orderId, targetColId }));
-    } catch (error) {
+      console.log('syncOrderStatus - orderId:', orderId, 'targetColId:', targetColId);
+      const updatedOrder = await dispatch(syncOrderStatus({ orderId, targetColId }));
+
+      if (updatedOrder) {
+        dispatch(updateOrder({ id: orderId, changes: updatedOrder }));
+      }
+    }
+    catch (error) {
       dispatch(
         moveOrder({
           orderId,
@@ -108,7 +148,7 @@ export default function Board() {
       Swal.fire({
         icon: "error",
         title: "Error",
-        text: "No se pudo actualizar el estado del pedido",
+        text: error?.message || "No se pudo actualizar el estado del pedido",
       });
     }
 
@@ -185,7 +225,7 @@ export default function Board() {
                   </Stack>
                 </Stack>
                 <Typography variant="body2" color="text.secondary">
-                  Mesa: {activeOrder.table?.name ?? "—"}
+                  Mesa: {activeOrder.table?.name ?? activeOrder.cart?.table?.name ?? "—"}
                 </Typography>
               </Stack>
             </CardContent>
