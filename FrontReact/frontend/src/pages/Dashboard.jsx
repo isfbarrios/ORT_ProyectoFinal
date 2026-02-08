@@ -2,16 +2,11 @@ import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { clearAuth, getAuth } from "../services/auth";
 import { useNavigate } from "react-router-dom";
-import { Box, Stack, Typography } from "@mui/material";
-
-import Board from "../components/Board";
-
-import {
-  setBoard,
-  setLoading,
-  setError,
-} from "../redux/features/dashboardSlice";
-
+import { Box, Stack } from "@mui/material";
+import Board from "../components/dashboard/Board";
+import DashboardHeader from "../components/dashboard/DashboardHeader";
+import DashboardFeedback from "../components/dashboard/DashboardFeedback";
+import { setBoard, setLoading, setError } from "../redux/features/dashboardSlice";
 import { fetchBoardFromApi } from "../services/dashboardService";
 
 export default function Dashboard() {
@@ -21,55 +16,34 @@ export default function Dashboard() {
   const auth = getAuth();
   const { isLoading, error } = useSelector((state) => state.dashboard);
 
-  // Validación de autenticación
-  // Validación de autenticación
   useEffect(() => {
-
     if (!auth?.isLogged) {
       clearAuth();
       navigate("/", { replace: true });
-
     }
   }, [auth, navigate]);
 
-
-  // Cargar tablero desde backend
   useEffect(() => {
-
-    async function cargarTablero() {
+    const cargarTablero = async () => {
       try {
         dispatch(setLoading(true));
-
-        const data = await fetchBoardFromApi(); //  devuelve SOLO array de pedidos
-
-        dispatch(setBoard(data));              // le paso el array cdirecto
-
-      }
-      catch (err) {
+        const data = await fetchBoardFromApi();
+        dispatch(setBoard(data));
+      } catch (err) {
         dispatch(setError(err.message));
-      }
-      finally {
+      } finally {
         dispatch(setLoading(false));
       }
-    }
+    };
 
     cargarTablero();
-  }, [dispatch])
+  }, [dispatch]);
 
   return (
     <Box sx={{ minHeight: "100%", display: "flex", flexDirection: "column", gap: 2 }}>
-      <Stack direction="row" alignItems="center" justifyContent="space-between">
-        <Typography variant="h5" fontWeight="bold">
-          Panel de Pedidos
-        </Typography>
-      </Stack>
+      <DashboardHeader />
 
-      {isLoading && <Typography>Cargando tablero...</Typography>}
-      {error && (
-        <Typography color="error.main">
-          {error}
-        </Typography>
-      )}
+      <DashboardFeedback isLoading={isLoading} error={error} />
 
       <Box
         sx={{

@@ -15,7 +15,17 @@ export default function MenuItemCard({ item, onAddToCart, isLoading }) {
   const isKitchen = userType === "COCINA";
 
   return (
-    <Card borderWidth="1px" borderColor="orange.100">
+    <Card
+      borderWidth="1px"
+      borderColor="orange.100"
+      borderRadius="xl"
+      boxShadow="sm"
+      transition="transform 120ms ease, box-shadow 120ms ease"
+      _hover={{
+        transform: "translateY(-2px)",
+        boxShadow: "md",
+      }}
+    >
       <CardBody>
         <Stack spacing={3}>
           <Heading size="md">{item.name}</Heading>

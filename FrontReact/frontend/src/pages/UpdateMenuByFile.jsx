@@ -1,9 +1,10 @@
 import { useState } from "react";
-import { Box, Heading, Stack, Text } from "@chakra-ui/react";
-import UploadMenuExcel from "../components/UploadMenuExcel";
+import { Box } from "@chakra-ui/react";
+import UploadMenuExcel from "../components/update-menu/UploadMenuExcel";
+import UpdateMenuHeader from "../components/update-menu/UpdateMenuHeader";
 import Menu from "./Menu";
 
-function UpdateMenuByFile() {
+export default function UpdateMenuByFile() {
   const [refreshKey, setRefreshKey] = useState(0);
 
   const handleImported = () => {
@@ -12,13 +13,7 @@ function UpdateMenuByFile() {
 
   return (
     <Box maxW="960px" mx="auto" py={6} textAlign="center">
-      <Stack spacing={2} mb={6} align="center">
-        <Heading size="lg">Actualizar menú por Excel</Heading>
-        <Text color="gray.500">
-          Cargá un archivo `.xlsx` para actualizar el menú del restaurante.
-        </Text>
-      </Stack>
-
+      <UpdateMenuHeader />
       <UploadMenuExcel onImported={handleImported} />
 
       <Box mt={8}>
@@ -27,5 +22,3 @@ function UpdateMenuByFile() {
     </Box>
   );
 }
-
-export default UpdateMenuByFile;

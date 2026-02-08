@@ -1,23 +1,15 @@
-// src/components/UploadMenuExcel.jsx
 import { useRef, useState } from "react";
-import {
-  Box,
-  Button,
-  Heading,
-  Input,
-  Stack,
-  Text,
-} from "@chakra-ui/react";
-import { updateMenuByFile } from "../services/menuService";
+import { Box, Button, Heading, Input, Stack, Text } from "@chakra-ui/react";
+import { updateMenuByFile } from "../../services/menuService";
 
-function UploadMenuExcel({ onImported }) {
+export default function UploadMenuExcel({ onImported }) {
   const fileInputRef = useRef(null);
   const [loading, setLoading] = useState(false);
   const [mensaje, setMensaje] = useState(null);
   const [error, setError] = useState(null);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const handleSubmit = async (event) => {
+    event.preventDefault();
     setMensaje(null);
     setError(null);
 
@@ -33,11 +25,8 @@ function UploadMenuExcel({ onImported }) {
       formData.append("file", file);
 
       const respuesta = await updateMenuByFile(formData);
-      setMensaje(
-        typeof respuesta === "string" ? respuesta : "Menú importado correctamente."
-      );
+      setMensaje(typeof respuesta === "string" ? respuesta : "Menú importado correctamente.");
 
-      // si el padre pasa un callback para refrescar la lista, lo ejecutamos
       if (typeof onImported === "function") {
         onImported();
       }
@@ -110,5 +99,3 @@ function UploadMenuExcel({ onImported }) {
     </Box>
   );
 }
-
-export default UploadMenuExcel;

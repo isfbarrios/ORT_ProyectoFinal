@@ -13,6 +13,10 @@ export default function PaymentSection({
           placeholder="Seleccionar"
           value={paymentMethod}
           onChange={(e) => setPaymentMethod(e.target.value)}
+          bg="orange.50"
+          borderColor="orange.200"
+          focusBorderColor="orange.400"
+          _hover={{ borderColor: "orange.300" }}
         >
           <option value="1">Efectivo</option>
           <option value="3">Mercado Pago</option>

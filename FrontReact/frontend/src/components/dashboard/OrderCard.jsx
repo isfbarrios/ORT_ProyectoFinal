@@ -1,6 +1,6 @@
 import Swal from "sweetalert2";
 import "sweetalert2/dist/sweetalert2.min.css";
-import { fetchOrderServiceFromApi } from "../services/orderService";
+import { fetchOrderServiceFromApi } from "../../services/orderService";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { Button, Card, CardContent, Chip, Stack, Typography } from "@mui/material";
@@ -14,14 +14,7 @@ export default function OrderCard({ order, columnId }) {
       4: { label: "Entregado", color: "#9CA3AF", chipBg: "#F3F4F6" },
     }[Number(columnId)] || { label: "Pendiente", color: "#DC2626", chipBg: "#FEE2E2" };
 
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-    isDragging,
-  } = useSortable({
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: order.id,
     data: { orderId: order.id, columnId },
   });
@@ -34,38 +27,24 @@ export default function OrderCard({ order, columnId }) {
   const mesa = order.table?.name ?? order.cart?.table?.name ?? "—";
   const estimatedMinutes = Number(order.delayTime) || 0;
 
-
   const handleDetails = async () => {
     try {
-      // Modal de carga
       Swal.fire({
         title: "Cargando detalles...",
         didOpen: () => Swal.showLoading(),
         allowOutsideClick: false,
-
       });
 
       const items = await fetchOrderServiceFromApi(order.cart.id);
-
-      // Total del pedido (precio unitario * cantidad)
-      const total = items.reduce(
-        (acc, it) => acc + it.itemAmount * it.quantity,
-        0
-      );
-
-      // Tiempo estimado
-      const estimatedFromItems = items.reduce(
-        (max, it) => Math.max(max, it.delayTime ?? 0),
-        0
-      );
-      const estimatedMinutes =
-        order.delayTime != null ? order.delayTime : estimatedFromItems;
+      const total = items.reduce((acc, item) => acc + item.itemAmount * item.quantity, 0);
+      const estimatedFromItems = items.reduce((max, item) => Math.max(max, item.delayTime ?? 0), 0);
+      const estimated = order.delayTime != null ? order.delayTime : estimatedFromItems;
 
       const rowsHtml = items
-        .map((it) => {
-          const nombre = it.menuItem?.name ?? "-";
-          const cantidad = it.quantity;
-          const unit = it.itemAmount;
+        .map((item) => {
+          const nombre = item.menuItem?.name ?? "-";
+          const cantidad = item.quantity;
+          const unit = item.itemAmount;
           const subtotal = unit * cantidad;
 
           return `
@@ -81,10 +60,9 @@ export default function OrderCard({ order, columnId }) {
 
       const html = `
         <p><strong>Mesa:</strong> ${mesa}</p>
-        ${estimatedMinutes > 0
-          ? `<p><strong>Tiempo estimado:</strong> ${estimatedMinutes} min</p>`
-          : `<p><strong>Tiempo estimado:</strong> No definido</p>`
-        }
+        ${estimated > 0
+          ? `<p><strong>Tiempo estimado:</strong> ${estimated} min</p>`
+          : `<p><strong>Tiempo estimado:</strong> No definido</p>`}
         <hr />
         ${items.length === 0
           ? "<p class='text-muted'>Este pedido no tiene ítems.</p>"
@@ -110,8 +88,7 @@ export default function OrderCard({ order, columnId }) {
               </tfoot>
             </table>
           </div>
-        `
-        }
+        `}
       `;
 
       Swal.fire({
@@ -125,12 +102,11 @@ export default function OrderCard({ order, columnId }) {
         buttonsStyling: false,
         confirmButtonText: "Cerrar",
       });
-    } catch (err) {
-      console.error(err);
+    } catch (error) {
       Swal.fire({
         icon: "error",
         title: "Error",
-        text: err.message || "No se pudieron cargar los detalles",
+        text: error.message || "No se pudieron cargar los detalles",
       });
     }
   };
@@ -146,6 +122,11 @@ export default function OrderCard({ order, columnId }) {
         boxShadow: isDragging ? 3 : 1,
         borderColor: "transparent",
         bgcolor: statusStyle.chipBg,
+        transition: "transform 120ms ease, box-shadow 120ms ease",
+        "&:hover": {
+          transform: "translateY(-2px)",
+          boxShadow: 3,
+        },
         ...style,
       }}
       {...listeners}
@@ -179,7 +160,7 @@ export default function OrderCard({ order, columnId }) {
             size="small"
             variant="outlined"
             onClick={handleDetails}
-            onPointerDown={(e) => e.stopPropagation()}
+            onPointerDown={(event) => event.stopPropagation()}
           >
             Ver detalles
           </Button>

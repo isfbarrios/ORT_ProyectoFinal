@@ -23,6 +23,10 @@ export default function UserDirectionForm({
             name="streetName"
             value={formData.streetName}
             onChange={onChange}
+            bg="orange.50"
+            borderColor="orange.200"
+            focusBorderColor="orange.400"
+            _hover={{ borderColor: "orange.300" }}
           />
         </FormControl>
 
@@ -33,6 +37,10 @@ export default function UserDirectionForm({
             name="doorNumber"
             value={formData.doorNumber}
             onChange={onChange}
+            bg="orange.50"
+            borderColor="orange.200"
+            focusBorderColor="orange.400"
+            _hover={{ borderColor: "orange.300" }}
           />
         </FormControl>
 
@@ -43,6 +51,10 @@ export default function UserDirectionForm({
             name="phone"
             value={formData.phone}
             onChange={onChange}
+            bg="orange.50"
+            borderColor="orange.200"
+            focusBorderColor="orange.400"
+            _hover={{ borderColor: "orange.300" }}
           />
         </FormControl>
 
@@ -53,6 +65,10 @@ export default function UserDirectionForm({
             value={formData.comments}
             onChange={onChange}
             placeholder="Aclaraciones para la entrega"
+            bg="orange.50"
+            borderColor="orange.200"
+            focusBorderColor="orange.400"
+            _hover={{ borderColor: "orange.300" }}
           />
         </FormControl>
 

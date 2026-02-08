@@ -32,7 +32,7 @@ export default function Column({ column }) {
         bgcolor: "common.white",
         border: "1px solid",
         borderColor: statusStyle.color,
-        boxShadow: "0 12px 30px rgba(245, 124, 0, 0.08)",
+        boxShadow: "0 12px 30px rgba(245, 124, 0, 0.12)",
       }}
     >
       <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>

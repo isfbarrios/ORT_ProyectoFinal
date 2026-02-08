@@ -10,15 +10,14 @@ import {
   reorderColumn,
   syncOrderStatus,
   updateOrder,
-} from "../redux/features/dashboardSlice";
+} from "../../redux/features/dashboardSlice";
 
 export default function Board() {
   const dispatch = useDispatch();
   const { columns, orders } = useSelector((state) => state.dashboard);
   const [activeOrderId, setActiveOrderId] = useState(null);
 
-  if (!columns || columns.length === 0)
-    return <p>No hay columnas cargadas...</p>;
+  if (!columns || columns.length === 0) return <p>No hay columnas cargadas...</p>;
 
   const getTargetColumnId = (over, sourceColId) => {
     if (!over) return null;
@@ -31,8 +30,7 @@ export default function Board() {
 
     if (raw !== null) {
       if (Number(raw) === sourceColId) {
-        let temp = over.data?.current?.sortable?.containerId ?? '';
-
+        const temp = over.data?.current?.sortable?.containerId ?? "";
         raw = Number(temp.startsWith("Sortable-") ? temp.replace("Sortable-", "") : raw);
       }
     }
@@ -64,11 +62,6 @@ export default function Board() {
     const sourceColId = active.data?.current?.columnId;
     const targetColId = getTargetColumnId(over, sourceColId);
 
-    console.log("handleDragEnd - active:", active);
-    console.log("handleDragEnd - over:", over);
-    console.log("handleDragEnd - sourceColId:", sourceColId);
-    console.log("handleDragEnd - targetColId:", targetColId);
-
     if (!orderId || !sourceColId) {
       setActiveOrderId(null);
       return;
@@ -90,6 +83,7 @@ export default function Board() {
         setActiveOrderId(null);
         return;
       }
+
       const orderIds = column.orderIds || [];
       const oldIndex = orderIds.indexOf(orderId);
       const overId = over?.id;
@@ -97,6 +91,7 @@ export default function Board() {
         typeof overId === "string" && overId.startsWith("column-")
           ? oldIndex
           : orderIds.indexOf(overId);
+
       if (oldIndex < 0 || newIndex < 0 || oldIndex === newIndex) {
         setActiveOrderId(null);
         return;
@@ -126,22 +121,18 @@ export default function Board() {
         targetIndex:
           typeof over?.id === "string" && over.id.startsWith("column-")
             ? undefined
-            : (columns
-              .find((col) => Number(col.id) === targetColId)
-              ?.orderIds || []
-            ).indexOf(over.id),
+            : (columns.find((col) => Number(col.id) === targetColId)?.orderIds || []).indexOf(
+                over.id
+              ),
       })
     );
 
     try {
-      console.log('syncOrderStatus - orderId:', orderId, 'targetColId:', targetColId);
       const updatedOrder = await dispatch(syncOrderStatus({ orderId, targetColId }));
-
       if (updatedOrder) {
         dispatch(updateOrder({ id: orderId, changes: updatedOrder }));
       }
-    }
-    catch (error) {
+    } catch (error) {
       dispatch(
         moveOrder({
           orderId,
@@ -169,6 +160,7 @@ export default function Board() {
       3: { label: "Listo", color: "#22C55E", chipBg: "#ECFDF3" },
       4: { label: "Entregado", color: "#9CA3AF", chipBg: "#F3F4F6" },
     }[Number(activeColumnId)] || { label: "Pendiente", color: "#DC2626", chipBg: "#FEE2E2" };
+
   const activeEstimatedMinutes = Number(activeOrder?.delayTime) || 0;
 
   return (
@@ -188,8 +180,8 @@ export default function Board() {
         }}
       >
         <Stack direction="row" spacing={3} sx={{ minWidth: "fit-content" }}>
-          {columns.map((col) => (
-            <Column key={col.id} column={col} />
+          {columns.map((column) => (
+            <Column key={column.id} column={column} />
           ))}
         </Stack>
       </Box>

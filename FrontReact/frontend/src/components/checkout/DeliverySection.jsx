@@ -33,6 +33,10 @@ export default function DeliverySection({
         <Select
           value={deliveryMode}
           onChange={(e) => setDeliveryMode(e.target.value)}
+          bg="orange.50"
+          borderColor="orange.200"
+          focusBorderColor="orange.400"
+          _hover={{ borderColor: "orange.300" }}
         >
           <option value="DELIVERY">Envío a domicilio</option>
           <option value="PICKUP">Retiro en local</option>
@@ -46,6 +50,10 @@ export default function DeliverySection({
           value={selectedDirection}
           onChange={(e) => setSelectedDirection(e.target.value)}
           isDisabled={deliveryMode === "PICKUP"}
+          bg="orange.50"
+          borderColor="orange.200"
+          focusBorderColor="orange.400"
+          _hover={{ borderColor: "orange.300" }}
         >
           {directionOptions.map((item) => (
             <option key={item.id} value={String(item.id)}>
@@ -77,6 +85,10 @@ export default function DeliverySection({
           value={phone}
           onChange={(e) => setPhone(e.target.value)}
           placeholder="Ej: 11 1234 5678"
+          bg="orange.50"
+          borderColor="orange.200"
+          focusBorderColor="orange.400"
+          _hover={{ borderColor: "orange.300" }}
         />
       </FormControl>
 
@@ -86,6 +98,10 @@ export default function DeliverySection({
           value={comments}
           onChange={(e) => setComments(e.target.value)}
           placeholder="Aclaraciones para la entrega"
+          bg="orange.50"
+          borderColor="orange.200"
+          focusBorderColor="orange.400"
+          _hover={{ borderColor: "orange.300" }}
         />
       </FormControl>
 

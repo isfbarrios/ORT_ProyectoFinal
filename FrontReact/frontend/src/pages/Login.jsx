@@ -1,56 +1,39 @@
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useNavigate, /*useSearchParams,*/ Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { USER_TYPE, getFromLocalStorage } from "../functions/localStorage";
-
-import {
-  Button,
-  Input,
-  FormControl,
-  FormLabel,
-  VStack,
-  Alert,
-  AlertIcon,
-  Heading,
-  Text,
-} from "@chakra-ui/react";
-
+import { Heading } from "@chakra-ui/react";
 import PublicLayout from "../components/layout/PublicLayout";
+import LoginForm from "../components/auth/LoginForm";
 import { loginApi, saveAuth } from "../services/auth";
 import { setUser, setLoading } from "../redux/features/appSlice";
 
 export default function Login() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-
   const isLoading = useSelector((state) => state.app.isLoading);
 
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
 
-  const handleLogin = async (e) => {
-    e.preventDefault();
+  const handleLogin = async (event) => {
+    event.preventDefault();
     setErrorMsg("");
     dispatch(setLoading(true));
 
     try {
-      let userType = getFromLocalStorage(USER_TYPE);
-
+      const userType = getFromLocalStorage(USER_TYPE);
       const data = await loginApi({ username, password, userType });
 
       saveAuth(data);
       dispatch(setUser(data.user ?? data));
 
       const nextPath = userType === "COCINA" ? "/kitchen" : "/menu";
-
       navigate(nextPath);
-    }
-    catch (error) {
-      console.error("Error de login:", error);
+    } catch (error) {
       setErrorMsg(error.message || "Credenciales inválidas");
-    }
-    finally {
+    } finally {
       dispatch(setLoading(false));
     }
   };
@@ -61,79 +44,15 @@ export default function Login() {
         Iniciar sesión
       </Heading>
 
-      <Text fontSize="sm" color="gray.500" textAlign="center" mb={4}>
-        Accedé a tu cuenta para continuar
-      </Text>
-
-      <form onSubmit={handleLogin}>
-        <VStack spacing={4}>
-          <FormControl>
-            <FormLabel>Usuario</FormLabel>
-            <Input
-              type="text"
-              placeholder="jperez"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              disabled={isLoading}
-              required
-            />
-          </FormControl>
-
-          <FormControl>
-            <FormLabel>Contraseña</FormLabel>
-            <Input
-              type="password"
-              placeholder="●●●●●●●●"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              disabled={isLoading}
-              required
-            />
-          </FormControl>
-
-          {errorMsg && (
-            <Alert status="error" borderRadius="md">
-              <AlertIcon />
-              {errorMsg}
-            </Alert>
-          )}
-
-          <Button
-            type="submit"
-            colorScheme="orange"
-            size="lg"
-            width="100%"
-            isLoading={isLoading}
-            loadingText="Ingresando..."
-          >
-            Ingresar
-          </Button>
-
-          <Text fontSize="sm" textAlign="center" color="gray.500" mt={4}>
-            ¿No tenés cuenta?{" "}
-            <Text
-              as={Link}
-              to="/register"
-              color="orange.400"
-              fontWeight="semibold"
-              display="inline"
-            >
-              Registrate
-            </Text>
-          </Text>
-
-          <Text fontSize="sm" textAlign="center" mt={2}>
-            <Text
-              as={Link}
-              to="/"
-              color="gray.400"
-              display="inline"
-            >
-              Volver al inicio
-            </Text>
-          </Text>
-        </VStack>
-      </form>
+      <LoginForm
+        username={username}
+        password={password}
+        errorMsg={errorMsg}
+        isLoading={isLoading}
+        onUsernameChange={(event) => setUsername(event.target.value)}
+        onPasswordChange={(event) => setPassword(event.target.value)}
+        onSubmit={handleLogin}
+      />
     </PublicLayout>
   );
 }

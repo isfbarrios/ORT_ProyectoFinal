@@ -1,56 +1,35 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import {
-  Alert,
-  AlertIcon,
-  Box,
-  Heading,
-  IconButton,
-  Stack,
-  Table,
-  TableContainer,
-  Tbody,
-  Td,
-  Text,
-  Th,
-  Thead,
-  Tr,
-  VStack,
-} from "@chakra-ui/react";
-import { CloseIcon } from "@chakra-ui/icons";
+import { Alert, AlertIcon, Box, Stack, Text } from "@chakra-ui/react";
 import Swal from "sweetalert2";
 import "sweetalert2/dist/sweetalert2.min.css";
-
 import { clearAuth, getAuth } from "../services/auth";
-import UserDirectionForm from "../components/UserDirectionForm";
+import UserDirectionForm from "../components/user-direction/UserDirectionForm";
+import UserDirectionHeaderCard from "../components/user-direction/UserDirectionHeaderCard";
+import UserDirectionsList from "../components/user-direction/UserDirectionsList";
 import { saveUserDirectionAsync } from "../redux/features/userDirectionSlice";
-import {
-  deleteUserDirection,
-  getUserDirections,
-} from "../services/userDirectionService";
+import { deleteUserDirection, getUserDirections } from "../services/userDirectionService";
 
 export default function UserDirectionPage() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
   const auth = getAuth();
-  const { loading, error } = useSelector(
-    (state) => state.userDirection
-  );
+  const { loading, error } = useSelector((state) => state.userDirection);
 
   const [formData, setFormData] = useState({
     streetName: "",
     doorNumber: "",
     phone: "",
     comments: "",
-    paymentMethod: "", // para mas adelamte
+    paymentMethod: "",
   });
+
   const [directions, setDirections] = useState([]);
   const [loadingDirections, setLoadingDirections] = useState(false);
   const [errorDirections, setErrorDirections] = useState(null);
 
-  // Validación de autenticación 
   useEffect(() => {
     if (!auth?.isLogged) {
       clearAuth();
@@ -75,21 +54,20 @@ export default function UserDirectionPage() {
     loadDirections();
   }, []);
 
-  const handleChange = (e) => {
+  const handleChange = (event) => {
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value,
+      [event.target.name]: event.target.value,
     });
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const handleSubmit = async (event) => {
+    event.preventDefault();
 
-    // para mas adelate paymentMethod
-    const { ...directionData } = formData;
+    const directionData = { ...formData };
+    const result = await dispatch(saveUserDirectionAsync(directionData));
 
-    const action = await dispatch(saveUserDirectionAsync(directionData));
-    if (!action.error) {
+    if (!result?.error) {
       await loadDirections();
       setFormData({
         streetName: "",
@@ -98,6 +76,7 @@ export default function UserDirectionPage() {
         comments: "",
         paymentMethod: "",
       });
+
       Swal.fire({
         icon: "success",
         title: "Dirección guardada",
@@ -134,7 +113,8 @@ export default function UserDirectionPage() {
       }
 
       await deleteUserDirection(id);
-      setDirections((prev) => prev.filter((d) => d.id !== id));
+      setDirections((prev) => prev.filter((direction) => direction.id !== id));
+
       Swal.fire({
         icon: "success",
         title: "Dirección eliminada",
@@ -153,21 +133,7 @@ export default function UserDirectionPage() {
 
   return (
     <Stack spacing={6}>
-      <Box
-        bg="white"
-        borderWidth="1px"
-        borderColor="orange.100"
-        rounded="xl"
-        p={{ base: 4, md: 6 }}
-        boxShadow="sm"
-      >
-        <Heading size="lg" mb={2}>
-          Dirección de entrega
-        </Heading>
-        <Text color="gray.500">
-          Guarda una dirección para agilizar tus pedidos.
-        </Text>
-      </Box>
+      <UserDirectionHeaderCard />
 
       <Box
         bg="white"
@@ -177,11 +143,8 @@ export default function UserDirectionPage() {
         p={{ base: 4, md: 6 }}
         boxShadow="sm"
       >
-        {loading && (
-          <Text color="gray.500" mb={3}>
-            Guardando dirección...
-          </Text>
-        )}
+        {loading && <Text color="gray.500" mb={3}>Guardando dirección...</Text>}
+
         {error && (
           <Alert status="error" borderRadius="md" mb={4}>
             <AlertIcon />
@@ -197,118 +160,18 @@ export default function UserDirectionPage() {
         />
       </Box>
 
-      <Box
-        bg="white"
-        borderWidth="1px"
-        borderColor="orange.100"
-        rounded="xl"
-        p={{ base: 4, md: 6 }}
-        boxShadow="sm"
-      >
-        <Heading size="md" mb={4}>
-          Mis direcciones
-        </Heading>
+      {loadingDirections && <Text color="gray.500">Cargando direcciones...</Text>}
 
-        {loadingDirections && (
-          <Text color="gray.500" mb={3}>
-            Cargando direcciones...
-          </Text>
-        )}
+      {errorDirections && (
+        <Alert status="error" borderRadius="md">
+          <AlertIcon />
+          {errorDirections}
+        </Alert>
+      )}
 
-        {errorDirections && (
-          <Alert status="error" borderRadius="md" mb={4}>
-            <AlertIcon />
-            {errorDirections}
-          </Alert>
-        )}
-
-        {!loadingDirections && directions.length === 0 && (
-          <Text color="gray.500">No tenés direcciones guardadas.</Text>
-        )}
-
-        {directions.length > 0 && (
-          <>
-            <VStack
-              spacing={3}
-              align="stretch"
-              display={{ base: "flex", md: "none" }}
-            >
-              {directions.map((d) => (
-                <Box
-                  key={d.id}
-                  borderWidth="1px"
-                  borderColor="orange.100"
-                  rounded="lg"
-                  p={4}
-                >
-                  <Stack spacing={1}>
-                    <Text fontSize="sm">
-                      <strong>Calle:</strong> {d.streetName}
-                    </Text>
-                    <Text fontSize="sm">
-                      <strong>Puerta:</strong> {d.doorNumber}
-                    </Text>
-                    <Text fontSize="sm">
-                      <strong>Teléfono:</strong> {d.phone}
-                    </Text>
-                    <Text fontSize="sm">
-                      <strong>Comentarios:</strong> {d.comments || "—"}
-                    </Text>
-                  </Stack>
-                  <Box mt={2} textAlign="right">
-                    <IconButton
-                      aria-label="Eliminar dirección"
-                      icon={<CloseIcon />}
-                      size="sm"
-                      variant="ghost"
-                      colorScheme="red"
-                      onClick={() => handleDelete(d.id)}
-                    />
-                  </Box>
-                </Box>
-              ))}
-            </VStack>
-
-            <TableContainer
-              width="100%"
-              overflowX="auto"
-              display={{ base: "none", md: "block" }}
-            >
-              <Table size="sm" width="100%">
-                <Thead>
-                  <Tr>
-                    <Th>Calle</Th>
-                    <Th>Puerta</Th>
-                    <Th>Teléfono</Th>
-                    <Th>Comentarios</Th>
-                    <Th textAlign="right"></Th>
-                  </Tr>
-                </Thead>
-                <Tbody>
-                  {directions.map((d) => (
-                    <Tr key={d.id}>
-                      <Td>{d.streetName}</Td>
-                      <Td>{d.doorNumber}</Td>
-                      <Td>{d.phone}</Td>
-                      <Td>{d.comments}</Td>
-                      <Td textAlign="right">
-                        <IconButton
-                          aria-label="Eliminar dirección"
-                          icon={<CloseIcon />}
-                          size="sm"
-                          variant="ghost"
-                          colorScheme="red"
-                          onClick={() => handleDelete(d.id)}
-                        />
-                      </Td>
-                    </Tr>
-                  ))}
-                </Tbody>
-              </Table>
-            </TableContainer>
-          </>
-        )}
-      </Box>
+      {!loadingDirections && !errorDirections && (
+        <UserDirectionsList directions={directions} onDelete={handleDelete} />
+      )}
     </Stack>
   );
 }

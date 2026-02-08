@@ -1,6 +1,6 @@
 import { NavLink } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { USER_TYPE, getFromLocalStorage } from "../functions/localStorage";
+import { USER_TYPE, getFromLocalStorage } from "../../functions/localStorage";
 import {
   Badge,
   Box,
@@ -10,7 +10,7 @@ import {
   Text,
   Button,
 } from "@chakra-ui/react";
-import { openCartModal } from "../redux/features/cartSlice";
+import { openCartModal } from "../../redux/features/cartSlice";
 
 function NavItem({ to, children }) {
   return (
@@ -56,30 +56,31 @@ export default function NavBar() {
   const isKitchen = userType === "COCINA";
 
   const handleOpenCart = () => {
-    //dispatch(fetchCartAsync());
     dispatch(openCartModal());
   };
 
   return (
     <Box
       as="nav"
-      bg="white"
+      bg="whiteAlpha.900"
       borderWidth="1px"
       borderColor="orange.100"
-      rounded="lg"
+      rounded="xl"
       px={4}
       py={3}
       mb={6}
       boxShadow="sm"
+      backdropFilter="blur(6px)"
     >
       <Flex align="center" justify="space-between" gap={4} wrap="wrap">
         <HStack spacing={2}>
           {isLocal && (
             <>
               <NavItem to="/menu">Menu</NavItem>
-              <NavAction onClick={() => { }}>Llamar mozo</NavAction>
+              <NavAction onClick={() => {}}>Llamar mozo</NavAction>
             </>
           )}
+
           {!isLocal && (
             <>
               {isKitchen && <NavItem to="/kitchen">Cocina</NavItem>}
@@ -92,20 +93,13 @@ export default function NavBar() {
         </HStack>
 
         {!isKitchen && (
-          <Button
-            onClick={handleOpenCart}
-            colorScheme="orange"
-            variant="solid"
-            size="sm"
-          >
+          <Button onClick={handleOpenCart} colorScheme="orange" variant="solid" size="sm">
             <HStack spacing={2}>
               <Text>Carrito</Text>
               <Badge colorScheme="whiteAlpha" bg="whiteAlpha.900" color="orange.700">
                 {itemsCount}
               </Badge>
-              {totalAmount > 0 && (
-                <Text fontWeight="semibold">- ${totalAmount}</Text>
-              )}
+              {totalAmount > 0 && <Text fontWeight="semibold">- ${totalAmount}</Text>}
             </HStack>
           </Button>
         )}

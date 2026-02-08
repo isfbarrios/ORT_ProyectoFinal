@@ -1,5 +1,7 @@
 import { useDispatch, useSelector } from "react-redux";
 import {
+  Alert,
+  AlertIcon,
   Box,
   Button,
   Divider,
@@ -14,17 +16,10 @@ import {
   Spinner,
   Text,
   VStack,
-  Alert,
-  AlertIcon,
 } from "@chakra-ui/react";
-
-import {
-  closeCartModal,
-  confirmCartAsync,
-  closeCartAsync,
-} from "../redux/features/cartSlice";
 import { useNavigate } from "react-router-dom";
-import { USER_TYPE, getFromLocalStorage } from "../functions/localStorage";
+import { closeCartAsync, closeCartModal, confirmCartAsync } from "../../redux/features/cartSlice";
+import { USER_TYPE, getFromLocalStorage } from "../../functions/localStorage";
 
 export default function CartModal() {
   const dispatch = useDispatch();
@@ -33,64 +28,43 @@ export default function CartModal() {
   const { isCartModalOpen, items, totalAmount, loading, error, cartId } = useSelector(
     (state) => state.cart
   );
-  const userType = getFromLocalStorage(USER_TYPE);
 
+  const userType = getFromLocalStorage(USER_TYPE);
   const isLocal = userType === "LOCAL";
-  //const hasItems = items.length > 0;
-  const hasUnprocessedItems = items.some(
-    (item) => Number(item.processed) === 0
-  );
+  const hasUnprocessedItems = items.some((item) => Number(item.processed) === 0);
   const canCloseCart = !hasUnprocessedItems && !loading;
 
   if (!isCartModalOpen) return null;
 
-  const handleConfirm = async () => {
-    if (isLocal) {
-      const order = await dispatch(confirmCartAsync());
-      if (order) {
-        dispatch(closeCartModal());
-        navigate("/menu");
-      }
-
-      return;
-    }
-    else {
-      const order = await dispatch(confirmCartAsync());
-      if (order) {
-        const payload = {
-          cartId: cartId,
-          deliveryMode: userType,
-          paymentMethod: 99,
-          phone: '',
-          comments: '',
-          directionId: -1,
-        };
-
-        const bill = await dispatch(closeCartAsync(payload));
-
-        dispatch(closeCartModal());
-
-        navigate("/checkout", { state: { bill } });
-
-      }
-
-      return;
-    }
-  };
-
   const payload = {
-    cartId: cartId,
+    cartId,
     deliveryMode: userType,
     paymentMethod: 99,
-    phone: '',
-    comments: '',
+    phone: "",
+    comments: "",
     directionId: -1,
+  };
+
+  const handleConfirm = async () => {
+    const order = await dispatch(confirmCartAsync());
+    if (!order) {
+      return;
+    }
+
+    if (isLocal) {
+      dispatch(closeCartModal());
+      navigate("/menu");
+      return;
+    }
+
+    const bill = await dispatch(closeCartAsync(payload));
+    dispatch(closeCartModal());
+    navigate("/checkout", { state: { bill } });
   };
 
   const handleClose = async () => {
     dispatch(closeCartModal());
     const bill = await dispatch(closeCartAsync(payload));
-
     navigate("/checkout", { state: { bill } });
   };
 
@@ -103,7 +77,7 @@ export default function CartModal() {
     >
       <DrawerOverlay />
       <DrawerContent>
-        <DrawerCloseButton />
+        <DrawerCloseButton color="orange.500" _hover={{ color: "orange.600" }} />
         <DrawerHeader>Carrito</DrawerHeader>
 
         <DrawerBody>
@@ -121,9 +95,7 @@ export default function CartModal() {
             </Alert>
           )}
 
-          {items.length === 0 && !loading && (
-            <Text color="gray.500">No hay productos.</Text>
-          )}
+          {items.length === 0 && !loading && <Text color="gray.500">No hay productos.</Text>}
 
           {items.length > 0 && (
             <VStack spacing={3} align="stretch">
@@ -131,10 +103,12 @@ export default function CartModal() {
                 <Box
                   key={`${item.cartItemId}-${index}`}
                   borderWidth="1px"
-                  borderColor="gray.200"
-                  rounded="md"
+                  borderColor="orange.100"
+                  rounded="lg"
                   px={3}
                   py={2}
+                  bg="orange.50"
+                  boxShadow="sm"
                 >
                   <HStack justify="space-between" align="start">
                     <Box>
@@ -143,9 +117,7 @@ export default function CartModal() {
                         Cantidad: {item.quantity}
                       </Text>
                     </Box>
-                    <Text fontWeight="semibold">
-                      ${Number(item.unitPrice) * item.quantity}
-                    </Text>
+                    <Text fontWeight="semibold">${Number(item.unitPrice) * item.quantity}</Text>
                   </HStack>
                 </Box>
               ))}
@@ -161,7 +133,7 @@ export default function CartModal() {
         </DrawerBody>
 
         <DrawerFooter gap={2}>
-          <Button variant="ghost" onClick={() => dispatch(closeCartModal())}>
+          <Button variant="ghost" colorScheme="orange" onClick={() => dispatch(closeCartModal())}>
             Volver
           </Button>
           {isLocal && (
