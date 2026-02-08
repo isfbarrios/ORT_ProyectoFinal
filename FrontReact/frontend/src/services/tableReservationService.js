@@ -1,9 +1,13 @@
 import { API_URL, buildFetchHeader } from "../functions/localStorage";
 import { clearAuth } from "./auth";
 
-export async function getTableAvailability() {
+export async function getTableAvailability(date, shiftId) {
+  const params = new URLSearchParams();
+  if (date) params.append("date", date);
+  if (shiftId !== undefined && shiftId !== null) params.append("shiftId", String(shiftId));
+
   // Cuando la BD funcione:
-  const res = await fetch(`${API_URL}/table_reservation`, {
+  const res = await fetch(`${API_URL}/table_reservation?${params.toString()}`, {
     method: "GET",
     headers: buildFetchHeader(),
     credentials: "include"

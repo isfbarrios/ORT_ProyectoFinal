@@ -11,6 +11,8 @@ public interface TableReservationRepository extends JpaRepository<Tablereservati
 
     int countByTableIdAndReservationDate(int tableId, LocalDate reservationDate);
 
+    int countByTableIdAndShiftIdAndReservationDate(int tableId, int shiftId, LocalDate reservationDate);
+
     @Query("""
              SELECT COUNT(DISTINCT r.tableId)
              FROM Tablereservation r

@@ -61,12 +61,16 @@ export const fetchAvailability = (date, shiftId) => async (dispatch) => {
     }
 };
 
-export const submitReservation = (payload) => async (dispatch) => {
+export const submitReservation = (payload) => async (dispatch, getState) => {
     dispatch({ type: "tableReservation/loading" });
 
     try {
         const result = await reserveTable(payload);
         dispatch({ type: "tableReservation/success", payload: result });
+        const { selectedDate, selectedShiftId } = getState().tableReservation || {};
+        if (selectedDate && selectedShiftId) {
+            dispatch(fetchAvailability(selectedDate, selectedShiftId));
+        }
     } catch (err) {
         dispatch({ type: "tableReservation/error", payload: err.message });
     }
