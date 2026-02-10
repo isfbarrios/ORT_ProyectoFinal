@@ -7,13 +7,13 @@ export async function fetchOrderServiceFromApi(cartId) {
   const res = await fetch(`${API_URL}/cart_items/cart/${cartId}`, {
     method: "GET",
     headers: buildFetchHeader(),
-    credentials:"include"
+    credentials: "include"
   });
 
-  const data = await safeJson(res);
+  const data = await safeJsonStrict(res);
 
   if (!res.ok) {
-    throw new Error(data.message || "No se pudieron obtener los ítems de la orden");
+    throw new Error(data?.message ?? "No se pudieron obtener los ítems de la orden");
   }
 
   console.log("fetchOrderServiceFromApi - data:", data);
@@ -32,17 +32,23 @@ export async function updateOrderState(orderId, stateId) {
       orderId: orderId,
       orderStateId: stateId
     }),
-    credentials:"include"
+    credentials: "include"
   });
 
+  const data = await safeJsonLoose(res);
+
   if (!res.ok) {
-    throw new Error("No se pudo actualizar el estado del pedido");
+    throw new Error(data?.message ?? "No se pudo actualizar el estado del pedido");
   }
 
-  return true;
+  if (data?.state?.id != null && Number(data.state.id) !== Number(stateId)) {
+    throw new Error("El servidor no confirmó el cambio de estado");
+  }
+
+  return data ?? true;
 }
 
-async function safeJson(res) {
+async function safeJsonStrict(res) {
   try {
     return await res.json();
   } catch {
@@ -50,3 +56,10 @@ async function safeJson(res) {
   }
 }
 
+async function safeJsonLoose(res) {
+  try {
+    return await res.json();
+  } catch {
+    return null;
+  }
+}

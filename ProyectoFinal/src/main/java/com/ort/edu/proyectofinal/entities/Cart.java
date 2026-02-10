@@ -7,7 +7,6 @@ import lombok.Setter;
 import org.hibernate.annotations.ColumnDefault;
 
 import java.math.BigDecimal;
-import java.time.Instant;
 import java.time.LocalDateTime;
 
 @Setter
@@ -26,10 +25,8 @@ public class Cart {
     @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private Tables table;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "SessionId", nullable = false)
-    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
-    private Session session;
+    @Column(name = "UserName", nullable = false, length = 50)
+    private String userName;
 
     @ColumnDefault("0.00")
     @Column(name = "Amount", nullable = false, precision = 12, scale = 2)
@@ -54,9 +51,9 @@ public class Cart {
 
     public Cart() {}
 
-    public Cart(Tables table, Session session, BigDecimal amount, Cartstate cartState, Integer delayTime) {
+    public Cart(Tables table, String userName, BigDecimal amount, Cartstate cartState, Integer delayTime) {
         this.table = table;
-        this.session = session;
+        this.userName = userName;
         this.amount = amount;
         this.delayTime = delayTime;
         this.cartState = cartState;

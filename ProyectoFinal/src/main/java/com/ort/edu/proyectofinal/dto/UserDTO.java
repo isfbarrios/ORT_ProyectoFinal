@@ -17,7 +17,7 @@ public class UserDTO {
     private String mail;
     private String username;
     private String sessionId;
-    private CoreManager.UserType type;
+    private String rol;
 
     public UserDTO() {}
 
@@ -27,8 +27,9 @@ public class UserDTO {
         this.mail = user.getMail();
         this.surname = user.getSurname();
         this.username = user.getUsername();
-        //Por defecto se asigna como local
-        this.type = CoreManager.UserType.LOCAL;
+        this.sessionId = user.getSessionId();
+        //TODO: Por defecto se asigna como local
+        this.rol = "LOCAL";
     }
 
     @Override
@@ -39,6 +40,7 @@ public class UserDTO {
                 ", surname='" + surname + '\'' +
                 ", mail='" + mail + '\'' +
                 ", username='" + username + '\'' +
+                ", sessionid='" + sessionId + '\'' +
                 '}';
     }
 

@@ -1,13 +1,13 @@
+import { isTokenExpired } from "./api";
 import {
   KEY,
   API_URL,
   saveToLocalStorage,
   getFromLocalStorage,
-  clearLocalStorage,
   removeFromLocalStorage,
   API_TOKEN,
+  API_REFRESH_TOKEN,
   SESSION_ID,
-  buildFetchHeader
 } from "../functions/localStorage"
 
 // guardo la session del usuario
@@ -24,13 +24,15 @@ export function saveAuth(data) {
   saveToLocalStorage(KEY, session);
 
   // si el back me  devolvió sessionId, lo guardo para el carrito
-  const token = data?.token;
-  if (token) {
-    console.log('saveAuth.sessionId: ' + token);
+  const accessToken = data?.accessToken;
+  const refreshToken = data?.refreshToken;
 
-    saveToLocalStorage(API_TOKEN, String(token));
-    saveToLocalStorage(SESSION_ID, String(data.user.sessionId));
-    //TODO: Si no tenemos el token, deberiamos cerrar sesion
+  if (refreshToken) {
+    saveToLocalStorage(API_REFRESH_TOKEN, String(refreshToken));
+  }
+
+  if (accessToken) {
+    saveToLocalStorage(API_TOKEN, String(accessToken));
   }
 }
 
@@ -41,64 +43,86 @@ export function getAuth() {
 
 //borro la sesion guardada en storage
 export function clearAuth() {
-  removeFromLocalStorage(KEY);
   removeFromLocalStorage(API_TOKEN);
+  removeFromLocalStorage(API_REFRESH_TOKEN);
   removeFromLocalStorage(SESSION_ID);
+  //removeFromLocalStorage(KEY);
 }
 
 // MOCK login (luego lo vamos a remplazar por fetch al backend)
-export async function loginApi({ email, password, userType }) {
-  const res = await fetch(API_URL + "/users/login", {
+export async function loginApi({ username, password, userType }) {
+  const res = await fetch(API_URL + "/auth/login", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
-      mail: email,
-      password: password,
-      userType: userType
+      nombreUsuario: username,
+      contrasenia: password,
+      type: userType
     }),
     credentials: "include"
   });
 
-  let data;
-
-  try {
-    data = await res.json();
+  if (!res.ok) {
+    const errorText = await res.text();
+    throw new Error(errorText || "Credenciales inválidas");
   }
-  catch {
+
+  if (res.status === 401) {
+    clearAuth();
+    window.location.href = "/";
+    throw new Error("Unauthorized");
+  }
+  // El backend devuelve JSON solo en caso de éxito (AuthResponseDTO)
+  try {
+    const data = await res.json();
+    return data;
+  }
+  catch (error) {
+    console.error("Error al parsear JSON:", error);
     throw new Error("Respuesta inválida del servidor");
   }
-
-  if (!res.ok) {
-    throw new Error(data.message || "Credenciales inválidas");
-  }
-
-  return data;
 }
 
-export async function sessionRenew() {
-  const res = await fetch(API_URL + "/users/session_renew", {
+export async function refreshToken() {
+  let accessToken = getFromLocalStorage(API_TOKEN);
+  let refreshToken = getFromLocalStorage(API_REFRESH_TOKEN);
+
+  if (accessToken && isTokenExpired(accessToken)) {
+    closeSession();
+    return;
+  }
+
+  const res = await fetch(API_URL + "/auth/refresh", {
     method: "POST",
-    headers: buildFetchHeader(),
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
-      sessionId: getFromLocalStorage(SESSION_ID)
+      accessToken: accessToken,
+      refreshToken: refreshToken
     }),
     credentials: "include"
   });
 
-  let data;
+  if (!res.ok) {
+    const errorText = await res.text();
+    throw new Error(errorText || "Error refrescando la sesión");
+  }
+
+  if (res.status === 401) {
+    closeSession();
+    window.location.href = "/";
+    throw new Error("Unauthorized");
+  }
 
   try {
-    data = await res.json();
+    const data = await res.json();
+    return data;
   }
-  catch {
-    throw new Error("Respuesta inválida del servidor");
+  catch (error) {
+    console.error("Error al parsear JSON:", error);
+    closeSession();
   }
+}
 
-  if (!res.ok) {
-    clearLocalStorage();
-    //TODO: Ver si puedo redireccionar al login
-    throw new Error(data.message || "Credenciales inválidas");
-  }
-
-  return data;
+export async function closeSession() {
+  clearAuth();
 }

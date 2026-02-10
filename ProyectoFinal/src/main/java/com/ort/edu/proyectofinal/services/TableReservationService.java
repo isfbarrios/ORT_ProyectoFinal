@@ -55,17 +55,14 @@ public class TableReservationService {
         Tableshift shift = tableShiftRepo.findById(tableshiftId)
                 .orElseThrow(() -> new TableException("El turno indicado no existe para esa mesa"));
 
-        if (shift.getState().getId() != CoreManager._AVAILABLE_STATE_ID) {
-            throw new TableException("El turno seleccionado no está disponible para reservar");
-        }
-
         int reservationLimit = Math.max(1, (int)Math.floor(localTablesTotal * reserveLimitPercentage));
 
         // Reglas
-        int tableReservationPerDay = tableReservationRepo.countByTableIdAndReservationDate(tableId, date);
+        int tableReservationForShiftAndDate = tableReservationRepo
+                .countByTableIdAndShiftIdAndReservationDate(tableId, shiftId, date);
 
-        if (tableReservationPerDay >= 1) {
-            throw new TableException("La mesa ya tiene una reserva para esa fecha");
+        if (tableReservationForShiftAndDate >= 1) {
+            throw new TableException("La mesa ya tiene una reserva para ese turno y fecha");
         }
 
         int tableReservationsToday = tableReservationRepo.countDistinctTablesByReservationDate(date);
@@ -76,7 +73,7 @@ public class TableReservationService {
                             + reservationLimit + " de " + localTablesTotal + " mesas");
         }
 
-        // 7) Crear la reserva
+        //Crear la reserva
         Tablereservation nueva = new Tablereservation();
             nueva.setTableId(tableId);
             nueva.setShiftId(shiftId);
@@ -91,13 +88,6 @@ public class TableReservationService {
         catch (DataIntegrityViolationException ex) {
             throw new TableException("La mesa ya tiene una reserva para esa fecha (validación en base de datos)");
         }
-
-        Tablestate busyState = tablestateRepo.findById(CoreManager._BUSY_STATE_ID)
-                .orElseThrow(() -> new IllegalArgumentException("El estado indicado no existe"));
-
-        shift.setState(busyState);
-
-        tableShiftRepo.save(shift);
 
         return true;
     }

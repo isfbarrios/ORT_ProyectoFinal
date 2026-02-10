@@ -1,31 +1,32 @@
 package com.ort.edu.proyectofinal.services;
 
-import com.ort.edu.proyectofinal.CoreManager;
-import com.ort.edu.proyectofinal.dto.UserDTO;
 import com.ort.edu.proyectofinal.dto.UserDirectionRequestDTO;
 import com.ort.edu.proyectofinal.entities.User;
 import com.ort.edu.proyectofinal.entities.UserDirection;
 import com.ort.edu.proyectofinal.repositories.UserDirectionRepository;
 import com.ort.edu.proyectofinal.repositories.UserRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.security.Principal;
 import java.time.LocalDateTime;
+
 @Service
 public class UserDirectionService {
 
     @Autowired
     private UserDirectionRepository repo;
+
     @Autowired
     private UserRepository userRepository;
 
-    private final CoreManager manager = CoreManager.getInstance();
+    @Transactional
+    public void save(UserDirectionRequestDTO dto, Principal principal) {
 
-    public void saveOrUpdate(UserDirectionRequestDTO dto) {
+        String userName = principal.getName();
 
-        UserDTO userDTO = manager.getUser();
-
-        User user = userRepository.findByUsername(userDTO.getUsername());
+        User user = userRepository.findByUsername(userName);
 
         if (user == null) {
             throw new RuntimeException("Usuario no encontrado");
@@ -43,5 +44,20 @@ public class UserDirectionService {
         direction.setLastUpdate(LocalDateTime.now());
 
         repo.save(direction);
+    }
+
+    @Transactional
+    public void delete(Integer id, Principal principal) {
+        String userName = principal.getName();
+        User user = userRepository.findByUsername(userName);
+
+        if (user == null) {
+            throw new RuntimeException("Usuario no encontrado");
+        }
+
+        UserDirection direction = repo.findByIdAndUser_Id(id, user.getId())
+                .orElseThrow(() -> new RuntimeException("Dirección no encontrada"));
+
+        repo.delete(direction);
     }
 }

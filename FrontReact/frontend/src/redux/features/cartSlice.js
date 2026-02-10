@@ -1,18 +1,15 @@
 import { createSlice } from "@reduxjs/toolkit";
 import {
+  apiProcessBill,
   apiAddItemToCart,
   apiGetCart,
   apiConfirmCart,
   apiCloseCart,
 } from "../../services/cartService";
-
-import {
-  SESSION_ID,
-  getFromLocalStorage,
-  clearLocalStorage
-} from "../../functions/localStorage"
+import { BILL, BILL_ID, saveToLocalStorage } from "../../functions/localStorage";
 
 const initialState = {
+  cartId: 0,
   items: [],
   totalAmount: 0,
   loading: false,
@@ -25,6 +22,7 @@ const cartSlice = createSlice({
   initialState,
   reducers: {
     setCart(state, action) {
+      state.cartId = action.payload.cartId || 0;
       state.items = action.payload.items || [];
       state.totalAmount = action.payload.totalAmount || 0;
       state.error = null;
@@ -95,7 +93,7 @@ export const addItemToCartAsync = (menuItemId, quantity) =>
 
     try {
       const data = await apiAddItemToCart(menuItemId, quantity);
-
+      console.log("addItemToCartAsync data:", data);
       dispatch(setCart(data));
     }
     catch (error) {
@@ -114,15 +112,14 @@ export const addItemToCartAsync = (menuItemId, quantity) =>
  * Devuelve la OrderDTO para que el componente pueda, por ejemplo, navegar al dashboard.
  */
 export const confirmCartAsync = () => async (dispatch) => {
+  console.log("confirmCartAsync called");
   dispatch(setCartLoading(true));
   dispatch(setCartError(null));
 
   try {
-    const sessionId = getFromLocalStorage(SESSION_ID);
-    const data = await apiConfirmCart(sessionId);
+    const data = await apiConfirmCart();
 
     dispatch(clearCartState());
-    //clearLocalStorage();
 
     return data; // OrderDTO
   }
@@ -140,23 +137,49 @@ export const confirmCartAsync = () => async (dispatch) => {
  * - llama al backend (/api/session-cart/close)
  * - limpia carrito y borra sessionId local
  */
-export const closeCartAsync = () => async (dispatch) => {
+export const closeCartAsync = (payload) => async (dispatch) => {
   dispatch(setCartLoading(true));
   dispatch(setCartError(null));
 
   try {
-    const sessionId = getFromLocalStorage(SESSION_ID);
-    const data = await apiCloseCart(sessionId);
+    const data = await apiCloseCart(payload);
+
+    if (data?.message) {
+      throw new Error(data.message);
+    }
+
+    saveToLocalStorage(BILL, data);
+    saveToLocalStorage(BILL_ID, data?.billId);
 
     console.log(data);
 
     dispatch(clearCartState());
-    clearLocalStorage();
+    //clearLocalStorage();
+    return data;
   }
   catch (error) {
     dispatch(setCartError(error.message));
+    return null;
   }
   finally {
     dispatch(setCartLoading(false));
+  }
+};
+
+export const apiProcessBillAsync = (payload) => async (dispatch) => {
+  try {
+    const data = await apiProcessBill(payload);
+
+    if (data?.message) {
+      throw new Error(data.message);
+    }
+
+    console.log(data);
+
+    return data;
+  }
+  catch (error) {
+    dispatch(setCartError(error.message));
+    return null;
   }
 };

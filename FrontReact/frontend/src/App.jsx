@@ -1,28 +1,50 @@
-import { Outlet } from "react-router-dom"; // muestro el cotenido de la ruta hija ej: log,home
-import NavBar from "./components/NavBar";
-import CartModal from "./components/CartModal";
+import { Outlet, useLocation } from "react-router-dom";
 import { useEffect } from "react";
 import { useDispatch } from "react-redux";
+import NavBar from "./components/navigation/NavBar";
+import CartModal from "./components/cart/CartModal";
+import KitchenLayout from "./components/layout/KitchenLayout";
 import { fetchCartAsync } from "./redux/features/cartSlice";
-import { sessionRenew } from "./services/auth";
-import {
-  getFromLocalStorage,
-  API_TOKEN,
-} from "./functions/localStorage";
+import { refreshToken, clearAuth } from "./services/auth";
 
 export default function App() {
-
   const dispatch = useDispatch();
+  const location = useLocation();
+
+  const isPublicRoute =
+    location.pathname === "/" ||
+    location.pathname === "/login" ||
+    location.pathname === "/register";
+
+  const isKitchenRoute = location.pathname.startsWith("/kitchen");
 
   useEffect(() => {
-    if (getFromLocalStorage(API_TOKEN)) {
-      sessionRenew();
+    const refreshSession = async () => {
+      try {
+        await refreshToken();
+      } catch (error) {
+        console.error("Error refrescando sesión:", error);
+        clearAuth();
+      }
+    };
+
+    refreshSession();
+
+    if (!isPublicRoute && !isKitchenRoute) {
+      dispatch(fetchCartAsync());
     }
-    dispatch(fetchCartAsync());
-  }, [dispatch]);
+  }, [dispatch, isPublicRoute, isKitchenRoute]);
+
+  if (isPublicRoute) {
+    return <Outlet />;
+  }
+
+  if (isKitchenRoute) {
+    return <KitchenLayout />;
+  }
 
   return (
-    <main style={{ padding: "1.5rem", maxWidth: 960, margin: "0 auto" }}>
+    <main className="app-shell">
       <NavBar />
       <CartModal />
       <Outlet />

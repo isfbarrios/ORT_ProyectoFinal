@@ -1,67 +1,69 @@
+import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { setDate, setShift, fetchAvailability } from "../redux/features/tableReservationSlice";
-import MesasGrid from "../components/MesaGrid";
+import { Stack } from "@chakra-ui/react";
+import {
+  setDate,
+  setShift,
+  fetchAvailability,
+  clearSuccess,
+} from "../redux/features/tableReservationSlice";
 
-const shifts = [
-    { id: 1, label: "19:00 - 20:00" },
-    { id: 2, label: "20:00 - 21:00" },
-    { id: 3, label: "21:00 - 22:00" },
-    { id: 4, label: "22:00 - 23:00" },
-    { id: 5, label: "23:00 - 24:00" },
-];
+import ReservationHeaderCard from "../components/reserva/ReservationHeaderCard";
+import ReservationFiltersCard from "../components/reserva/ReservationFiltersCard";
+import ReservationAvailability from "../components/reserva/ReservationAvailability";
 
-const ReservaPage = () => {
+export default function ReservaPage() {
+  const dispatch = useDispatch();
+  const tableReservationState = useSelector((state) => state.tableReservation);
 
-    const dispatch = useDispatch();
-    const tableReservationState = useSelector((state) => state.tableReservation);
+  const {
+    tables = [],
+    selectedDate = "",
+    selectedShiftId = null,
+    loading = false,
+    error,
+    reservationSuccess,
+  } = tableReservationState || {};
 
-    // Validación de seguridad
-    const { tables = [], selectedDate = "", selectedShiftId = null, loading = false } = tableReservationState || {};
+  const handleBuscar = () => {
+    if (!selectedDate || !selectedShiftId) {
+      return;
+    }
 
-    const handleBuscar = () => {
-        if (!selectedDate || !selectedShiftId) return;
-        dispatch(fetchAvailability(selectedDate, selectedShiftId));
-    };
+    dispatch(fetchAvailability(selectedDate, selectedShiftId));
+  };
 
-    return (
-        <div className="container mt-4">
+  useEffect(() => {
+    if (!reservationSuccess) return;
 
-            <h2>Reservas</h2>
+    const timer = setTimeout(() => {
+      dispatch(clearSuccess());
+    }, 10000);
 
-            {/* Selector de fecha */}
-            <label className="form-label">Fecha:</label>
-            <input
-                type="date"
-                className="form-control"
-                onChange={(e) => dispatch(setDate(e.target.value))}
-            />
+    return () => clearTimeout(timer);
+  }, [dispatch, reservationSuccess]);
 
-            {/* Selector de turno */}
-            <label className="form-label mt-3">Turno:</label>
-            <select
-                className="form-select"
-                onChange={(e) => dispatch(setShift(Number(e.target.value)))}
-            >
-                <option value="">Seleccione un turno</option>
-                {shifts.map((s) => (
-                    <option key={s.id} value={s.id}>{s.label}</option>
-                ))}
-            </select>
+  return (
+    <Stack spacing={6}>
+      <ReservationHeaderCard />
 
-            <button className="btn btn-primary mt-3" onClick={handleBuscar}>
-                Buscar mesas
-            </button>
+      <ReservationFiltersCard
+        selectedDate={selectedDate}
+        selectedShiftId={selectedShiftId}
+        loading={loading}
+        error={error}
+        reservationSuccess={reservationSuccess}
+        onDateChange={(event) => dispatch(setDate(event.target.value))}
+        onShiftChange={(event) => dispatch(setShift(Number(event.target.value)))}
+        onSearch={handleBuscar}
+      />
 
-            <hr />
-
-            {loading && <p>Cargando disponibilidad...</p>}
-
-            {!loading && tables.length > 0 && (
-                <MesasGrid mesas={tables} turnoSeleccionado={selectedShiftId} />
-            )}
-
-        </div>
-    );
-};
-
-export default ReservaPage;
+      <ReservationAvailability
+        loading={loading}
+        tables={tables}
+        selectedDate={selectedDate}
+        selectedShiftId={selectedShiftId}
+      />
+    </Stack>
+  );
+}

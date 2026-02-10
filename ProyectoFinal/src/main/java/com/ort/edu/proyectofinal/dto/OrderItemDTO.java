@@ -8,15 +8,21 @@ import lombok.Setter;
 @Setter
 public class OrderItemDTO {
 
-    private OrderitemId id;
-    private Cartitem cartItem;
+    private Integer id;
+    private Order order;
+    private Menuitem menuItem;
     private Integer quantity;
+    private java.math.BigDecimal unitPrice;
+    private String notes;
 
     public OrderItemDTO() {}
 
     public OrderItemDTO(Orderitem item) {
         this.id = item.getId();
-        this.cartItem = item.getCartItem();
+        this.order = item.getOrder();
+        this.menuItem = item.getMenuItem();
         this.quantity = item.getQuantity();
+        this.unitPrice = item.getUnitPrice();
+        this.notes = item.getNotes();
     }
 }

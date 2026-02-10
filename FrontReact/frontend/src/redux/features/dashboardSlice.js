@@ -1,4 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
+import { updateOrderState } from "../../services/orderService";
 
 // Columnas fijas del tablero
 const BASE_COLUMNS = [
@@ -13,6 +14,13 @@ const initialState = {
   orders: {},        // { [id]: pedido }
   isLoading: false,
   error: null,
+};
+
+const insertAt = (list, item, index) => {
+  const next = list.slice();
+  const safeIndex = index == null || index < 0 ? next.length : index;
+  next.splice(safeIndex, 0, item);
+  return next;
 };
 
 const dashboardSlice = createSlice({
@@ -60,7 +68,7 @@ const dashboardSlice = createSlice({
 
     // mover pedido entre columnas (drag & drop) solo a nivel front
     moveOrder: (state, action) => {
-      let { orderId, sourceColId, targetColId } = action.payload;
+      let { orderId, sourceColId, targetColId, targetIndex } = action.payload;
 
       // Fuerzo todo a número por las dudas
       orderId = Number(orderId);
@@ -91,7 +99,7 @@ const dashboardSlice = createSlice({
         targetCol.orderIds = [];
       }
       if (!targetCol.orderIds.some((id) => Number(id) === orderId)) {
-        targetCol.orderIds.push(orderId);
+        targetCol.orderIds = insertAt(targetCol.orderIds, orderId, targetIndex);
       }
 
       // Actualizar el "estado" del pedido en memoria (state en lugar de cartState)
@@ -105,6 +113,15 @@ const dashboardSlice = createSlice({
       }
     },
 
+    reorderColumn: (state, action) => {
+      const { columnId, orderIds } = action.payload || {};
+      if (!columnId || !Array.isArray(orderIds)) return;
+      const column = state.columns.find(
+        (col) => Number(col.id) === Number(columnId)
+      );
+      if (!column) return;
+      column.orderIds = orderIds;
+    },
 
     updateOrder: (state, action) => {
       const { id, changes } = action.payload || {};
@@ -133,10 +150,17 @@ export const {
   setBoard,
   setOrders,
   moveOrder,
+  reorderColumn,
   updateOrder,
   setLoading,
   setError,
   resetDashboard,
 } = dashboardSlice.actions;
+
+export const syncOrderStatus =
+  ({ orderId, targetColId }) =>
+    async () => {
+      return await updateOrderState(orderId, targetColId);
+    };
 
 export default dashboardSlice.reducer;

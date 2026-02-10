@@ -32,9 +32,12 @@ VALUES(5, 'Fabricio', 'Barrios', 'fbarrios@hotmail.com', 'fbarrios', '$2a$10$2QL
 
 delete from Users where UserName = 'fbarrios@hotmail.com';
 
-ALTER TABLE MenuItem
-ADD COLUMN BasePrice DECIMAL(12,2) NOT NULL DEFAULT 0
-AFTER Description;
+ALTER TABLE Users
+ADD COLUMN SessionId VARCHAR(50)
+AFTER Mail;
+
+ALTER TABLE Users
+DROP COLUMN SessionId;
 
 UPDATE MenuItem
 SET BasePrice = 450.00
@@ -52,32 +55,123 @@ UPDATE MenuItem
 SET BasePrice = 120.00
 WHERE MenuId = 1 AND Name = 'Refresco 500ml';
 
+select * from `Order` u;
 
-CREATE USER 'backend'@'%' IDENTIFIED BY 'ortedu2025';
-GRANT ALL PRIVILEGES ON proyectofinal.* TO 'backend'@'%';
-FLUSH PRIVILEGES;
-
-SELECT VERSION();
-
-
-ALTER TABLE OrderItem
-DROP FOREIGN KEY fk_OrderItem_MenuItem;
-
-ALTER TABLE OrderItem
-DROP COLUMN MenuItemId;
-
-
+select * from Users u;
 
 select * from UserDirection oi;
 
-select * from Cart oi;
+select count(*) from Cart oi;
 
-select * from `Order` o;
+select * from Cart c order by c.CartId desc;
+
+
+ALTER TABLE Cart
+DROP FOREIGN KEY fk_Cart_Session;
+
+ALTER TABLE Cart
+DROP COLUMN SessionId;
+
+
+ALTER TABLE Cart
+ADD COLUMN UserName VARCHAR(50) NOT NULL AFTER TableId;
+
+
+ALTER TABLE Cart
+ADD INDEX ix_Cart_UserName (UserName);
+
+
+ALTER TABLE `Order`
+DROP FOREIGN KEY `fk_Order_Canal`;
+
+ALTER TABLE `Order`
+DROP INDEX `fk_Order_Canal`;
+
+
+ALTER TABLE `Order`
+DROP COLUMN `CanalId`;
+
+ALTER TABLE `Order`
+ADD COLUMN `Rol` VARCHAR(30) NOT NULL AFTER `StateId`;
+
+
+CREATE TABLE OrderItem (
+  OrderItemId INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  OrderId INT UNSIGNED NOT NULL,
+  MenuItemId INT UNSIGNED NOT NULL,
+  Quantity INT UNSIGNED NOT NULL,
+  UnitPrice DECIMAL(12,2) NOT NULL,
+  Notes TEXT DEFAULT NULL,
+  PRIMARY KEY (OrderItemId),
+  KEY ix_OrderItem_Order (OrderId),
+  CONSTRAINT fk_OrderItem_Order
+    FOREIGN KEY (OrderId) REFERENCES `Order` (OrderId),
+  CONSTRAINT chk_OrderItem_Qty CHECK (Quantity > 0),
+  CONSTRAINT chk_OrderItem_Price CHECK (UnitPrice >= 0)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 drop table if exists OrderItem;
 
-INSERT INTO OrderItem (OrderId,CartId,ItemId,Quantity,ExtraData) VALUES
-	 (2,1,1,1,NULL),
-	 (3,3,3,1,NULL);
+ALTER TABLE OrderItem
+DROP  COLUMN ExtraData;
+
+ALTER TABLE OrderItem
+ADD COLUMN Notes TEXT DEFAULT NULL,
+
+select * from `Order` o where o.CartId = 170;
+
+select * from CartState;
+
+select * from Cart c order by c.CartId desc;
+
+select * from CartItem c where c.CartId = 181;
+
+select * from UserDirection u;
+
+ALTER TABLE UserDirection
+DROP INDEX uq_userdirection_user;
+
+alter table UserDirection drop foreign key `fk_userdirection_users`;
+
+CREATE INDEX idx_userdirection_user
+ON UserDirection (UserId);
+
+ALTER TABLE UserDirection
+ADD CONSTRAINT fk_userdirection_users
+FOREIGN KEY (UserId)
+REFERENCES Users (UserId)
+ON DELETE CASCADE;
+
+select * from Bill b order by b.BillId desc;
+
+select * from TableReservation t;
+
+select * from MenuItem t;
+
+select * from MenuItemType t;
+
+select * from Menu t;
+
+insert into PaymentType values (99, 'Pendiente');
+
+update Cart set CartStateId = 3 where CartId < 180;
+
+select * from BillItem b order by b.BillId desc;
+
+CREATE TABLE `Order` (
+  OrderId int(10) unsigned NOT NULL AUTO_INCREMENT,
+  CartId int(10) unsigned NOT NULL,
+  OrderDate DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  OrderStateId int(10) unsigned NOT NULL,
+  Notes TEXT DEFAULT NULL,
+  LastUpdate DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (OrderId),
+  KEY ix_Order_Cart (CartId),
+  KEY ix_Order_State (OrderStateId),
+  CONSTRAINT fk_Order_Cart
+    FOREIGN KEY (CartId) REFERENCES Cart (CartId)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+
 
 

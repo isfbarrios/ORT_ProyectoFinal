@@ -1,15 +1,18 @@
 package com.ort.edu.proyectofinal.services;
 
-import com.ort.edu.proyectofinal.dto.OrderDTO;
 import com.ort.edu.proyectofinal.dto.OrderUpdateDTO;
+import com.ort.edu.proyectofinal.dto.UserDTO;
 import com.ort.edu.proyectofinal.entities.*;
+import com.ort.edu.proyectofinal.exception.OrderException;
+import com.ort.edu.proyectofinal.repositories.CartItemRepository;
 import com.ort.edu.proyectofinal.repositories.OrderRepository;
 import com.ort.edu.proyectofinal.repositories.OrderStateRepository;
-import com.ort.edu.proyectofinal.repositories.OrderCanalRepository;
+import com.ort.edu.proyectofinal.repositories.UserRepository;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.math.BigDecimal;
+import java.security.Principal;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -23,74 +26,47 @@ public class OrderService {
     private OrderStateRepository stateRepo;
 
     @Autowired
-    private OrderCanalRepository canalRepo;
+    private UserRepository userRepository;
+    @Autowired
+    private CartItemRepository cartItemRepository;
 
-    //TODO: Para crear las ordenes, deberiamos hacerlo por aca. Ver bien que es lo que deberiamos recibir por params
-    public Order createOrder(Cart cart, List<Cartitem> items) {
+    public Order createOrder(Cart cart, List<Cartitem> items) throws OrderException {
 
         if (items == null || items.isEmpty()) {
-            throw new IllegalArgumentException("La orden debe contener al menos un ítem");
+            throw new OrderException("La orden debe contener al menos un ítem");
         }
 
         Order order = new Order();
-        order.setDate(LocalDateTime.now());
+        order.setOrderDate(LocalDateTime.now());
         order.setLastUpdate(LocalDateTime.now());
         order.setCart(cart);
-
-        // Número de orden simple (podés cambiar la estrategia)
-        order.setOrderNumber(generateOrderNumber());
 
         // Estado inicial (por ejemplo, id = 1 "Pendiente")
         Orderstate initialState = stateRepo.findById(1)
                 .orElseThrow(() -> new RuntimeException("Estado inicial de la orden no encontrado"));
         order.setState(initialState);
 
-        // Canal por defecto (por ejemplo, id = 1 "Salón")
-        Ordercanal defaultCanal = canalRepo.findById(1)
-                .orElseThrow(() -> new RuntimeException("Canal por defecto no encontrado"));
-        order.setCanal(defaultCanal);
-
-        // Podés setear descripción si querés guardar algo del carrito/mesa
-        order.setDescription(null);
-
-        // Calcular total y crear Orderitems
-        BigDecimal total = BigDecimal.ZERO;
-
         for (Cartitem cartItem : items) {
-
-            if (cartItem.getItemAmount() != null) {
-                total = total.add(cartItem.getItemAmount());
-            }
-
-            /*
-             OrderId    INT UNSIGNED NOT NULL,
-              CartId     INT UNSIGNED NOT NULL,
-              ItemId     INT UNSIGNED NOT NULL,
-              Quantity   INT UNSIGNED NOT NULL,
-              ExtraData  JSON NULL,
-             */
             Orderitem item = new Orderitem();
-            OrderitemId itemId = new OrderitemId();
-            // El orderId lo setea Hibernate cuando se persista la orden
-            itemId.setItemId(cartItem.getId().getItemId());
-
-            item.setId(itemId);
-            item.setCartItem(cartItem);
+            item.setOrder(order);
+            item.setMenuItem(cartItem.getMenuItem());
             item.setQuantity(cartItem.getQuantity());
-            item.setExtraData(null);
+            item.setUnitPrice(cartItem.getItemAmount());
+            item.setNotes(null);
 
             order.addItem(item);
+
+            cartItem.setProcessed(1);
+
+            cartItemRepository.saveAndFlush(cartItem);
         }
 
-        order.setAmount(total);
+        System.out.println();
+        System.out.println("confirmCart.order: " + order.toString());
+        System.out.println();
 
         // Hibernate genera order.id y luego los order_item.order_id
-        return orderRepo.save(order);
-    }
-
-    private String generateOrderNumber() {
-        // Ejemplo simple: ORD-<timestamp>
-        return "ORD-" + System.currentTimeMillis();
+        return orderRepo.saveAndFlush(order);
     }
 
     public Order updateOrderState(OrderUpdateDTO dto) {
@@ -107,4 +83,3 @@ public class OrderService {
         return orderRepo.save(order);
     }
 }
-

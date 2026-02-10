@@ -1,0 +1,134 @@
+import { NavLink, useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  BILL,
+  BILL_ID,
+  KEY,
+  TABLE_ID,
+  USER_TYPE,
+  getFromLocalStorage,
+  removeFromLocalStorage,
+} from "../../functions/localStorage";
+import {
+  Badge,
+  Box,
+  Flex,
+  HStack,
+  Link as ChakraLink,
+  Text,
+  Button,
+} from "@chakra-ui/react";
+import { openCartModal } from "../../redux/features/cartSlice";
+import { clearAuth } from "../../services/auth";
+
+function NavItem({ to, children }) {
+  return (
+    <ChakraLink
+      as={NavLink}
+      to={to}
+      px={3}
+      py={2}
+      rounded="md"
+      fontWeight="semibold"
+      _hover={{ textDecoration: "none", bg: "orange.50" }}
+      _activeLink={{ bg: "orange.100", color: "orange.700" }}
+    >
+      {children}
+    </ChakraLink>
+  );
+}
+
+function NavAction({ onClick, children }) {
+  return (
+    <Button
+      onClick={onClick}
+      px={3}
+      py={2}
+      rounded="md"
+      fontWeight="semibold"
+      variant="outline"
+      colorScheme="orange"
+      _hover={{ bg: "orange.50" }}
+      _active={{ bg: "orange.100", color: "orange.700" }}
+    >
+      {children}
+    </Button>
+  );
+}
+
+export default function NavBar() {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const itemsCount = useSelector((state) => state.cart.items.length);
+  const totalAmount = useSelector((state) => state.cart.totalAmount);
+  const userType = getFromLocalStorage(USER_TYPE);
+  const isLocal = userType === "LOCAL";
+  const isKitchen = userType === "COCINA";
+
+  const handleOpenCart = () => {
+    dispatch(openCartModal());
+  };
+
+  const handleLogout = () => {
+    clearAuth();
+    removeFromLocalStorage(KEY);
+    removeFromLocalStorage(USER_TYPE);
+    removeFromLocalStorage(TABLE_ID);
+    removeFromLocalStorage(BILL_ID);
+    removeFromLocalStorage(BILL);
+    navigate("/", { replace: true });
+  };
+
+  return (
+    <Box
+      as="nav"
+      bg="whiteAlpha.900"
+      borderWidth="1px"
+      borderColor="orange.100"
+      rounded="xl"
+      px={4}
+      py={3}
+      mb={6}
+      boxShadow="sm"
+      backdropFilter="blur(6px)"
+    >
+      <Flex align="center" justify="space-between" gap={4} wrap="wrap">
+        <HStack spacing={2}>
+          {isLocal && (
+            <>
+              <NavItem to="/menu">Menu</NavItem>
+              <NavAction onClick={() => {}}>Llamar mozo</NavAction>
+            </>
+          )}
+
+          {!isLocal && (
+            <>
+              {isKitchen && <NavItem to="/kitchen">Cocina</NavItem>}
+              {isKitchen && <NavItem to="/update_menu">Cargar menú</NavItem>}
+              {!isKitchen && <NavItem to="/menu">Menu</NavItem>}
+              {!isKitchen && <NavItem to="/directions">Direcciones</NavItem>}
+              {!isKitchen && <NavItem to="/reserva">Reservas</NavItem>}
+            </>
+          )}
+        </HStack>
+
+        <HStack spacing={2}>
+          {!isKitchen && (
+            <Button onClick={handleOpenCart} colorScheme="orange" variant="solid" size="sm">
+              <HStack spacing={2}>
+                <Text>Carrito</Text>
+                <Badge colorScheme="whiteAlpha" bg="whiteAlpha.900" color="orange.700">
+                  {itemsCount}
+                </Badge>
+                {totalAmount > 0 && <Text fontWeight="semibold">- ${totalAmount}</Text>}
+              </HStack>
+            </Button>
+          )}
+          <Button onClick={handleLogout} variant="outline" colorScheme="orange" size="sm">
+            Cerrar sesión
+          </Button>
+        </HStack>
+      </Flex>
+    </Box>
+  );
+}

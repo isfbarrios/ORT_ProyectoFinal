@@ -7,7 +7,7 @@ export default function RequireAuth() {
 
   // Si no hay auth, o isLogged !== true → fuera
   if (!auth?.isLogged) {
-    return <Navigate to="/login" state={{ from: location }} replace />;
+    return <Navigate to="/" state={{ from: location }} replace />;
   }
 
   return <Outlet />;

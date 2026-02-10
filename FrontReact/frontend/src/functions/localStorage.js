@@ -1,7 +1,12 @@
 export const KEY = "auth";
 export const API_TOKEN = "API_TOKEN";
+export const API_REFRESH_TOKEN = "API_REFRESH_TOKEN";
 export const SESSION_ID = "SESSION_ID";
 export const API_URL = "http://localhost:8080/api";
+export const USER_TYPE = "USER_TYPE";
+export const TABLE_ID = "TABLE_ID"
+export const BILL_ID = "BILL_ID";
+export const BILL = "BILL";
 //export const API_URL = "https://platofuerte.lat/api";
 
 // GUARDAR DATO 
@@ -64,7 +69,8 @@ export async function safeJson(res) {
   const text = await res.text();
   try {
     return JSON.parse(text);
-  } catch {
+  }
+  catch {
     return { message: text || "Respuesta inválida del servidor" };
   }
 }

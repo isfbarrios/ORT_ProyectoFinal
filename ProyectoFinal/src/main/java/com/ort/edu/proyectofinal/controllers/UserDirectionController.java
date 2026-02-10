@@ -1,44 +1,68 @@
 package com.ort.edu.proyectofinal.controllers;
 
-import com.ort.edu.proyectofinal.CoreManager;
-import com.ort.edu.proyectofinal.dto.ResponseDTO;
-import com.ort.edu.proyectofinal.dto.UserDirectionRequestDTO;
-import com.ort.edu.proyectofinal.exception.AuthException;
-import com.ort.edu.proyectofinal.security.JwtUtil;
+import com.ort.edu.proyectofinal.dto.*;
+import com.ort.edu.proyectofinal.entities.User;
+import com.ort.edu.proyectofinal.repositories.UserDirectionRepository;
+import com.ort.edu.proyectofinal.repositories.UserRepository;
 import com.ort.edu.proyectofinal.services.UserDirectionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
+import java.util.List;
+import java.util.stream.Collectors;
+
 @RestController
 @RequestMapping("/api/user_direction")
 public class UserDirectionController {
 
     @Autowired
-    private JwtUtil jwtUtil;
-    @Autowired
     private UserDirectionService service;
 
-    private final CoreManager manager = CoreManager.getInstance();
+    @Autowired
+    private UserDirectionRepository repo;
+
+    @Autowired
+    private UserRepository userRepository;
+
+    @GetMapping
+    public ResponseEntity<?> getAll(Principal principal) {
+
+        String userName = principal.getName();
+
+        User user = userRepository.findByUsername(userName);
+
+        if (user == null) return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+
+        List<UserDirectionDTO> items = repo.findByUser_Id(user.getId())
+                .stream()
+                .map(UserDirectionDTO::new)
+                .collect(Collectors.toList());
+
+        UserDirectionsDTO directions = new UserDirectionsDTO(user.getUsername(), items);
+
+        return ResponseEntity.ok(directions);
+    }
 
     @PostMapping("/new_direction")
-    public ResponseEntity<?> saveDirection(
-            @RequestBody UserDirectionRequestDTO body,
-            @RequestHeader(value = "Authorization", required = false) String authHeader) {
+    public ResponseEntity<?> save(@RequestBody UserDirectionRequestDTO body, Principal principal) {
 
-        try {
-            manager.validateTokenJWT(jwtUtil, authHeader);
-        } catch (AuthException e) {
-            return ResponseEntity
-                    .status(HttpStatus.UNAUTHORIZED)
-                    .body(new ResponseDTO(e.getMessage()));
-        }
-
-        service.saveOrUpdate(body);
+        service.save(body, principal);
 
         return ResponseEntity.ok(
                 new ResponseDTO("Dirección guardada correctamente")
+        );
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> delete(@PathVariable Integer id, Principal principal) {
+
+        service.delete(id, principal);
+
+        return ResponseEntity.ok(
+                new ResponseDTO("Dirección eliminada correctamente")
         );
     }
 }

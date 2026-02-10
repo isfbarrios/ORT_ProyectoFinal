@@ -1,21 +1,37 @@
 import React, { useEffect, useState } from "react";
-import { motion } from "framer-motion";
 import { useDispatch, useSelector } from "react-redux";
+import {
+  Box,
+  Divider,
+  HStack,
+  Heading,
+  SimpleGrid,
+  Skeleton,
+  SkeletonText,
+  Text,
+  VStack,
+  Alert,
+  AlertIcon,
+  usePrefersReducedMotion,
+} from "@chakra-ui/react";
+import { motion } from "framer-motion";
 
 import { getMenuItemsByMenu } from "../services/menuService";
-import {
-  addItemToCartAsync,
-  fetchCartAsync,
+import { addItemToCartAsync } from "../redux/features/cartSlice";
+import MenuHeader from "../components/menu/MenuHeader";
+import MenuItemCard from "../components/menu/MenuItemCard";
+import MenuEmptyState from "../components/menu/MenuEmptyState";
 
-} from "../redux/features/cartSlice";
+export default function Menu({ menuId = 1, refreshKey = 0 }) {
 
-export default function Menu({ menuId = 1 }) {
   const dispatch = useDispatch();
   const cart = useSelector((state) => state.cart);
+  const shouldReduceMotion = usePrefersReducedMotion();
 
   const [items, setItems] = useState([]);
   const [loadingMenu, setLoadingMenu] = useState(true);
   const [errorMenu, setErrorMenu] = useState(null);
+  const [searchQuery, setSearchQuery] = useState("");
 
   // Cargar items del menú
   useEffect(() => {
@@ -35,129 +51,179 @@ export default function Menu({ menuId = 1 }) {
     };
 
     loadMenu();
-  }, [menuId]);
+  }, [menuId, refreshKey]);
 
   // Cargar carrito (si existe sesión)
-  useEffect(() => {
+  /*useEffect(() => {
     dispatch(fetchCartAsync());
-  }, [dispatch]);
+  }, [dispatch]);*/
 
   const handleAddToCart = (menuItemId) => {
     dispatch(addItemToCartAsync(menuItemId, 1));
   };
 
-  if (loadingMenu || cart.loading) {
-    return (
-      <div className="container mt-4 text-center">
-        <div className="spinner-border" role="status"></div>
-      </div>
-    );
-  }
+  const filteredItems = items.filter((item) =>
+    item.name.toLowerCase().includes(searchQuery.trim().toLowerCase())
+  );
 
-  if (errorMenu) {
-    return (
-      <div className="container mt-4">
-        <div className="alert alert-danger text-center">{errorMenu}</div>
-      </div>
-    );
-  }
+  const normalizeCategoryName = (value) =>
+    value?.toString().trim().toLowerCase();
+
+  const getCategoryKey = (item) => {
+    const typeName = normalizeCategoryName(item?.type?.name);
+    if (!typeName) return "otros";
+
+    if (typeName.includes("entrada") || typeName.includes("principal") || typeName.includes("comida") || typeName.includes("plato")) {
+      return "comidas";
+    }
+
+    if (typeName.includes("postre")) {
+      return "postres";
+    }
+
+    if (typeName.includes("bebida") || typeName.includes("refresco")) {
+      return "refrescos";
+    }
+
+    return "otros";
+  };
+
+  const groupedItems = filteredItems.reduce((acc, item) => {
+    const categoryKey = getCategoryKey(item);
+    if (!acc[categoryKey]) acc[categoryKey] = [];
+    acc[categoryKey].push(item);
+    return acc;
+  }, {});
+
+  const categoryOrder = [
+    { key: "comidas", label: "Comidas" },
+    { key: "postres", label: "Postres" },
+    { key: "refrescos", label: "Refrescos" },
+    { key: "otros", label: "Otros" },
+  ];
+
+  const containerVariants = {
+    hidden: {},
+    show: {
+      transition: {
+        staggerChildren: 0.08,
+      },
+    },
+  };
+
+  const sectionVariants = {
+    hidden: { opacity: 0, y: 12 },
+    show: {
+      opacity: 1,
+      y: 0,
+      transition: { duration: 0.4, ease: "easeOut" },
+    },
+  };
+
+  const skeletonItems = Array.from({ length: 6 }, (_, index) => index);
 
   return (
-    <div className="container mt-4">
-      <h2 className="mb-4 text-center">Menú del Restaurante</h2>
+    <Box>
+      <MenuHeader
+        searchQuery={searchQuery}
+        onSearchChange={setSearchQuery}
+      />
 
-      {/* Cards (vista “linda”) */}
-      <div className="row g-3">
-        {items.map((item) => (
-          <div className="col-12 col-md-6 col-lg-4" key={item.id}>
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.3 }}
-            >
-              <div className="card shadow-sm h-100">
-                <div className="card-body d-flex flex-column">
-                  <h5 className="card-title">{item.name}</h5>
-
-                  {item.description && (
-                    <p className="card-text text-muted">
-                      {item.description}
-                    </p>
-                  )}
-
-                  <div className="mt-auto">
-                    <p className="fw-bold fs-5">
-                      {item.basePrice !== undefined && item.basePrice !== null
-                        ? `$${item.basePrice.toFixed(2)}`
-                        : "—"}
-                    </p>
-
-                    <button
-                      className="btn btn-primary w-100"
-                      onClick={() => handleAddToCart(item.id)}
-                    >
-                      Añadir al pedido
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </motion.div>
-          </div>
-        ))}
-
-        {items.length === 0 && (
-          <div className="col-12">
-            <p className="text-center">
-              No hay ítems cargados para este menú.
-            </p>
-          </div>
-        )}
-      </div>
-
-      {/* Tabla (vista más “admin”) */}
-      <div className="table-responsive mt-4">
-        <table className="table table-striped table-bordered align-middle">
-          <thead className="table-dark">
-            <tr>
-              <th style={{ width: "50px" }}>ID</th>
-              <th>Nombre</th>
-              <th>Descripción</th>
-              <th style={{ width: "120px" }}>Precio</th>
-              <th style={{ width: "150px" }}></th>
-            </tr>
-          </thead>
-          <tbody>
-            {items.map((item) => (
-              <tr key={item.id}>
-                <td>{item.id}</td>
-                <td className="fw-semibold">{item.name}</td>
-                <td>{item.description || "—"}</td>
-                <td className="fw-bold">
-                  {item.basePrice !== undefined && item.basePrice !== null
-                    ? `$${item.basePrice.toFixed(2)}`
-                    : "—"}
-                </td>
-                <td>
-                  <button
-                    className="btn btn-primary w-100"
-                    onClick={() => handleAddToCart(item.id)}
-                  >
-                    Añadir al pedido
-                  </button>
-                </td>
-              </tr>
+      {loadingMenu && (
+        <VStack spacing={6} py={6} align="stretch">
+          <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} spacing={6}>
+            {skeletonItems.map((index) => (
+              <Box
+                key={`menu-skeleton-${index}`}
+                bg="white"
+                borderWidth="1px"
+                borderColor="orange.100"
+                rounded="2xl"
+                boxShadow="sm"
+                p={4}
+              >
+                <Skeleton height="22px" mb={3} borderRadius="full" />
+                <SkeletonText noOfLines={2} spacing="3" skeletonHeight="3" />
+                <Skeleton height="18px" mt={4} width="40%" borderRadius="full" />
+                <Skeleton height="36px" mt={4} borderRadius="full" />
+              </Box>
             ))}
+          </SimpleGrid>
+        </VStack>
+      )}
 
-            {items.length === 0 && (
-              <tr>
-                <td colSpan="5" className="text-center p-4">
-                  No hay items cargados para este menú.
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
-      </div>
-    </div>
+      {errorMenu && (
+        <Alert status="error" borderRadius="md" mb={6}>
+          <AlertIcon />
+          {errorMenu}
+        </Alert>
+      )}
+
+      {!loadingMenu && !errorMenu && filteredItems.length > 0 && (
+        <VStack
+          spacing={8}
+          align="stretch"
+          {...(shouldReduceMotion
+            ? {}
+            : {
+                as: motion.div,
+                initial: "hidden",
+                animate: "show",
+                variants: containerVariants,
+              })}
+        >
+          {categoryOrder.map((category) => {
+            const categoryItems = groupedItems[category.key] || [];
+            if (categoryItems.length === 0) return null;
+
+            return (
+              <Box
+                key={category.key}
+                bg="white"
+                borderWidth="1px"
+                borderColor="orange.100"
+                rounded="2xl"
+                boxShadow="sm"
+                p={{ base: 4, md: 5 }}
+                {...(shouldReduceMotion
+                  ? {}
+                  : {
+                      as: motion.div,
+                      variants: sectionVariants,
+                    })}
+              >
+                <HStack spacing={3} mb={4}>
+                  <Heading size="md" color="orange.700">
+                    {category.label}
+                  </Heading>
+                  <Divider borderColor="orange.100" />
+                  <Text color="gray.500" fontSize="sm">
+                    {categoryItems.length} ítem{categoryItems.length !== 1 ? "s" : ""}
+                  </Text>
+                </HStack>
+                <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} spacing={6}>
+                  {categoryItems.map((item) => (
+                    <MenuItemCard
+                      key={item.id}
+                      item={item}
+                      onAddToCart={handleAddToCart}
+                      isLoading={cart.loading}
+                    />
+                  ))}
+                </SimpleGrid>
+              </Box>
+            );
+          })}
+        </VStack>
+      )}
+
+      {!loadingMenu && !errorMenu && items.length === 0 && (
+        <MenuEmptyState message="No hay ítems cargados para este menú." />
+      )}
+
+      {!loadingMenu && !errorMenu && items.length > 0 && filteredItems.length === 0 && (
+        <MenuEmptyState message="No se encontraron platos con ese nombre." />
+      )}
+    </Box>
   );
 }

@@ -1,14 +1,12 @@
 package com.ort.edu.proyectofinal.dto;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.ort.edu.proyectofinal.entities.Cart;
 import com.ort.edu.proyectofinal.entities.Order;
-import com.ort.edu.proyectofinal.entities.Ordercanal;
 import com.ort.edu.proyectofinal.entities.Orderstate;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.Objects;
 
 @Getter
@@ -16,35 +14,32 @@ import java.util.Objects;
 public class OrderDTO {
 
     private Integer id;
-    private String orderNumber;
     private Cart cart;
-    private BigDecimal amount;
+    private LocalDateTime orderDate;
     private Orderstate state;
-    private Ordercanal canal;
-    private String description;
+    private String notes;
+    private LocalDateTime lastUpdate;
 
     public OrderDTO() {}
 
     public OrderDTO(Order order) {
         this.id = order.getId();
-        this.orderNumber = order.getOrderNumber();
         this.cart = order.getCart();
-        this.amount = order.getAmount();
+        this.orderDate = order.getOrderDate();
         this.state = order.getState();
-        this.canal = order.getCanal();
-        this.description = order.getDescription();
+        this.notes = order.getNotes();
+        this.lastUpdate = order.getLastUpdate();
     }
 
     @Override
     public String toString() {
         return "OrderDTO{" +
                 "id=" + id +
-                ", orderNumber='" + orderNumber + '\'' +
                 ", cart=" + cart +
-                ", amount=" + amount +
+                ", orderDate=" + orderDate +
                 ", state=" + state +
-                ", canal=" + canal +
-                ", description='" + description + '\'' +
+                ", notes='" + notes + '\'' +
+                ", lastUpdate=" + lastUpdate +
                 '}';
     }
 
@@ -52,11 +47,11 @@ public class OrderDTO {
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
         OrderDTO orderDTO = (OrderDTO) o;
-        return Objects.equals(id, orderDTO.id) && Objects.equals(orderNumber, orderDTO.orderNumber);
+        return Objects.equals(id, orderDTO.id) && Objects.equals(orderDate, orderDTO.orderDate);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, orderNumber);
+        return Objects.hash(id, orderDate);
     }
 }

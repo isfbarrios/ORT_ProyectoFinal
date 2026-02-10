@@ -48,8 +48,9 @@ export const saveUserDirectionAsync = (direction) => async (dispatch) => {
   try {
     const data = await saveUserDirection(direction);
     dispatch(saveDirectionSuccess(data));
-
+    return { data };
   } catch (error) {
     dispatch(saveDirectionError(error.message));
+    return { error: error.message };
   }
 };

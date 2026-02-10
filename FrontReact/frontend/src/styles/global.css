@@ -1,0 +1,75 @@
+@import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap");
+
+:root {
+  --brand-100: #fff3e0;
+  --brand-300: #ffb870;
+  --brand-500: #ff8a1a;
+  --brand-700: #d16a00;
+  --ink-900: #1f1a14;
+  --surface: #ffffff;
+  --surface-2: #fff7ec;
+  --ring: rgba(255, 138, 26, 0.35);
+  --shadow-soft: 0 8px 24px rgba(31, 26, 20, 0.08);
+  --font-sans: "Space Grotesk", sans-serif;
+}
+
+body {
+  font-family: var(--font-sans);
+  color: var(--ink-900);
+  background:
+    radial-gradient(1200px 400px at 10% -10%, #ffe6cc 0%, transparent 60%),
+    radial-gradient(900px 300px at 90% 0%, #fff0dd 0%, transparent 55%),
+    #fffaf5;
+}
+
+.app-shell {
+  padding: 1.5rem;
+  max-width: 960px;
+  margin: 0 auto;
+}
+
+.surface-card {
+  background: var(--surface);
+  border: 1px solid #ffe6cc;
+  border-radius: 14px;
+  box-shadow: var(--shadow-soft);
+}
+
+.focus-ring:focus-visible {
+  outline: 3px solid var(--ring);
+  outline-offset: 2px;
+}
+
+.swal-brand-popup {
+  background: var(--brand-100);
+}
+
+.swal-brand-button {
+  background: var(--brand-500);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 0.5rem 1rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.swal-brand-button:focus {
+  outline: 2px solid var(--brand-300);
+  outline-offset: 2px;
+}
+
+.swal-brand-table {
+  background: #fffaf2;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.swal-brand-table th {
+  background: #ffe6cc;
+  color: var(--ink-900);
+}
+
+.swal-brand-table td {
+  background: #fffaf2;
+}
